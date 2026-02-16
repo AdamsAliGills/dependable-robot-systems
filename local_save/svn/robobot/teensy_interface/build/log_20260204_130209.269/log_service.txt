@@ -1,0 +1,46 @@
+% Service logfile
+% 1 	Time (sec)
+% 2 	Message
+1770206538.2351 msg: # Mqtt data connection established
+1770206538.4370 msg: # Mqtt cmd connection established
+1770206538.4478 msg: Teensy connection just opened
+1770206529.2692 Setup finished OK=1
+1770206538.7479 msg: # SCurrent: subscribed to Teensy data
+1770206538.7479 msg: # SDistForce: subscribed to Teensy data
+1770206538.7479 msg: # SEdge: subscribed to Teensy data
+1770206538.7479 msg: # SEncoder: subscribed to Teensy data (pose and/or vel)
+1770206538.7480 msg: # SImu: subscribed to Teensy data (gyro and acc)
+1770206538.7480 msg: # SRobot:: subscribed to HBT
+1770206538.7480 msg: # STeensy: subscribed to Teensy data (id -> dname)
+1770207068.7967 msg: # SCurrent: subscribed to Teensy data
+1770207068.7967 msg: # SDistForce: subscribed to Teensy data
+1770207068.7967 msg: # SEdge: subscribed to Teensy data
+1770207068.7967 msg: # SEncoder: subscribed to Teensy data (pose and/or vel)
+1770207068.7967 msg: # SImu: subscribed to Teensy data (gyro and acc)
+1770207068.7967 msg: # SRobot:: subscribed to HBT
+1770207068.7967 msg: # STeensy: subscribed to Teensy data (id -> dname)
+1770207068.8033 msg: 1770207068.8033 NTP time glitch of 512.582 sec, maybe an NTP update
+
+1770207070.7155 new Master: (0) 2026-02-04 13:11:10.658149
+1770207070.7159 Log command: robobot/cmd/ti log 1
+1770207071.2128 Mixer order: robobot/cmd/ti rc 0.25 0.0
+1770207073.3169 Mixer order: robobot/cmd/ti rc 0.1 0.5
+1770207076.6209 Mixer order: robobot/cmd/ti rc 0 0
+1770207081.1945 Mixer order: robobot/cmd/ti rc 0 0
+1770207081.2711 Mixer order: robobot/cmd/ti rc 0 0
+1770207081.3237 Log command: robobot/cmd/ti log 0
+1770206538.5465 Lost Master, alive since 2026-02-04 13:11:10.658149
+1770207188.9600 new Master: (0) 2026-02-04 13:13:08.894325
+1770207189.0035 Log command: robobot/cmd/ti log 1
+1770207189.5249 Mixer order: robobot/cmd/ti rc 0.25 0.0
+1770207191.6294 Mixer order: robobot/cmd/ti rc 0.1 0.5
+1770207194.9339 Mixer order: robobot/cmd/ti rc 0 0
+1770207198.9703 Mixer order: robobot/cmd/ti rc 0 0
+1770207199.0428 Mixer order: robobot/cmd/ti rc 0 0
+1770207199.0933 Log command: robobot/cmd/ti log 0
+1770206538.5465 Lost Master, alive since 2026-02-04 13:13:08.894325
+1770207222.9750 msg: # SEncoder: subscribed to Teensy data (pose and/or vel)
+1770207239.7721 msg: 1770207239.7721 NTP time glitch of 18.369 sec, maybe an NTP update
+
+1770207258.2822 msg: # STeensy: close USB
+1770207223.5280 All terminated; closing logfile

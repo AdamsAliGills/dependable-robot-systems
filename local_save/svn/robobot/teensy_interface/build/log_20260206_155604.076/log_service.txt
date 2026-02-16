@@ -1,0 +1,38 @@
+% Service logfile
+% 1 	Time (sec)
+% 2 	Message
+1770389773.0438 msg: # Mqtt data connection established
+1770389773.2457 msg: # Mqtt cmd connection established
+1770389773.2565 msg: Teensy connection just opened
+1770389764.0761 Setup finished OK=1
+1770389773.5561 msg: # SCurrent: subscribed to Teensy data
+1770389773.5561 msg: # SDistForce: subscribed to Teensy data
+1770389773.5561 msg: # SEdge: subscribed to Teensy data
+1770389773.5561 msg: # SEncoder: subscribed to Teensy data (pose and/or vel)
+1770389773.5561 msg: # SImu: subscribed to Teensy data (gyro and acc)
+1770389773.5561 msg: # SRobot:: subscribed to HBT
+1770389773.5561 msg: # STeensy: subscribed to Teensy data (id -> dname)
+1770822230.6764 msg: 1770822230.6764 NTP time glitch of 432439.656 sec, maybe an NTP update
+
+1770822230.6839 msg: # SCurrent: subscribed to Teensy data
+1770822230.6839 msg: # SDistForce: subscribed to Teensy data
+1770822230.6839 msg: # SEdge: subscribed to Teensy data
+1770822230.6839 msg: # SImu: subscribed to Teensy data (gyro and acc)
+1770822230.6839 msg: # SRobot:: subscribed to HBT
+1770822230.6839 msg: # STeensy: subscribed to Teensy data (id -> dname)
+1770822677.7651 new Master: (0) 2026-02-11 16:11:17.711959
+1770822677.7652 Log command: robobot/cmd/ti log 1
+1770822678.5469 Mixer order: robobot/cmd/ti rc 0.25 0.0
+1770822680.6516 Mixer order: robobot/cmd/ti rc 0.1 0.5
+1770822682.7564 Mixer order: robobot/cmd/ti rc 0 0
+1770822682.8282 Mixer order: robobot/cmd/ti rc 0 0
+1770822682.8702 Log command: robobot/cmd/ti log 0
+1770389773.3546 Lost Master, alive since 2026-02-11 16:11:17.711959
+1770822718.2357 new Master: (0) 2026-02-11 16:11:58.184932
+1770822718.2772 Log command: robobot/cmd/ti log 1
+1770822719.0229 Mixer order: robobot/cmd/ti rc 0.25 0.0
+1770822721.1257 Mixer order: robobot/cmd/ti rc 0.1 0.5
+1770822724.4310 Mixer order: robobot/cmd/ti rc 0 0
+1770822728.9079 Mixer order: robobot/cmd/ti rc 0 0
+1770822728.9796 Mixer order: robobot/cmd/ti rc 0 0
+1770822729.0215 Log command: robobot/cmd/ti log 0

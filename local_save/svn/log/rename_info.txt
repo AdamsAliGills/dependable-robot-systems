@@ -1,0 +1,94 @@
+2026-02-02T22:01:43 CET
+Same hostname Oliver - all is fine.
+Test access to SSID DTUdevice
+no DTUdevice SSID found
+2026-02-03T16:08:06 CET
+Same hostname Oliver - all is fine.
+Test access to SSID DTUdevice
+no DTUdevice SSID found
+2026-02-03T17:57:58 CET
+New name is Oscar - so rename host from Oliver
+Test access to SSID DTUdevice
+no DTUdevice SSID found
+2026-02-03T17:59:21 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-03T17:59:24 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-03T17:59:26 CET
+Same hostname Oscar - all is fine.
+2026-02-03T17:59:28 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-03T17:59:30 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-04T12:43:07 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-04T13:02:08 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-04T13:13:49 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-04T15:28:35 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-06T15:56:02 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-11T16:30:45 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T15:07:42 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T15:33:16 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T15:44:01 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T16:31:05 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T17:38:19 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T18:10:13 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T18:12:36 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-13T18:16:46 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-16T10:58:49 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice
+2026-02-16T11:09:21 CET
+Same hostname Oscar - all is fine.
+Test access to SSID DTUdevice
+We are not connected, trying to connect to DTUdevice

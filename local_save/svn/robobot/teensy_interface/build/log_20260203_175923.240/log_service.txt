@@ -1,0 +1,14 @@
+% Service logfile
+% 1 	Time (sec)
+% 2 	Message
+1770138000.7366 msg: Teensy connection just opened
+1770137963.2402 Setup finished OK=1
+1770138001.0357 msg: # SCurrent: subscribed to Teensy data
+1770138001.0357 msg: # SDistForce: subscribed to Teensy data
+1770138001.0357 msg: # SEdge: subscribed to Teensy data
+1770138001.0357 msg: # SEncoder: subscribed to Teensy data (pose and/or vel)
+1770138001.0357 msg: # SImu: subscribed to Teensy data (gyro and acc)
+1770138001.0357 msg: # SRobot:: subscribed to HBT
+1770138001.0357 msg: # STeensy: subscribed to Teensy data (id -> dname)
+1770138075.6408 msg: # STeensy: close USB
+1770138074.6579 All terminated; closing logfile

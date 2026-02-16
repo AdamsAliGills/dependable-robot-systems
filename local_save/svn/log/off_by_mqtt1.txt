@@ -1,0 +1,128 @@
+# 20260203_160816.283 UService::setup: Started
+# UMqtt:: off_by_mqtt connected to MQTT broker localhost
+# Listening to MQTT)
+# at 2026-02-03 17:56:13.723 UMqtt:: Connection lost
+#     cause: (null)
+# At 2026-02-03 17:56:13.737; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770137773.7374 alive at 2026-02-03 17:56:13.737# At 2026-02-03 17:56:16.741; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770137776.7411 alive at 2026-02-03 17:56:16.741# At 2026-02-03 17:56:19.745; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770137779.7450 alive at 2026-02-03 17:56:19.745# 1770137782.7491 MQTT reconnect (2026-02-03 17:56:22.749)
+# 1770137782.7491 MQTT reconnected (2026-02-03 17:56:22.749)
+# At 2026-02-03 17:56:22.749; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770137782.7491 alive at 2026-02-03 17:56:22.749# at 2026-02-03 17:57:49.596 UMqtt:: Connection lost
+#     cause: (null)
+# 1770137869.9209 MQTT reconnect (2026-02-03 17:57:49.920)
+# UMqtt:: Waiting for Mosquitto (1)
+# at 2026-02-03 17:57:51.361 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
+# 20260203_175932.021 UService::setup: Started
+# UMqtt:: Waiting for Mosquitto (1) localhost
+# UMqtt:: Waiting for Mosquitto (2) localhost
+# UMqtt:: Waiting for Mosquitto (3) localhost
+# UMqtt:: Waiting for Mosquitto (4) localhost
+# UMqtt:: Waiting for Mosquitto (5) localhost
+# UMqtt:: Waiting for Mosquitto (6) localhost
+# UMqtt:: Waiting for Mosquitto (7) localhost
+# UMqtt:: Waiting for Mosquitto (8) localhost
+# UMqtt:: Waiting for Mosquitto (9) localhost
+# UMqtt:: Waiting for Mosquitto (10) localhost
+# UMqtt:: Waiting for Mosquitto (11) localhost
+# UMqtt:: Waiting for Mosquitto (12) localhost
+# UMqtt:: Waiting for Mosquitto (13) localhost
+# UMqtt:: Waiting for Mosquitto (14) localhost
+# UMqtt:: Waiting for Mosquitto (15) localhost
+# UMqtt:: Failed to connect, return code -1
+# Listening to MQTT)
+# at 2026-02-03 18:01:14.639 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
+# 20260203_175934.182 UService::setup: Started
+# UMqtt:: Waiting for Mosquitto (1) localhost
+# UMqtt:: Waiting for Mosquitto (2) localhost
+# UMqtt:: Waiting for Mosquitto (3) localhost
+# UMqtt:: Waiting for Mosquitto (4) localhost
+# UMqtt:: Waiting for Mosquitto (5) localhost
+# UMqtt:: Waiting for Mosquitto (6) localhost
+# UMqtt:: Waiting for Mosquitto (7) localhost
+# UMqtt:: Waiting for Mosquitto (8) localhost
+# UMqtt:: Waiting for Mosquitto (9) localhost
+# UMqtt:: Waiting for Mosquitto (10) localhost
+# UMqtt:: Waiting for Mosquitto (11) localhost
+# UMqtt:: Waiting for Mosquitto (12) localhost
+# UMqtt:: Waiting for Mosquitto (13) localhost
+# UMqtt:: Waiting for Mosquitto (14) localhost
+# UMqtt:: Waiting for Mosquitto (15) localhost
+# UMqtt:: Failed to connect, return code -1
+# Listening to MQTT)
+# at 2026-02-03 17:59:54.306 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
+# 20260203_175938.307 UService::setup: Started
+# UMqtt:: Waiting for Mosquitto (1) localhost
+# UMqtt:: Waiting for Mosquitto (2) localhost
+# UMqtt:: Waiting for Mosquitto (3) localhost
+# UMqtt:: Waiting for Mosquitto (4) localhost
+# UMqtt:: Waiting for Mosquitto (5) localhost
+# UMqtt:: Waiting for Mosquitto (6) localhost
+# UMqtt:: Waiting for Mosquitto (7) localhost
+# UMqtt:: Waiting for Mosquitto (8) localhost
+# UMqtt:: Waiting for Mosquitto (9) localhost
+# UMqtt:: Waiting for Mosquitto (10) localhost
+# UMqtt:: Waiting for Mosquitto (11) localhost
+# UMqtt:: Waiting for Mosquitto (12) localhost
+# UMqtt:: Waiting for Mosquitto (13) localhost
+# UMqtt:: Waiting for Mosquitto (14) localhost
+# UMqtt:: Waiting for Mosquitto (15) localhost
+# UMqtt:: Failed to connect, return code -1
+# Listening to MQTT)
+# at 2026-02-03 18:02:22.989 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
+# 20260204_130218.191 UService::setup: Started
+# UMqtt:: off_by_mqtt connected to MQTT broker localhost
+# Listening to MQTT)
+# at 2026-02-04 13:11:08.800 UMqtt:: Connection lost
+#     cause: (null)
+# At 2026-02-04 13:11:08.817; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770207068.8175 alive at 2026-02-04 13:11:08.817# At 2026-02-04 13:11:11.823; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770207071.8238 alive at 2026-02-04 13:11:11.823# At 2026-02-04 13:11:14.828; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770207074.8282 alive at 2026-02-04 13:11:14.828# 1770207077.8329 MQTT reconnect (2026-02-04 13:11:17.832)
+# 1770207077.8329 MQTT reconnected (2026-02-04 13:11:17.832)
+# At 2026-02-04 13:11:17.832; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770207077.8329 alive at 2026-02-04 13:11:17.832# at 2026-02-04 13:13:41.404 UMqtt:: Connection lost
+#     cause: (null)
+# 1770207222.1251 MQTT reconnect (2026-02-04 13:13:42.125)
+# UMqtt:: Waiting for Mosquitto (1)
+# at 2026-02-04 13:13:43.509 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
+# 20260213_150752.984 UService::setup: Started
+# UMqtt:: off_by_mqtt connected to MQTT broker localhost
+# Listening to MQTT)
+# at 2026-02-13 15:33:09.284 UMqtt:: Connection lost
+#     cause: (null)
+# at 2026-02-13 15:33:11.063 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
+# 20260213_163115.919 UService::setup: Started
+# UMqtt:: off_by_mqtt connected to MQTT broker localhost
+# Listening to MQTT)
+# at 2026-02-13 16:36:30.869 UMqtt:: Connection lost
+#     cause: (null)
+# At 2026-02-13 16:36:30.870; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770996990.8709 alive at 2026-02-13 16:36:30.870# At 2026-02-13 16:36:33.884; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770996993.8844 alive at 2026-02-13 16:36:33.884# At 2026-02-13 16:36:36.888; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770996996.8881 alive at 2026-02-13 16:36:36.888# 1770996999.8918 MQTT reconnect (2026-02-13 16:36:39.891)
+# 1770996999.8918 MQTT reconnected (2026-02-13 16:36:39.891)
+# At 2026-02-13 16:36:39.891; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1770996999.8918 alive at 2026-02-13 16:36:39.891# at 2026-02-13 17:38:12.638 UMqtt:: Connection lost
+#     cause: (null)
+# 1771000693.9233 MQTT reconnect (2026-02-13 17:38:13.923)
+# at 2026-02-13 17:38:14.261 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
+# 20260213_173829.525 UService::setup: Started
+# UMqtt:: off_by_mqtt connected to MQTT broker localhost
+# Listening to MQTT)
+# at 2026-02-13 18:10:07.016 UMqtt:: Connection lost
+#     cause: (null)
+# At 2026-02-13 18:10:07.880; failed (rc=-3) to publish robobot/off_by_mqtt/alive 1771002607.8804 alive at 2026-02-13 18:10:07.880# at 2026-02-13 18:10:08.666 Interrupted by signal 15
+# --------- terminating -----------
+# UMqtt:: client shutdown
+# end of service terminate
