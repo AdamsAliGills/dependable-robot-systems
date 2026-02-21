@@ -26,7 +26,7 @@ import time as t
 from datetime import *
 
 class SImu:
-
+    '''Raw IMU data from the robot.'''
     gyro = [0, 0, 0]
     gyroUpdCnt = 0
     gyroTime =datetime.now()
