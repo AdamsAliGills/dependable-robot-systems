@@ -127,6 +127,9 @@ def driveToLine():
     but in practice it will spin in circles cuz contoler
     is not properly implemented or something wrong with "robobot/cmd/ti", "rc 0.2 0.0"
 
+
+    aswell the sedge.py has it own isues
+
     """
     state = 0
     pose.tripBreset()
@@ -242,11 +245,11 @@ def loop():
 
     102(pi rotation)-->.
 
-    103(line following)-->
+    103(line following)-->.
 
-    0-->12-->14-->20-->99
-    (apperantly just running mqtt-client does some line following and imageAnalysis according  to defaults)
-    (needs to be properly tested tho .....)
+    0-->12-->14-->20-->99 (pertains to the button start???- it seems like it captures images like we have seen before)
+    (apperantly just running mqtt-client does some line following and imageAnalysis according to defaults tho)
+    (needs to be properly tested .....)
     """
     from ulog import flog
 
@@ -357,8 +360,18 @@ def loop():
 def main():
     """
     starts mqtt client using the service object from the uservice.py file
-    the service setup can use optional command line arguments procesed by
+    the service setup() can use optional command line arguments procesed by
     by bultin python argument parser object.
+
+    setup() includes the setup() for all other objects connected to
+    all the other scripts in the code
+        gpio.setup()
+        robot.setup()
+        ir.setup()
+        pose.setup()
+        imu.setup()
+        cam.setup()
+        edge.setup()
 
     loop() is called on start
     """
