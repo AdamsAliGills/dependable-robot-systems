@@ -6,8 +6,19 @@ class roundAbout():
     def __init__(self):
         self.name = "RoundAbout"
         self.state = 0
-        pose.tripBreset()
+        start_time = time.time()
+        while time.time() - start_time < 15:  # Run for 15 seconds
+            self.get_tilt()
+            time.sleep(0.1)  # optional: prevent 100% CPU usage
+                
+        
+
     
+
+    def get_tilt(self):
+        print(pose.pose[3])
+
+
     def execute(self):
         """Call this repeatedly from a loop - non-blocking state machine"""
         while not service.stop:
