@@ -22,7 +22,6 @@
 #* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 #* ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #* THE SOFTWARE. */
-
 #import sys
 #import threading
 import time as t
@@ -40,7 +39,8 @@ from sedge import edge
 from sgpio import gpio
 from scam import cam
 from uservice import service
-
+# Custom made mission functions
+from mission_planner import missionPlanner
 ############################################################
 
 def imageAnalysis(save):
@@ -181,7 +181,7 @@ def driveTurnPi():
     else:
       print(f"# drive turned {pose.tripBh:.3f} rad in {pose.tripBtimePassed():.3f} seconds")
       service.send("robobot/cmd/ti","rc 0.0 0.0") # (forward m/s, turn-rate rad/sec)
-      break;
+      break
     print(f"# turn {state}, now {pose.tripBh:.3f} rad in {pose.tripBtimePassed():.3f} seconds; left {edge.posLeft}, right {edge.posRight}")
     t.sleep(0.05)
   pass
@@ -205,6 +205,8 @@ def loop():
     state = 103 # find edge and follow line
   elif service.args.usestate > 0:
     state = service.args.usestate
+  elif service.args.OSCAR:
+    state = 999 # start OSCAR main
   print(f"% Starting at state {state}")
   # elif not service.args.now:
   #   print("% Ready, press start button")
@@ -259,6 +261,10 @@ def loop():
     elif state == 103:
       driveToLine()
       state = 100
+    elif state == 999:
+      missionPlanner()
+      state = 100
+
     else: # abort
       print(f"% Mission finished/aborted; state={state}")
       break
