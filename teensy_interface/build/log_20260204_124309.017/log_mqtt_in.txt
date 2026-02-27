@@ -1,0 +1,41 @@
+% mqtt logfile, enabled=true
+% broker=tcp://localhost:1883
+% context=drive
+% client id=tif_cmd
+% system=robobot/ (top level ID)
+% function=cmd/ (next level name)
+% 1 	Time (sec)
+% 2 	Quality of service 0=max once, 1=at least once, 2=once, S=subscribe
+% 3 	'Topic'
+% 4 	Message / payload
+1770205414.9602 0 drive robobot/cmd/ti log 1
+1770205415.0506 0 drive robobot/cmd/T0 enc0
+1770205415.0944 0 drive robobot/cmd/T0 confw 0.074 0.074 19 92 0.23
+1770205415.0945 0 drive robobot/cmd/T0 confi
+1770205415.4611 0 drive robobot/cmd/ti alive 2026-02-04 12:43:34.903417
+1770205415.9637 0 drive robobot/cmd/ti alive 2026-02-04 12:43:34.903417
+1770206485.4746 Fail to publish (-3, 0) 0, topic 'robobot/teensy_interface/alive', payload: 1770206485.4745 2026-02-04 13:01:25.474
+1770206487.4894 Fail to publish (-3, 1) 0, topic 'robobot/teensy_interface/alive', payload: 1770206487.4894 2026-02-04 13:01:27.489
+1770206489.4977 Fail to publish (-3, 2) 0, topic 'robobot/teensy_interface/alive', payload: 1770206489.4977 2026-02-04 13:01:29.497
+1770206489.4977 Reconnecting 2026-02-04 13:01:29.497
+1770206489.6894 S 1 robobot/cmd/#
+1770206491.5475 0 'robobot/teensy_interface/alive' 1770206491.5474 2026-02-04 13:01:31.547
+1770206493.5560 0 'robobot/teensy_interface/alive' 1770206493.5559 2026-02-04 13:01:33.555
+1770206495.5643 0 'robobot/teensy_interface/alive' 1770206495.5643 2026-02-04 13:01:35.564
+1770206497.5731 0 'robobot/teensy_interface/alive' 1770206497.5731 2026-02-04 13:01:37.573
+1770206499.5816 0 'robobot/teensy_interface/alive' 1770206499.5815 2026-02-04 13:01:39.581
+1770206501.5902 0 'robobot/teensy_interface/alive' 1770206501.5901 2026-02-04 13:01:41.590
+1770206503.5985 0 'robobot/teensy_interface/alive' 1770206503.5985 2026-02-04 13:01:43.598
+1770206505.6068 0 'robobot/teensy_interface/alive' 1770206505.6067 2026-02-04 13:01:45.606
+1770206507.6150 0 'robobot/teensy_interface/alive' 1770206507.6149 2026-02-04 13:01:47.614
+1770206509.6232 0 'robobot/teensy_interface/alive' 1770206509.6231 2026-02-04 13:01:49.623
+1770206511.6324 0 'robobot/teensy_interface/alive' 1770206511.6323 2026-02-04 13:01:51.632
+1770206513.6413 0 'robobot/teensy_interface/alive' 1770206513.6411 2026-02-04 13:01:53.641
+1770206515.6504 0 'robobot/teensy_interface/alive' 1770206515.6503 2026-02-04 13:01:55.650
+1770206517.6603 0 'robobot/teensy_interface/alive' 1770206517.6602 2026-02-04 13:01:57.660
+1770206519.6694 0 'robobot/teensy_interface/alive' 1770206519.6693 2026-02-04 13:01:59.669
+1770206520.3096 1 drive robobot/cmd/ti 1770206520.3092 log 1
+1770206520.3109 1 drive robobot/cmd/shutdown 1770206520.3092 GPIO button
+1770206521.6798 Fail to publish (-3, 3) 0, topic 'robobot/teensy_interface/alive', payload: 1770206521.6798 2026-02-04 13:02:01.679
+1770206521.6798 Reconnecting 2026-02-04 13:02:01.679
+1770206540.1987 Failed (-1) to connect to to MQTT server at 2026-02-04 13:02:20.198

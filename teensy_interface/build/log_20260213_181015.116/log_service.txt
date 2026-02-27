@@ -1,0 +1,9 @@
+% Service logfile
+% 1 	Time (sec)
+% 2 	Message
+1771002623.8906 msg: # Mqtt data connection established
+1771002624.0958 msg: # Mqtt cmd connection established
+1771002624.1066 msg: Teensy connection just opened
+1771002615.1161 Setup finished OK=0
+1771002632.3500 msg: # STeensy: close USB
+1771002628.3503 All terminated; closing logfile

@@ -1,0 +1,7 @@
+% Service logfile
+% 1 	Time (sec)
+% 2 	Message
+1770138001.6341 msg: Teensy connection just opened
+1770137965.2944 Setup finished OK=1
+1770138004.7320 msg: # STeensy: close USB
+1770138001.7329 All terminated; closing logfile
