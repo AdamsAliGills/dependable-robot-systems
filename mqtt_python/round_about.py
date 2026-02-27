@@ -4,11 +4,12 @@ import time
 from simu import imu
 
 class roundAbout():
-    def __init__(self):
+    def __init__(self, target_angle: float):
         '''Constructor for the roundAbout mission'''
         self.name = "RoundAbout"
         self.starting_tilt = pose.pose[3]*180.0/3.14159 # store the original tilt in degrees
         self.state = 0
+        self.target_angle = target_angle
         print()
         print()
         print()
@@ -90,31 +91,23 @@ class roundAbout():
                 print(self.get_delta_tilt())
             
             elif self.state == 11:
-                print(11)
+                # start turning 90 degrees
                 self.start_yaw = self.get_yaw()
+                service.send("robobot/cmd/ti", "rc 0.0 0.7")
                 self.state = 12
-                continue
-                service.send("robobot/cmd/ti", "rc 0.0 0.7") # start turning 90 degrees
-                self.state = 12
+
             elif self.state == 12:
-                print(12)
-                #if self.get_yaw() >= self.start_yaw + 80:
-                if True:
+                # when 90 degrees are reached, start rotating
+                if self.get_yaw() >= self.start_yaw + 80: # 80 because it overshoots a bit
                     radius = -0.3 # radius of the roundabout in meters
                     speed = 0.2 # speed for the roundabout in meters/second
                     service.send("robobot/cmd/ti", f"rc {speed} {speed/radius}")
                     self.start_yaw = self.get_yaw()
                     self.state = 13
+
             elif self.state == 13:
-                print(13)
-                if self.get_yaw() <= self.start_yaw - (360 - 45):
-                    service.send("robobot/cmd/ti", "rc 0.0 0.7")
-                    self.start_yaw = self.get_yaw()
-                    self.state = 99
-            elif self.state == 14:
-                print(14)
-                if self.get_yaw() >= self.start_yaw + 90:
-                    service.send("robobot/cmd/ti", "rc 0.0 0.0")
+                # when the target angle (minus 45 degrees) is reached, finish
+                if self.get_yaw() <= self.start_yaw - (self.target_angle - 45):
                     self.state = 99
 
             else:
