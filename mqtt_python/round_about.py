@@ -1,7 +1,8 @@
 from uservice import service
 from spose import pose
-import time
 from simu import imu
+import time
+import math
 
 class roundAbout():
     def __init__(self, target_angle: float):
@@ -93,21 +94,23 @@ class roundAbout():
             elif self.state == 11:
                 # start turning 90 degrees
                 self.start_yaw = self.get_yaw()
-                service.send("robobot/cmd/ti", "rc 0.0 0.7")
+                angular_speed = math.copysign(0.7, -self.target_angle)
+                service.send("robobot/cmd/ti", f"rc 0.0 {angular_speed}")
                 self.state = 12
 
             elif self.state == 12:
                 # when 90 degrees are reached, start rotating
-                if self.get_yaw() >= self.start_yaw + 80: # 80 because it overshoots a bit
-                    radius = -0.3 # radius of the roundabout in meters
+                if abs(self.get_yaw() - self.start_yaw) >= 80: # 80 because it overshoots a bit
+                    radius = 0.3 # radius of the roundabout in meters
                     speed = 0.2 # speed for the roundabout in meters/second
-                    service.send("robobot/cmd/ti", f"rc {speed} {speed/radius}")
+                    angular_speed = math.copysign(speed/radius, self.target_angle)
+                    service.send("robobot/cmd/ti", f"rc {speed} {angular_speed}")
                     self.start_yaw = self.get_yaw()
                     self.state = 13
 
             elif self.state == 13:
                 # when the target angle (minus 45 degrees) is reached, finish
-                if self.get_yaw() <= self.start_yaw - (self.target_angle - 45):
+                if abs(self.get_yaw() - self.start_yaw) >= abs(self.target_angle) - 45:
                     self.state = 99
 
             else:
