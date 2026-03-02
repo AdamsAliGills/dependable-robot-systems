@@ -96,6 +96,8 @@ class UService:
                 help='Turn 180 degrees (Pi) and stop')
     self.parser.add_argument('-e', '--edge', action='store_true',
                 help='Find line and follow the left edge')
+    self.parser.add_argument('-o', '--oscar', action='store_true',
+                help='Run the Oscar mission planner')
     self.parser.add_argument('-u', '--usestate', type=int, default = 0,
                 help='set mission state to this value')
     self.args = self.parser.parse_args()
