@@ -205,7 +205,7 @@ def loop():
     state = 103 # find edge and follow line
   elif service.args.usestate > 0:
     state = service.args.usestate
-  elif service.args.OSCAR:
+  elif service.args.oscar:
     state = 999 # start OSCAR main
   print(f"% Starting at state {state}")
   # elif not service.args.now:

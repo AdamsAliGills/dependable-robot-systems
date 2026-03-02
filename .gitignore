@@ -1,0 +1,3 @@
+*.pyc
+.venv/*
+mqtt_python/*.jpg
