@@ -1,6 +1,6 @@
 from uservice import service
 from round_about import roundAbout
-from ball_in_hole import ballInHole
+
 class missionPlanner():
     def __init__(self):
         try:
@@ -15,11 +15,4 @@ class missionPlanner():
     def roundAboutCaller(self):
         '''Caller for the roundabout mission'''
         return roundAbout()
-    
-    def seeSawCaller(self):
-        pass
-
-    def ballInHoleCaller(self):
-        '''Caller for the ball in hole mission'''
-        return ballInHole()
 
