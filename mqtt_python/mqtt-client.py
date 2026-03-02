@@ -66,7 +66,7 @@ def stateTimePassed():
 def driveToLine():
     """
     now it just has an ir threashold for anything less than 0.2
-    0.2 is a dark constant that wont change with calibration script
+    0.2 is a distance that wont change with calibration script
 
     if ir < 0.2 we commad it to move forward
     but in practice it will spin in circles cuz contoler
@@ -74,6 +74,7 @@ def driveToLine():
     implements unstable controller either from poor desgin choice
     or poor calibration
 
+    if line lineValidCnt less than 4 then it will just move straight for abit
     """
     state = 0
     pose.tripBreset()
