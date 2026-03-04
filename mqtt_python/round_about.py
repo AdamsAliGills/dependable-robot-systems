@@ -32,7 +32,7 @@ class roundAbout():
         '''Constructor for the roundAbout mission'''
         self.name = "RoundAbout"
         self.starting_tilt = pose.pose[3]*180.0/3.14159 # store the original tilt in degrees
-        self.state = 11
+        self.state = 0 #0 for kris's code, 11 for stefanos 
         self.target_angle = target_angle
         print()
         print("creating roundAbout")
@@ -55,7 +55,7 @@ class roundAbout():
     def get_delta_tilt(self):
         '''Gets the tilt and returns it in degrees'''
         tilt_old = pose.pose[3]*180.0/3.14159 #radians to degrees
-        time.sleep(1)
+        time.sleep(0.3)
         tilt_new = pose.pose[3]*180.0/3.14159 #radians to degrees
         delta_tilt = abs(tilt_new - tilt_old)
         return delta_tilt
@@ -68,15 +68,17 @@ class roundAbout():
         print("% RoundAbout: starting")
         while not service.stop:
             if self.state == 0:  # approach until tilt detected
-                service.send("robobot/cmd/ti", "rc 0.3 0.0")
+                print("############################################################")
+                print(f"Starting tilt at GND: {pose.pose[3]*180.0/3.14159}")
+                print("############################################################")
+                service.send("robobot/cmd/ti", "rc 0.05 0.0")
                 self.state = 1
             elif self.state == 1:  # wait until front wheel hits ramp
                 if self.get_delta_tilt() > 2:
                     self.state = 2
-                print()
-                print(f"Current tilt: {pose.pose[3]*180.0/3.14159}")
-                print()
-                time.sleep(2)
+                    print("############################################################")
+                    print(f"HIT RAMP, TILT: {pose.pose[3]*180.0/3.14159}")
+                    print("############################################################")
             elif self.state == 2:  # slow down to climb
                 service.send("robobot/cmd/ti", "rc 0.1 0.0")
                 self.state = 3
@@ -84,9 +86,9 @@ class roundAbout():
             elif self.state == 3:  # wait until fully on roundabout
                 if abs(self.starting_tilt - (pose.pose[3]*180.0/3.14159)) < 3:
                     service.send("robobot/cmd/ti", "rc 0.0 0.0")
-                    print()
-                    print(f"On roundabout tilt: {pose.pose[3]*180.0/3.14159}")
-                    print()
+                    print("############################################################")
+                    print(f"ON ROUNDABOUT, TILT: {pose.pose[3]*180.0/3.14159}")
+                    print("############################################################")
                     print("% RoundAbout: on platform, starting turn")
                     self.state = 99
                     print("")
