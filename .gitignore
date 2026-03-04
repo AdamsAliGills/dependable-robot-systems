@@ -1,3 +1,6 @@
 *.pyc
 .venv/*
-mqtt_python/*.jpg
+mqtt_python/*.jpglocal_save/
+local_save_editable/
+oscar_program/
+local_save/
