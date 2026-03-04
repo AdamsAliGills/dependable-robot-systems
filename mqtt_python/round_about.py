@@ -4,27 +4,40 @@ from simu import imu
 import time
 import math
 
+
+from sedge import edge
+from sir import ir
+
+def driveToLine():
+  state = 0
+  dist_to_line = 0;
+  print("% Driving to line ---------------------- right ir start ---")
+  service.send("robobot/cmd/T0", "leds 16 0 100 0") # green
+  while not (service.stop):
+    if state == 0: # forward towards line
+      service.send("robobot/cmd/ti","rc 0.2 0.0") # (forward m/s, turn-rate rad/sec)
+      state = 1
+    elif state == 1:
+      if edge.lineValidCnt > 4:
+        # start follow line
+        edge.lineControl(0.2, True)
+        service.send("robobot/cmd/T0","servo 1 0 0") # (move servo to position 0 - front)
+    time.sleep(0.01)
+  pass
+  service.send("robobot/cmd/T0","leds 16 0 0 0") # end
+  print("% Driving to line ------------------------- end")
+
 class roundAbout():
     def __init__(self, target_angle: float):
         '''Constructor for the roundAbout mission'''
         self.name = "RoundAbout"
         self.starting_tilt = pose.pose[3]*180.0/3.14159 # store the original tilt in degrees
-        self.state = 0
+        self.state = 11
         self.target_angle = target_angle
         print()
+        print("creating roundAbout")
         print()
-        print()
-        print()
-        print()
-        print()
-        print(f"Current tilt: {self.starting_tilt}")
-        print()
-        print()
-        print()
-        print()
-        print()
-        print()
-                
+        
 
     def print_current_tilt(self):
         '''Prints the current tilt of the robot in degrees'''
@@ -100,8 +113,9 @@ class roundAbout():
 
             elif self.state == 12:
                 # when 90 degrees are reached, start rotating
+                print(abs(self.get_yaw() - self.start_yaw))
                 if abs(self.get_yaw() - self.start_yaw) >= 80: # 80 because it overshoots a bit
-                    radius = 0.3 # radius of the roundabout in meters
+                    radius = 0.33 # radius of the roundabout in meters
                     speed = 0.2 # speed for the roundabout in meters/second
                     angular_speed = math.copysign(speed/radius, self.target_angle)
                     service.send("robobot/cmd/ti", f"rc {speed} {angular_speed}")
@@ -109,13 +123,15 @@ class roundAbout():
                     self.state = 13
 
             elif self.state == 13:
+                print(abs(self.get_yaw() - self.start_yaw))
                 # when the target angle (minus 45 degrees) is reached, finish
-                if abs(self.get_yaw() - self.start_yaw) >= abs(self.target_angle) - 45:
+                if abs(self.get_yaw() - self.start_yaw) >= abs(self.target_angle) - 75:
                     self.state = 99
 
             else:
                 service.send("robobot/cmd/ti", "rc 0.0 0.0")
                 print("% RoundAbout: complete")
+                driveToLine()
                 break
             #time.sleep(0.05)
         print(f"% On roundabout, starting to turn.")
