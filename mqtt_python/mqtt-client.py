@@ -41,7 +41,7 @@ from scam import cam
 from uservice import service
 
 # Custom made mission functions
-from mission_planner import missionPlanner
+# from mission_planner import missionPlanner
 
 
 """
@@ -158,7 +158,7 @@ def loop():
 
     while not (service.stop):
         if state == 0:
-            edge.print()
+            edge.printn()
         elif state == 103:
             driveToLine()
             state = 100
