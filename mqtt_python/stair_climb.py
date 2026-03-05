@@ -18,7 +18,7 @@ class stairClimb():
             
             if self.state == 0:
                 # move servo to straight position
-                service.send("robobot/cmd/T0", "servo 1 -200 300")
+                service.send("robobot/cmd/T0", "servo 1 -150 300")
                 self.state = 1
             elif self.state == 1:  # wait until first step is detected
                 if ir.ir[0] < 0.09:
@@ -26,7 +26,7 @@ class stairClimb():
                     edge.lineControl(0)
                     service.send("robobot/cmd/ti", "rc 0.2 0.0")
                     # move servo down
-                    service.send("robobot/cmd/T0", "servo 1 -200 300")
+                    service.send("robobot/cmd/T0", "servo 1 -700 300")
                     self.state = 2
 
             else:
