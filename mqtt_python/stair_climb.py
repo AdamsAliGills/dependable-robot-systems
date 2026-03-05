@@ -24,12 +24,13 @@ class stairClimb():
                     edge.lineControl(0)
                     service.send("robobot/cmd/ti", "rc 0.2 0.0")
                     # move servo down
-                    service.send("robobot/cmd/T0", "servo 1 -700 300")
+                    service.send("robobot/cmd/T0", "servo 1 700 300")
                     self.state = 2
 
             else:
-                service.send("robobot/cmd/T0", "servo 1 10000 10000") #disable servo
-                print("% Stair climb: complete")
-                break
+                #service.send("robobot/cmd/T0", "servo 1 10000 10000") #disable servo
+                #print("% Stair climb: complete")
+                #break
+                pass
             time.sleep(0.05)
 
