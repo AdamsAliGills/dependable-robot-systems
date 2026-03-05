@@ -158,10 +158,7 @@ def loop():
 
     while not (service.stop):
         if state == 0:
-            print("no args besides edge does anything")
-            # edge line sensor values
-            print(f"line sensor values:{edge.edge}")
-            break
+            edge.print()
         elif state == 103:
             driveToLine()
             state = 100
@@ -174,7 +171,7 @@ def loop():
             print(f"% State change from {oldstate} to {state}")
             oldstate = state
             stateTime = datetime.now()
-        t.sleep(0.1)
+        t.sleep(1)
         pass  # end of while loop
 
     # end of mission, turn LEDs off and stop
