@@ -14,7 +14,8 @@ class missionPlanner():
 
     def roundAboutCaller(self):
         '''Caller for the roundabout mission'''
-        return roundAbout()
+        r = roundAbout()
+        r.execute()
     
     def seeSawCaller(self):
         '''Caller for the see saw mission'''

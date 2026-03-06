@@ -38,7 +38,6 @@ class roundAbout():
         print("-----------------------------------------")
         print("INITIALIZING ROUNDABOUT MISSION")
         print("-----------------------------------------")
-        self.execute()
 
     def logger(self):
         '''Logs the tilt to a loggings_.txt file for debugging'''
