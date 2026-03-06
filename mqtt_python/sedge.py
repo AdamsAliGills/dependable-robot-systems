@@ -70,8 +70,11 @@ class SEdge:
     lineCtrl = False  # private
     # try with a P-Lead controller
     lineKp = 1
-    lineTauZ = 0.8
-    lineTauP = 0.25
+    lineKd = 0.2
+    e_prev = 0
+    tau = 0.15
+    # lineTauZ = 0.8
+    # lineTauP = 0.25
     # Lead pre-calculated factors
     tauP2pT = 1.0
     tauP2mT = 0.0
@@ -375,9 +378,9 @@ class SEdge:
 
         # some parameters depend on sample time, adjust
         # print(f"LineCtrl:: sample time {self.edge_nInterval}")
-        if abs(self.edge_nInterval - self.edgeIntervalSetup) > 2.0:  # ms
-            self.PIDrecalculate()
-            self.edgeIntervalSetup = self.edge_nInterval
+        # if abs(self.edge_nInterval - self.edgeIntervalSetup) > 2.0:  # ms
+        # self.PIDrecalculate()
+        # self.edgeIntervalSetup = self.edge_nInterva
         if self.followLeft:
             e = self.refPosition - self.posLeft
         else:
@@ -387,9 +390,18 @@ class SEdge:
         # To correct we need a negative turn rate (CV),
         # so sign of e is OK
         #
-        # calculate action (P-Lead controller)
-        self.u = self.lineKp * e  # error times Kp
+        self.lineKp_next = self.lineKp * e  # error times Kp
+        self.line_e_dervative = (e - self.e_prev) / self.edge_nInterval
+        self.lineKd_filter_next = (
+            self.lineKd * self.line_e_dervative + self.tau * self.lineKd_filter
+        ) / (self.edge_nInterval + self.tau)
+        self.e_prev = e
+        self.lineKp = self.lineKp_next
+        self.lineKd_filter = self.lineKd_filter_next
+
+        self.linePD = self.lineKp_next + self.lineKd_filter_next
         # Lead filter
+        """
         self.lineY = (
             self.u * self.tauZ2pT
             - self.lineE1 * self.tauZ2mT
@@ -404,7 +416,8 @@ class SEdge:
         self.lineE1 = self.u
         self.lineY1 = self.lineY
         # make response
-        par = f"rc {self.velocity:.3f} {self.lineY:.3f} {t.time()}"
+        """
+        par = f"rc {self.velocity:.3f} {self.linePD:.3f} {t.time()}"
         # debug - no action, go straight
         # par = f"{self.velocity:.3f} 0 {t.time()}"
         # debug end
