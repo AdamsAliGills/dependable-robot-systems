@@ -1,31 +1,10 @@
 from uservice import service
 from spose import pose
+from sedge import edge
 from simu import imu
 import time
 import math
 
-
-from sedge import edge
-from sir import ir
-
-def driveToLine():
-  state = 0
-  dist_to_line = 0;
-  print("% Driving to line ---------------------- right ir start ---")
-  service.send("robobot/cmd/T0", "leds 16 0 100 0") # green
-  while not (service.stop):
-    if state == 0: # forward towards line
-      service.send("robobot/cmd/ti","rc 0.2 0.0") # (forward m/s, turn-rate rad/sec)
-      state = 1
-    elif state == 1:
-      if edge.lineValidCnt > 4:
-        # start follow line
-        edge.lineControl(0.2, True)
-        service.send("robobot/cmd/T0","servo 1 0 0") # (move servo to position 0 - front)
-    time.sleep(0.01)
-  pass
-  service.send("robobot/cmd/T0","leds 16 0 0 0") # end
-  print("% Driving to line ------------------------- end")
 
 class roundAbout():
     def __init__(self, target_angle: float):
@@ -101,7 +80,6 @@ class roundAbout():
 
             elif self.state == 12:
                 # when 90 degrees are reached, start rotating
-                print(abs(self.get_yaw() - self.start_yaw))
                 if abs(self.get_yaw() - self.start_yaw) >= 80:  # 80 because it overshoots a bit
                     radius = 0.33  # radius of the roundabout in meters
                     speed = 0.2   # speed for the roundabout in meters/second
@@ -111,15 +89,19 @@ class roundAbout():
                     self.state = 13
 
             elif self.state == 13:
-                print(abs(self.get_yaw() - self.start_yaw))
-                # when the target angle (minus 45 degrees) is reached, finish
+                # when the target angle (minus 45 degrees) is reached, exit going straight
                 if abs(self.get_yaw() - self.start_yaw) >= abs(self.target_angle) - 75:
+                    self.state = 14
+                    service.send("robobot/cmd/ti","rc 0.2 0.0")
+
+            elif self.state == 14:
+                # when the line is found, start following it
+                if edge.lineValidCnt > 4:
+                    edge.lineControl(0.2, True) # start follow line
                     self.state = 99
 
             else:
-                service.send("robobot/cmd/ti", "rc 0.0 0.0")
                 print("% RoundAbout: complete")
-                driveToLine()
                 break
+
             time.sleep(0.05)
-        print(f"% On roundabout, starting to turn.")
