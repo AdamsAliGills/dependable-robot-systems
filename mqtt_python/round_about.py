@@ -78,7 +78,7 @@ class roundAbout():
         print("% RoundAbout: starting")
         while not service.stop:
             if self.state == 0:  # TODO: Synchronize this state with line following mission
-                service.send("robobot/cmd/ti", "rc 0.2 0.0") #TODO: Remove this line
+                edge.lineControl(0.2)
                 self.state = 1 
 
             elif self.state == 1:
@@ -93,6 +93,7 @@ class roundAbout():
                 print("-----------------------------------------")
                 print(f"Detected roundabount, tilt @ {current_tilt:.4f}...")
                 print("-----------------------------------------") 
+                edge.lineControl(0)
                 service.send("robobot/cmd/ti", "rc 0.05 0.0")
                 self.state = 3
 
