@@ -28,12 +28,12 @@ def driveToLine():
   print("% Driving to line ------------------------- end")
 
 class roundAbout():
-    def __init__(self):
+    def __init__(self, target_angle: float):
         '''Constructor for the roundAbout mission'''
         self.name = "RoundAbout"
         self.starting_tilt = abs(pose.pose[3]*180.0/3.14159) # store the original tilt in degrees
         self.state = 0
-        self.target_angle = 180
+        self.target_angle = target_angle
         self.stable_count = 0
         print("-----------------------------------------")
         print("INITIALIZING ROUNDABOUT MISSION")

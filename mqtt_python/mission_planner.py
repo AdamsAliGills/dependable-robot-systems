@@ -14,7 +14,7 @@ class missionPlanner():
 
     def roundAboutCaller(self):
         '''Caller for the roundabout mission'''
-        r = roundAbout()
+        r = roundAbout(135)
         r.execute()
     
     def seeSawCaller(self):
