@@ -425,10 +425,10 @@ class SEdge:
             "robobot/cmd/ti", par
         )  # send new turn command, maintaining velocity
         # debug print
-        if True:  # self.edge_nUpdCnt % 20 == 0:
-            print(
-                f"% Edge::followLine: ctrl: e={e:.3f}, u={self.u:.3f}, y={self.lineY:.3f}, cnt {self.lineValidCnt}, -> {par}"
-            )
+        # if True:  # self.edge_nUpdCnt % 20 == 0:
+        # print(
+        #    f"% Edge::followLine: ctrl: e={e:.3f}, u={self.u:.3f}, y={self.lineY:.3f}, cnt {self.lineValidCnt}, -> {par}"
+        # )
 
     ##########################################################
 
