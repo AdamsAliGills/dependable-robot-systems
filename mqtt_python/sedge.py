@@ -417,6 +417,10 @@ class SEdge:
         self.lineY1 = self.lineY
         # make response
         """
+        if self.linePD > 4:
+            self.linePD = 4
+        elif self.linePD < -4:
+            self.linePD = -4
         par = f"rc {self.velocity:.3f} {self.linePD:.3f} {t.time()}"
         # debug - no action, go straight
         # par = f"{self.velocity:.3f} 0 {t.time()}"
