@@ -11,7 +11,7 @@ class missionPlanner():
 
     def planMission(self):
         print(f"Mission planner is planning the mission...")
-
+        self.roundAboutCaller()
     def roundAboutCaller(self):
         '''Caller for the roundabout mission'''
         r = roundAbout(135)

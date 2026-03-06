@@ -31,7 +31,6 @@ class roundAbout():
     def __init__(self, target_angle: float):
         '''Constructor for the roundAbout mission'''
         self.name = "RoundAbout"
-        self.starting_tilt = abs(pose.pose[3]*180.0/3.14159) # store the original tilt in degrees
         self.state = 0
         self.target_angle = target_angle
         self.stable_count = 0
@@ -39,28 +38,20 @@ class roundAbout():
         print("INITIALIZING ROUNDABOUT MISSION")
         print("-----------------------------------------")
 
-    def logger(self):
+    def setup_logger(self):
         '''Logs the tilt to a loggings_.txt file for debugging'''
                 # determine log file name (don't overwrite existing)
-        log_path = "loggings.txt"
+        log_path = "loggings_IMU.txt"
         counter = 1
         while True:
             try:
                 open(log_path, "x").close()  # "x" mode fails if file already exists
                 break
             except FileExistsError:
-                log_path = f"loggings_{counter}.txt"
+                log_path = f"loggings_IMU{counter}.txt"
                 counter += 1
 
-        print(f"Logging tilt to {log_path} ...")
-        with open(log_path, "w") as f:
-            while not service.stop:
-                tilt = abs(pose.pose[3] * 180.0 / 3.14159)
-                timestamp = time.strftime("%H:%M:%S")
-                line = f"{timestamp}, {tilt:.6f}\n"
-                f.write(line)
-                f.flush()
-                time.sleep(0.1)
+        self.f = open(log_path, "w")
 
     def get_delta_tilt(self):
         '''Gets the tilt and returns it in degrees'''
@@ -76,47 +67,31 @@ class roundAbout():
     def execute(self):
         """Call this repeatedly from a loop - non-blocking state machine"""
         print("% RoundAbout: starting")
+        self.setup_logger()
         while not service.stop:
+
+            imu_tilt = imu.gyroIntegral[1]
+            timestamp = time.strftime(f"{time.time() % 60}")
+            line = f"{timestamp}, {imu_tilt:.6f}\n"
+            self.f.write(line)
+            self.f.flush()
+
+            time.sleep(0.1)
             if self.state == 0:  # TODO: Synchronize this state with line following mission
                 edge.lineControl(0.2)
-                self.state = 1 
+                self.starting_tilt = imu.gyroIntegral[1] # store the original tilt in degrees
+                self.state = 1
 
             elif self.state == 1:
-                current_tilt = abs(pose.pose[3]*180.0/3.14159)
-                drop = self.starting_tilt - current_tilt
-                print(f"Tilt: {current_tilt:.4f}  Drop: {drop:.4f}") 
-                if drop > 3:  # Estimate threshold for detecting the drop into the roundabout, based on trial and error
+                current_tilt = imu.gyroIntegral[1]
+                if current_tilt < self.starting_tilt - 3:
                     self.state = 2
-                    print(f"Detected drop of {drop:.4f} degrees. Current tilt: {current_tilt:.4f} degrees.")
-               
             elif self.state == 2:  # slow down to climb
-                print("-----------------------------------------")
-                print(f"Detected roundabount, tilt @ {current_tilt:.4f}...")
-                print("-----------------------------------------") 
-                edge.lineControl(0)
-                service.send("robobot/cmd/ti", "rc 0.05 0.0")
-                self.state = 3
-
-            elif self.state == 3:  # wait until fully on platform
-                print(f"Current tilt: {abs(pose.pose[3]*180.0/3.14159)}, stable count: {self.stable_count}")
-                current_tilt = abs(pose.pose[3] * 180.0 / 3.14159)
-                if (self.stable_count >= 5 and # count based on trial and error. Can be adjusted. 
-                current_tilt  <= 180 and # threshold based on measurements for tilt when fully on platform
-                current_tilt >= 175): #threshold based on measurements for tilt when fully on platform
-                    service.send("robobot/cmd/ti", "rc 0.0 0.0")
-                    ("-----------------------------------------")
-                    print(f"On roundabout, tilt @ {pose.pose[3]*180.0/3.14159}")
-                    ("-----------------------------------------")
-                    print("% RoundAbout: on platform, starting turn")
+                current_tilt = imu.gyroIntegral[1]
+                if current_tilt > self.starting_tilt - 2:
+                    edge.lineControl(0)
                     self.state = 11
-                    
-                if (self.get_delta_tilt() < 2 and  # 2 degrees delta for stability, based on trial and error
-                    current_tilt >= 174 # threshold based on measurements for tilt when fully on platform
-                    and current_tilt <= 177): #threshold based on measurements for tilt when fully on platform
-                    self.stable_count += 1
-                else:
-                    self.stable_count = 0 # Reset count if tilt changes significantly
-          
+
             elif self.state == 11:
                 # start turning 90 degrees
                 self.start_yaw = self.get_yaw()
@@ -146,5 +121,5 @@ class roundAbout():
                 print("% RoundAbout: complete")
                 driveToLine()
                 break
-
+            time.sleep(0.05)
         print(f"% On roundabout, starting to turn.")
