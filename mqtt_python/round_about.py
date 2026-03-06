@@ -31,8 +31,8 @@ class roundAbout():
     def __init__(self, target_angle: float):
         '''Constructor for the roundAbout mission'''
         self.name = "RoundAbout"
-        self.starting_tilt = abs(pose.pose[3]*180.0/3.14159) # store the original tilt in degrees
-        self.state = 0 #0 for kris's code, 11 for stefanos 
+        self.starting_tilt = pose.pose[3]*180.0/3.14159 # store the original tilt in degrees
+        self.state = 11
         self.target_angle = target_angle
         self.stable_count = 0
         print()
@@ -51,11 +51,11 @@ class roundAbout():
             t += 0.1
 
     def get_delta_tilt(self):
-        '''Gets the tilt delta over 0.3 seconds and returns it in degrees'''
-        tilt_old = abs(pose.pose[3]*180.0/3.14159)
-        time.sleep(0.2)
-        tilt_new = abs(pose.pose[3]*180.0/3.14159)
-        delta_tilt = abs(tilt_old - tilt_new)
+        '''Gets the tilt and returns it in degrees'''
+        tilt_old = pose.pose[3]*180.0/3.14159 #radians to degrees
+        time.sleep(1)
+        tilt_new = pose.pose[3]*180.0/3.14159 #radians to degrees
+        delta_tilt = abs(tilt_new - tilt_old)
         return delta_tilt
 
     def get_yaw(self):
@@ -65,13 +65,8 @@ class roundAbout():
         """Call this repeatedly from a loop - non-blocking state machine"""
         print("% RoundAbout: starting")
         while not service.stop:
-
-            if self.state == 0:
-                self.starting_tilt = abs(pose.pose[3]*180.0/3.14159)
-                print("############################################################")
-                print(f"Starting tilt at GND: {self.starting_tilt:.4f}")
-                print("############################################################")
-                service.send("robobot/cmd/ti", "rc 0.1 0.0")  # was 0.02
+            if self.state == 0:  # approach until tilt detected
+                service.send("robobot/cmd/ti", "rc 0.3 0.0")
                 self.state = 1
             elif self.state == 111:  # tilt logging mode
                 # determine log file name (don't overwrite existing)
@@ -101,7 +96,10 @@ class roundAbout():
                 print(f"Tilt: {current_tilt:.4f}  Drop: {drop:.4f}")  # add this temporarily to see whats happening
                 if drop < -1:  # lowered from 1.0
                     self.state = 2
-                    print(f"HIT RAMP, TILT: {current_tilt:.4f}")
+                print()
+                print(f"Current tilt: {pose.pose[3]*180.0/3.14159}")
+                print()
+                time.sleep(2)
             elif self.state == 2:  # slow down to climb
                 service.send("robobot/cmd/ti", "rc 0.1 0.0")
                 self.state = 3
@@ -112,9 +110,10 @@ class roundAbout():
                 current_tilt  <= 180 and
                 current_tilt >= 176):
                     service.send("robobot/cmd/ti", "rc 0.0 0.0")
-                    print("############################################################")
-                    print(f"ON ROUNDABOUT, TILT: {current_tilt:.4f}")
-                    print("############################################################")
+                    print()
+                    print(f"On roundabout tilt: {pose.pose[3]*180.0/3.14159}")
+                    print()
+                    print("% RoundAbout: on platform, starting turn")
                     self.state = 99
                     service.stop = True
                     
