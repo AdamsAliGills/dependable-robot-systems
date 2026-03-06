@@ -28,32 +28,45 @@ def driveToLine():
   print("% Driving to line ------------------------- end")
 
 class roundAbout():
-    def __init__(self, target_angle: float):
+    def __init__(self):
         '''Constructor for the roundAbout mission'''
         self.name = "RoundAbout"
-        self.starting_tilt = pose.pose[3]*180.0/3.14159 # store the original tilt in degrees
-        self.state = 11
-        self.target_angle = target_angle
+        self.starting_tilt = abs(pose.pose[3]*180.0/3.14159) # store the original tilt in degrees
+        self.state = 0
+        self.target_angle = 180
         self.stable_count = 0
-        print()
-        print("creating roundAbout")
-        print(f"Starting tilt: {self.starting_tilt:.4f} degrees")
-        print()
+        print("-----------------------------------------")
+        print("INITIALIZING ROUNDABOUT MISSION")
+        print("-----------------------------------------")
+        self.execute()
 
-    def print_current_tilt(self):
-        '''Prints the current tilt of the robot in degrees'''
-        t = 0
-        while t < 30:
-            if service.stop:
+    def logger(self):
+        '''Logs the tilt to a loggings_.txt file for debugging'''
+                # determine log file name (don't overwrite existing)
+        log_path = "loggings.txt"
+        counter = 1
+        while True:
+            try:
+                open(log_path, "x").close()  # "x" mode fails if file already exists
                 break
-            print(pose.pose[3]*180.0/3.14159)
-            time.sleep(0.1)
-            t += 0.1
+            except FileExistsError:
+                log_path = f"loggings_{counter}.txt"
+                counter += 1
+
+        print(f"Logging tilt to {log_path} ...")
+        with open(log_path, "w") as f:
+            while not service.stop:
+                tilt = abs(pose.pose[3] * 180.0 / 3.14159)
+                timestamp = time.strftime("%H:%M:%S")
+                line = f"{timestamp}, {tilt:.6f}\n"
+                f.write(line)
+                f.flush()
+                time.sleep(0.1)
 
     def get_delta_tilt(self):
         '''Gets the tilt and returns it in degrees'''
         tilt_old = pose.pose[3]*180.0/3.14159 #radians to degrees
-        time.sleep(1)
+        time.sleep(0.2)
         tilt_new = pose.pose[3]*180.0/3.14159 #radians to degrees
         delta_tilt = abs(tilt_new - tilt_old)
         return delta_tilt
@@ -65,70 +78,45 @@ class roundAbout():
         """Call this repeatedly from a loop - non-blocking state machine"""
         print("% RoundAbout: starting")
         while not service.stop:
-            if self.state == 0:  # approach until tilt detected
-                service.send("robobot/cmd/ti", "rc 0.3 0.0")
-                self.state = 1
-            elif self.state == 111:  # tilt logging mode
-                # determine log file name (don't overwrite existing)
-                log_path = "loggings.txt"
-                counter = 1
-                while True:
-                    try:
-                        open(log_path, "x").close()  # "x" mode fails if file already exists
-                        break
-                    except FileExistsError:
-                        log_path = f"loggings_{counter}.txt"
-                        counter += 1
-
-                print(f"Logging tilt to {log_path} ...")
-                with open(log_path, "w") as f:
-                    while not service.stop:
-                        tilt = abs(pose.pose[3] * 180.0 / 3.14159)
-                        timestamp = time.strftime("%H:%M:%S")
-                        line = f"{timestamp}, {tilt:.6f}\n"
-                        f.write(line)
-                        f.flush()
-                        time.sleep(0.1)
+            if self.state == 0:  # TODO: Synchronize this state with line following mission
+                service.send("robobot/cmd/ti", "rc 0.2 0.0") #TODO: Remove this line
+                self.state = 1 
 
             elif self.state == 1:
                 current_tilt = abs(pose.pose[3]*180.0/3.14159)
                 drop = self.starting_tilt - current_tilt
-                print(f"Tilt: {current_tilt:.4f}  Drop: {drop:.4f}")  # add this temporarily to see whats happening
-                if drop < -1:  # lowered from 1.0
+                print(f"Tilt: {current_tilt:.4f}  Drop: {drop:.4f}") 
+                if drop > 3:  # Estimate threshold for detecting the drop into the roundabout, based on trial and error
                     self.state = 2
-                print()
-                print(f"Current tilt: {pose.pose[3]*180.0/3.14159}")
-                print()
-                time.sleep(2)
+                    print(f"Detected drop of {drop:.4f} degrees. Current tilt: {current_tilt:.4f} degrees.")
+               
             elif self.state == 2:  # slow down to climb
-                service.send("robobot/cmd/ti", "rc 0.1 0.0")
+                print("-----------------------------------------")
+                print(f"Detected roundabount, tilt @ {current_tilt:.4f}...")
+                print("-----------------------------------------") 
+                service.send("robobot/cmd/ti", "rc 0.05 0.0")
                 self.state = 3
 
             elif self.state == 3:  # wait until fully on platform
+                print(f"Current tilt: {abs(pose.pose[3]*180.0/3.14159)}, stable count: {self.stable_count}")
                 current_tilt = abs(pose.pose[3] * 180.0 / 3.14159)
-                if (self.stable_count >= 5 and 
-                current_tilt  <= 180 and
-                current_tilt >= 176):
+                if (self.stable_count >= 5 and # count based on trial and error. Can be adjusted. 
+                current_tilt  <= 180 and # threshold based on measurements for tilt when fully on platform
+                current_tilt >= 175): #threshold based on measurements for tilt when fully on platform
                     service.send("robobot/cmd/ti", "rc 0.0 0.0")
-                    print()
-                    print(f"On roundabout tilt: {pose.pose[3]*180.0/3.14159}")
-                    print()
+                    ("-----------------------------------------")
+                    print(f"On roundabout, tilt @ {pose.pose[3]*180.0/3.14159}")
+                    ("-----------------------------------------")
                     print("% RoundAbout: on platform, starting turn")
-                    self.state = 99
-                    service.stop = True
+                    self.state = 11
                     
-                if self.get_delta_tilt() < 2.0:
+                if (self.get_delta_tilt() < 2 and  # 2 degrees delta for stability, based on trial and error
+                    current_tilt >= 174 # threshold based on measurements for tilt when fully on platform
+                    and current_tilt <= 177): #threshold based on measurements for tilt when fully on platform
                     self.stable_count += 1
                 else:
                     self.stable_count = 0 # Reset count if tilt changes significantly
-                 
-
-
-
-
-
-              
-
+          
             elif self.state == 11:
                 # start turning 90 degrees
                 self.start_yaw = self.get_yaw()
