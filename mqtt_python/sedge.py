@@ -69,6 +69,7 @@ class SEdge:
     # follow line controller
     lineCtrl = False  # private
     # try with a P-Lead controller
+    lineKd_filter_result = 0
     lineKp = 1
     lineKd = 0.2
     e_prev = 0
@@ -390,16 +391,14 @@ class SEdge:
         # To correct we need a negative turn rate (CV),
         # so sign of e is OK
         #
-        self.lineKp_next = self.lineKp * e  # error times Kp
+        self.lineKp_result = self.lineKp * e  # error times Kp
         self.line_e_dervative = (e - self.e_prev) / self.edge_nInterval
-        self.lineKd_filter_next = (
-            self.lineKd * self.line_e_dervative + self.tau * self.lineKd_filter
+        self.lineKd_filter_result = (
+            self.lineKd * self.line_e_dervative + self.tau * self.lineKd_filter_result
         ) / (self.edge_nInterval + self.tau)
         self.e_prev = e
-        self.lineKp = self.lineKp_next
-        self.lineKd_filter = self.lineKd_filter_next
 
-        self.linePD = self.lineKp_next + self.lineKd_filter_next
+        self.linePD = self.lineKp_result + self.lineKd_filter_result
         # Lead filter
         """
         self.lineY = (
