@@ -160,6 +160,7 @@ def loop():
     while not (service.stop):
         if state == 0:
             edge.printn()
+            print(f"\n err value .......... {edge.refPosition - edge.posLeft}")
         elif state == 103:
             driveToLine()
             state = 100

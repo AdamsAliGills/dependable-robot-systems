@@ -304,61 +304,57 @@ class SEdge:
     ##########################################################
 
     def LineDetect(self):
-        sum = 0
-        posSum = 0
-        high = int(1)
-        # find levels (and average)
-        # using normalised readings (0 (no reflection) to 1000 (calibrated white)))
+        sum_val = 0.0
+        high = 0.0
+
         for i in range(8):
-            sum += self.edge_n[i]  # for average
-            if self.edge_n[i] > high:
-                high = self.edge_n[i]  # most bright value (floor level)
-        self.high = high  # most white level
-        # print(f"% Edge (sedge.py):: {low}, {high} - what")
-        # average white level
-        self.average = sum / 8.0
-        # detect if we have a crossing line
+            val = self.edge_n[i]
+            sum_val += val
+            if val > high:
+                high = val
+
+        self.high = high
+        self.average = sum_val / 8.0
         self.crossingLine = self.average >= self.crossingThreshold
-        # is line valid (high above threshold)
         self.lineValid = self.high >= self.lineValidThreshold
-        # find line position
-        # from left side - stop at first value above half of the brightest
+
         if self.lineValid:
-            posLeft = -3.5  # max left
-            if self.edge_n[0] < self.lineValidThreshold:
-                posLeft = -3  # between sensor 1 and 2 or more right
-                for i in range(1, 8):
-                    if self.edge_n[i] < self.lineValidThreshold:
-                        posLeft += 1
-                    else:
+            cog_sum_l = 0.0
+            cog_pos_l = 0.0
+            low_cutoff = self.lineValidThreshold - 100.0
+
+            for i in range(8):
+                v = self.edge_n[i] - low_cutoff
+                if v > 0:
+                    cog_sum_l += v
+                    cog_pos_l += (i + 1) * v
+                    if i < 7 and self.edge_n[i + 1] < self.lineValidThreshold:
                         break
-            posRight = 3.5  # max right
-            if self.edge_n[7] < self.lineValidThreshold:
-                posRight = 3  # may be between sensor 8 and 7 or more left
-                for i in range(1, 8):
-                    if self.edge_n[7 - i] < self.lineValidThreshold:
-                        posRight -= 1
-                    else:
+
+            cog_sum_r = 0.0
+            cog_pos_r = 0.0
+            for i in range(7, -1, -1):
+                v = self.edge_n[i] - low_cutoff
+                if v > 0:
+                    cog_sum_r += v
+                    cog_pos_r += (i + 1) * v
+                    if i > 0 and self.edge_n[i - 1] < self.lineValidThreshold:
                         break
-            self.posLeft = posLeft
-            self.posRight = posRight
-        else:
-            # just keep old value
-            pass
-        #
+
+            if cog_sum_l > 0:
+                self.posLeft = (cog_pos_l / cog_sum_l) - 4.5
+            if cog_sum_r > 0:
+                self.posRight = (cog_pos_r / cog_sum_r) - 4.5
+
         if self.lineValid and self.lineValidCnt < 20:
             self.lineValidCnt += 1
         elif not self.lineValid:
-            if self.lineValidCnt > 0:
-                self.lineValidCnt -= 1
-            else:
-                self.lineValidCnt = 0
+            self.lineValidCnt = max(0, self.lineValidCnt - 1)
+
         if self.crossingLine and self.crossingLineCnt < 20:
             self.crossingLineCnt += 1
         elif not self.crossingLine:
-            self.crossingLineCnt -= 1
-            if self.crossingLineCnt < 0:
-                self.crossingLineCnt = 0
+            self.crossingLineCnt = max(0, self.crossingLineCnt - 1)
         pass
         # print(f"% Edge (sedge.py):: ({self.edge_n[0]} {self.edge_n[1]} {self.edge_n[2]} {self.edge_n[3]} {self.edge_n[4]} {self.edge_n[5]} {self.edge_n[6]}), high={self.high}, left={self.posLeft:.2f}, right={self.posRight:.2f}.")
 
