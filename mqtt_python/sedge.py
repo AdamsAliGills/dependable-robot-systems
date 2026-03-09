@@ -70,10 +70,10 @@ class SEdge:
     lineCtrl = False  # private
     # try with a P-Lead controller
     lineKd_filter_result = 0
-    lineKp = 1
-    lineKd = 0.2
+    lineKp = 1.2
+    lineKd = 0.7
     e_prev = 0
-    tau = 0.15
+    tau = 0.4
     # lineTauZ = 0.8
     # lineTauP = 0.25
     # Lead pre-calculated factors

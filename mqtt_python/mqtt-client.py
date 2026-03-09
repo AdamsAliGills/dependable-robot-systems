@@ -95,6 +95,7 @@ def driveToLine():
             if edge.lineValidCnt > 4:
                 # start follow line
                 edge.lineControl(0.3, True)
+                edge.followLine()
                 service.send(
                     "robobot/cmd/T0", "servo 1 0 0"
                 )  # (move servo to position 0 - front)
