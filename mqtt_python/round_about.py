@@ -2,9 +2,12 @@ from uservice import service
 from spose import pose
 from sedge import edge
 from simu import imu
+from random import choice
 import time
 import math
 
+def get_yaw():
+    return imu.gyroIntegral[2]
 
 class roundAbout():
     def __init__(self, target_angle: float):
@@ -40,20 +43,14 @@ class roundAbout():
         delta_tilt = abs(tilt_new - tilt_old)
         return delta_tilt
 
-    def get_yaw(self):
-        return imu.gyroIntegral[2]
-
     def execute(self):
         """Call this while following the line - blocking state machine"""
         print("% RoundAbout: starting")
-        self.setup_logger()
         while not service.stop:
 
             imu_tilt = imu.gyroIntegral[1]
             timestamp = time.strftime(f"{time.time() % 60}")
             line = f"{timestamp}, {imu_tilt:.6f}\n"
-            self.f.write(line)
-            self.f.flush()
 
             time.sleep(0.1)
             if self.state == 0:  # TODO: Synchronize this state with line following mission
@@ -72,35 +69,86 @@ class roundAbout():
 
             elif self.state == 11:
                 # start turning 90 degrees
-                self.start_yaw = self.get_yaw()
+                self.start_yaw = get_yaw()
                 angular_speed = math.copysign(0.7, -self.target_angle)
                 service.send("robobot/cmd/ti", f"rc 0.0 {angular_speed}")
                 self.state = 12
 
             elif self.state == 12:
                 # when 90 degrees are reached, start rotating
-                if abs(self.get_yaw() - self.start_yaw) >= 80:  # 80 because it overshoots a bit
+                if abs(get_yaw() - self.start_yaw) >= 80:  # 80 because it overshoots a bit
                     radius = 0.33  # radius of the roundabout in meters
                     speed = 0.2   # speed for the roundabout in meters/second
                     angular_speed = math.copysign(speed/radius, self.target_angle)
                     service.send("robobot/cmd/ti", f"rc {speed} {angular_speed}")
-                    self.start_yaw = self.get_yaw()
+                    self.start_yaw = get_yaw()
                     self.state = 13
 
             elif self.state == 13:
                 # when the target angle (minus 45 degrees) is reached, exit going straight
-                if abs(self.get_yaw() - self.start_yaw) >= abs(self.target_angle) - 75:
+                if abs(get_yaw() - self.start_yaw) >= abs(self.target_angle) - 75:
                     self.state = 14
                     service.send("robobot/cmd/ti","rc 0.2 0.0")
 
             elif self.state == 14:
                 # when the line is found, finish
                 if edge.lineValidCnt > 4:
-                    service.send("robobot/cmd/ti","rc 0.0 0.0")
+                    #service.send("robobot/cmd/ti","rc 0.0 0.0")
                     self.state = 99
 
             else:
                 print("% RoundAbout: complete")
-                break
+                return True
 
             time.sleep(0.05)
+        return False
+
+
+    def test(max_attempts: int, current_entrance = 45):
+        entrance_list = [0, 45, 180, 270]
+
+        for i in range(max_attempts):
+            print(f"Round about test {i} starting")
+
+            valid_entrances = [ e for e in entrance_list if abs(e - current_entrance) >= 75 or e == current_entrance ]
+            new_entrance = choice(valid_entrances) # random exit
+            angle = new_entrance - current_entrance
+            angle = choice([angle, angle - 360]) # random direction
+            angle = ((angle + 360) % 720) - 360 or 360
+
+            print(f"new entrance: {new_entrance}")
+            print(f"angle: {angle}")
+
+            current_entrance = new_entrance
+
+            r = roundAbout(angle)
+
+            edge.lineControl(0.2)
+            success = r.execute()
+            if success:
+                print(f"Round about test {i} successful")
+            else:
+                print(f"Round about test {i} gone wrong")
+                return i
+
+
+            edge.lineControl(0.2)
+
+            # Wait 2 seconds non-blocking, return False if stopped
+            wait_start = time.time()
+            while time.time() - wait_start < 2:
+                if service.stop:
+                    return i
+                time.sleep(0.01)
+            edge.lineControl(0)
+
+            start_yaw = get_yaw()
+            service.send("robobot/cmd/ti", f"rc 0.0 1.0")
+
+            while abs(get_yaw() - start_yaw) < 170:
+                if service.stop:
+                    return i
+                time.sleep(0.01)
+            service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+
+        return max_attempts

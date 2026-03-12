@@ -12,13 +12,17 @@ class missionPlanner():
     def planMission(self):
         print(f"Mission planner is planning the mission...")
         self.roundAboutCaller()
+
     def roundAboutCaller(self):
         '''Caller for the roundabout mission'''
-        r = roundAbout(135)
+        tot_tests = 10
+        n = roundAbout.test(tot_tests)
+        print()
+        print(f"===================== TESTS RESULTS ============================")
+        print(f"{n} tests out of {tot_tests} were successful")
+        print(f"---------TESTS RESULTS-------------")
+        print()
 
-        edge.lineControl(0.2)
-        r.execute()
-        edge.lineControl(0.2)
     
     def seeSawCaller(self):
         '''Caller for the see saw mission'''
