@@ -1,117 +1,162 @@
 
 
 
-#TODO: ADD CALIBRATION DATA VIA CHESS BOARD
-# 1. Get orange 
-    # a. get color range from image (use color picker)
-    # b. convert image to hsv 
-  
-# 2. Get circle shape
 
 import os
-from skimage import color, io, measure, img_as_ubyte
-from skimage.measure import profile_line
-from skimage.transform import rescale, resize
 import matplotlib.pyplot as plt
-import numpy as np
-import pydicom as dicom
 import sys
-import cv2 as cv
-# class ballInHole():
-#     def __init__(self, hole_diameter = float): #hole_diameter in mm
-#         self.hole_diameter = hole_diameter
-#         self.image_path_folder = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new"
-
-#         print(f"Ball in hole mission initialized with hole diameter: {self.hole_diameter}")
+import imutils 
+import glob
+from collections import deque
+from imutils.video import VideoStream
+import numpy as np
+import argparse
+import cv2
+import imutils
+import time
 
 
     
 
+def ball_tracking(image_path):
+    image = cv2.imread(image_path)
+    if image is None:
+        print(f"Failed to load image from {image_path}")
+        return None, None, None  # fix: return 3 values
+
+    frame = imutils.resize(image, width=600)
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     
+    orange_lower = np.array([1, 100, 150])
+    orange_upper = np.array([25, 255, 255])
+  
+    
+    mask = cv2.inRange(hsv, orange_lower, orange_upper)
+    mask = cv2.erode(mask, None, iterations=2)
+    mask = cv2.dilate(mask, None, iterations=2)
+    
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = imutils.grab_contours(cnts)
+    center = None
+    radius = 0
+    
+    if len(cnts) > 0:
+        c = max(cnts, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        M = cv2.moments(c)
+        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+        if radius > 10:
+            cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
+            cv2.circle(frame, center, 5, (0, 0, 255), -1)
+    else:
+        print(f"No ball detected in {os.path.basename(image_path)}")
+
+    cv2.imshow("Ball Tracking", frame)
+    cv2.imshow("Mask", mask)
+    
+    print(f"Image: {os.path.basename(image_path)} | Center: {center} | Radius: {radius:.1f}px")
+    
+    key = cv2.waitKey(0) & 0xFF
+    cv2.destroyAllWindows()
+    
+    return center, radius, key  # always 3 values
+
+# --- run on a single image ---
+
+def tune_hsv(image_path):
+    """Helper to give a UI to tune HSV for simpler tuning"""
+    image = cv2.imread(image_path)
+    frame = imutils.resize(image, width=600)
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+
+    def nothing(x):
+        pass
+
+    cv2.namedWindow("Trackbars")
+    cv2.createTrackbar("H low",  "Trackbars", 1,  179, nothing)
+    cv2.createTrackbar("H high", "Trackbars", 30, 179, nothing)
+    cv2.createTrackbar("S low",  "Trackbars", 80, 255, nothing)
+    cv2.createTrackbar("S high", "Trackbars", 255, 255, nothing)
+    cv2.createTrackbar("V low",  "Trackbars", 80, 255, nothing)
+    cv2.createTrackbar("V high", "Trackbars", 255, 255, nothing)
+
+    print("Adjust trackbars to tune HSV. Press Q when happy with the values.")
+
+    while True:
+        h_low  = cv2.getTrackbarPos("H low",  "Trackbars")
+        h_high = cv2.getTrackbarPos("H high", "Trackbars")
+        s_low  = cv2.getTrackbarPos("S low",  "Trackbars")
+        s_high = cv2.getTrackbarPos("S high", "Trackbars")
+        v_low  = cv2.getTrackbarPos("V low",  "Trackbars")
+        v_high = cv2.getTrackbarPos("V high", "Trackbars")
+
+        lower = np.array([h_low,  s_low,  v_low])
+        upper = np.array([h_high, s_high, v_high])
+
+        mask = cv2.inRange(hsv, lower, upper)
+        mask = cv2.erode(mask,  None, iterations=2)
+        mask = cv2.dilate(mask, None, iterations=2)
+
+        # overlay mask on frame so you can see what's being detected
+        result = cv2.bitwise_and(frame, frame, mask=mask)
+
+        cv2.imshow("Mask",   mask)
+        cv2.imshow("Result", result)
+
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            print(f"Final HSV range:")
+            print(f"  orange_lower = np.array([{h_low}, {s_low}, {v_low}])")
+            print(f"  orange_upper = np.array([{h_high}, {s_high}, {v_high}])")
+            break
+
+    cv2.destroyAllWindows()
+
 
 
 if __name__ == "__main__":
+# tune_hsv("/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/image_2026_Feb_25_174725_009.jpg")
 
+#TODO: Need to adjust HSV interval based on these 3 images also
+# "image_2026_Feb_25_174723_007.jpg"
+#  orange_lower = np.array([0, 64, 2])
+#   orange_upper = np.array([33, 255, 255])
+
+# "image_2026_Feb_25_174724_008.jpg
+# orange_lower = np.array([0, 57, 5])
+#   orange_upper = np.array([30, 255, 255])
+
+# "# image_2026_Feb_25_174725_009.jpg
+# orange_lower = np.array([0, 33, 38])
+#   orange_upper = np.array([32, 255, 255])
+
+
+
+    folder_path = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball"
+ 
+
+    extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
    
-    clear_image = io.imread("/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/" \
-    "image_2026_Feb_25_181532_003.jpg")
+   
+    image_paths = []
+    for ext in extensions:
+        image_paths.extend(glob.glob(os.path.join(folder_path, ext)))
+    image_paths.sort()
+
+    if len(image_paths) == 0:
+        print(f"No images found in {folder_path}")
+    else:
+        print(f"Found {len(image_paths)} images. Press any key to advance, Q to quit.")
+        for i, image_path in enumerate(image_paths):
+            print(f"\n[{i+1}/{len(image_paths)}]")
+            center, radius, key = ball_tracking(image_path)
+            if key == ord("q"):  # press Q to quit early
+                print("Quitting early")
+                break
+
+    cv2.destroyAllWindows()
+    print("Done")
 
 
-    clear_image_test = io.imread("/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/" \
-    "image_2026_Feb_25_181531_002.jpg")
-
-
-    
-
-
-    def ballinhole(image):
-
-        clear_image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-        hsv_image  = cv.cvtColor(clear_image, cv.COLOR_RGB2HSV)
-
-        plt.figure(figsize=(6, 6))
-        plt.imshow(hsv_image)
-        plt.title("HSV image")
-        plt.axis('off')
-        plt.show()
-
-        orange_lower = np.array([100,100 , 100])
-        orange_upper = np.array([256, 256, 256])
-
-        mask = cv.inRange(hsv_image, orange_lower, orange_upper)
-
-
-        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
-        mask_clean = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel)
-        
-        fig, axes = plt.subplots(1, 2, figsize=(30, 30))
-        axes[0].imshow(mask, cmap='gray')
-        axes[0].set_title("Mask - before cleanup")
-        axes[0].axis('off')
-        axes[1].imshow(mask_clean, cmap='gray')
-        axes[1].set_title("Mask - after cleanup")
-        axes[1].axis('off')
-        plt.show()
-
-
-
-        BALL_REAL_RADIUS_MM = 40.6  # standard golf ball radius, adjust if yours differs
-        # Calibrate this once: measure pixel radius in an image at a known distance
-        EXPECTED_PIXEL_RADIUS = 50   # tune this from your test images
-        RADIUS_TOLERANCE = 20        # ± pixels allowed
-
-        ball_candidates = []
-        contours, _ = cv.findContours(mask_clean, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        for cnt in contours:
-            area = cv.contourArea(cnt)
-            if area < 100:  # just to skip tiny noise before heavier checks
-                continue
-
-            (cx, cy), radius = cv.minEnclosingCircle(cnt)
-
-            if abs(radius - EXPECTED_PIXEL_RADIUS) > RADIUS_TOLERANCE:
-                continue
-
-            ball_candidates.append((cnt, (int(cx), int(cy)), int(radius)))
-
-        ball_candinates = sorted(ball_candinates)
-        ball_candinates = ball_candinates[-1]
-
-        result_image = clear_image.copy()
-        for cnt, (cx, cy), radius in ball_candidates:
-            cv.circle(result_image, (cx, cy), radius, (0, 255, 0), 2)  # detected circle
-            cv.circle(result_image, (cx, cy), 5, (255, 0, 0), -1)      # centroid dot
-            print(f"Ball at ({cx}, {cy}) | Detected radius: {radius}px")  
-
-            print(f"Centroid: ({int(cx)}, {int(cy)}) | Radius: {radius:.1f} | Circularity: {circularity:.2f} | Fill ratio: {fill_ratio:.2f}")
-
-        plt.figure(figsize=(6, 6))
-        plt.imshow(result_image)
-        plt.title(f"Ball candidates found: {len(ball_candidates)}")
-        plt.axis('off')
-        plt.show()
-
-    # ballInHole(40.6)  # Example hole diameter
-
-    test_1 = ballinhole(clear_image)
-    test_2 = ballinhole(clear_image_test)
