@@ -1,6 +1,6 @@
 from uservice import service
 from round_about import roundAbout
-
+from sedge import edge
 
 class missionPlanner():
     def __init__(self):
@@ -15,7 +15,10 @@ class missionPlanner():
     def roundAboutCaller(self):
         '''Caller for the roundabout mission'''
         r = roundAbout(135)
+
+        edge.lineControl(0.2)
         r.execute()
+        edge.lineControl(0.2)
     
     def seeSawCaller(self):
         '''Caller for the see saw mission'''

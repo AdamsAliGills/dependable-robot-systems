@@ -44,7 +44,7 @@ class roundAbout():
         return imu.gyroIntegral[2]
 
     def execute(self):
-        """Call this repeatedly from a loop - non-blocking state machine"""
+        """Call this while following the line - blocking state machine"""
         print("% RoundAbout: starting")
         self.setup_logger()
         while not service.stop:
@@ -57,7 +57,6 @@ class roundAbout():
 
             time.sleep(0.1)
             if self.state == 0:  # TODO: Synchronize this state with line following mission
-                edge.lineControl(0.2)
                 self.starting_tilt = imu.gyroIntegral[1] # store the original tilt in degrees
                 self.state = 1
 
@@ -95,9 +94,9 @@ class roundAbout():
                     service.send("robobot/cmd/ti","rc 0.2 0.0")
 
             elif self.state == 14:
-                # when the line is found, start following it
+                # when the line is found, finish
                 if edge.lineValidCnt > 4:
-                    edge.lineControl(0.2, True) # start follow line
+                    service.send("robobot/cmd/ti","rc 0.0 0.0")
                     self.state = 99
 
             else:
