@@ -12,8 +12,6 @@ import imutils
 import time
 
 
-
-
 def main():
     pass
 
@@ -24,67 +22,86 @@ def calibrate_camera():
 
 def ball_tracking(image_path):
     """Get's the outline of a golf ball"""
-    # Read image in
     image = cv2.imread(image_path)
     if image is None:
         print(f"Failed to load image from {image_path}")
-        return None, None, None  # fix: return 3 values
+        return None, None, None
 
-    frame = imutils.resize(image, width=600) #minimize frame size to increase FPS
-    blurred = cv2.GaussianBlur(frame, (11, 11), 0) #decrease noise 
-    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV) #convert from bgr to hsv
-    
-    # Definition of orange HSV boundaries
-    orange_lower = np.array([1, 100, 150]) 
+    frame = imutils.resize(image, width=600)
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+
+    orange_lower = np.array([1, 100, 150])
     orange_upper = np.array([25, 255, 255])
-      
+
     mask = cv2.inRange(hsv, orange_lower, orange_upper)
-    mask = cv2.erode(mask, None, iterations=3) #removes noise
-    mask = cv2.dilate(mask, None, iterations=4) #dilates the objects left from erosion
-    
+    mask = cv2.erode(mask, None, iterations=3)
+    mask = cv2.dilate(mask, None, iterations=4)
+
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
+
     center = None
-    radius = 0
-    
-    if len(cnts) > 0:
-        best_c = None
-        best_radius = 0
+    best_radius = 0
+    candidates = []  # all circles that pass circularity check
 
-        for c in cnts:
-            area = cv2.contourArea(c)
-            perimeter = cv2.arcLength(c, True)
+    for c in cnts:
+        area = cv2.contourArea(c)
+        perimeter = cv2.arcLength(c, True)
+        if perimeter == 0:
+            continue
 
-            if perimeter == 0:
-                continue
+        circularity = (4 * np.pi * area) / (perimeter ** 2)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
 
-            circularity = (4 * np.pi * area) / (perimeter ** 2)
+        if circularity > 0.4 and radius > 10:
+            candidates.append((c, x, y, radius, circularity))
 
-            ((x, y), radius) = cv2.minEnclosingCircle(c)
+    print(f"\nImage: {os.path.basename(image_path)} | {len(candidates)} candidate(s) found")
 
-            # Only accept contours that are roughly circular and big enough
-            if circularity > 0.72 and radius > 10:
-                if radius > best_radius:
-                    best_c = c
-                    best_radius = radius
-                    best_x, best_y = x, y
+    if candidates:
+        # Draw ALL candidates in green with their stats
+        for i, (c, x, y, radius, circularity) in enumerate(candidates):
+            cx, cy = int(x), int(y)
+            r = int(radius)
+            # green circle for all candidates
+            cv2.circle(frame, (cx, cy), r, (0,255,0), 1)
+            # Label: index, radius, circularity
+            label = f"#{i} r={r} c={circularity:.2f}"
+            label = f"#{i} r={r} circ={circularity:.2f} y={cy}"
+            cv2.putText(frame, label, (cx - r, cy - r - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,255,0), 1)
 
-        if best_c is not None:
-            M = cv2.moments(best_c)
-            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            cv2.circle(frame, (int(best_x), int(best_y)), int(best_radius), (0, 255, 255), 2)
-            cv2.circle(frame, center, 5, (0, 0, 255), -1)
-        else:
-            print(f"No circular ball detected in {os.path.basename(image_path)}")
-        cv2.imshow("Ball Tracking", frame)
-        cv2.imshow("Mask", mask)
-    
-    print(f"Image: {os.path.basename(image_path)} | Center: {center} | Radius: {radius:.1f}px")
-    
+        # Pick closest to camera = largest radius
+        best = max(candidates, key=lambda item: item[2])
+        best_c, best_x, best_y, best_radius, best_circ = best
+
+        M = cv2.moments(best_c)
+        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+
+        # Draw winner in yellow, center dot in red
+        cv2.circle(frame, (int(best_x), int(best_y)), int(best_radius), (0, 255, 255), 2)
+        cv2.circle(frame, center, 5, (0, 0, 255), -1)
+
+        # Winner label
+        winner_label = f"BEST r={int(best_radius)} circ={best_circ:.2f} y={int(best_y)}"
+        cv2.putText(frame, winner_label,
+                    (int(best_x) - int(best_radius), int(best_y) - int(best_radius) - 15),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+
+        print(f"  Winner → center: {center}, radius: {best_radius:.1f}, circularity: {best_circ:.2f}")
+        for i, (_, x, y, r, circ) in enumerate(candidates):
+            print(f"  #{i} → pos: ({int(x)}, {int(y)}), radius: {r:.1f}, circularity: {circ:.2f}")
+    else:
+        print(f"  No circular candidates found")
+
+    cv2.imshow("Ball Tracking", frame)
+    cv2.imshow("Mask", mask)
+
     key = cv2.waitKey(0) & 0xFF
     cv2.destroyAllWindows()
-    
-    return center, radius, key  # always 3 values
+
+    return center, best_radius, key
 
 def erosion_values(img_original,mask,desired_value):
     """To try various erosion values for optimization of HSV mask"""
@@ -274,7 +291,7 @@ if __name__ == "__main__":
 #   orange_upper = np.array([32, 255, 255])
 
 
-    folder_path = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/"
+    folder_path = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/other/"
     extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
     image_paths = []
     for ext in extensions:
