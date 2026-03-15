@@ -10,7 +10,7 @@ import argparse
 import cv2
 import imutils
 import time
-
+import pytest
 
 def main():
     pass
@@ -21,7 +21,14 @@ def calibrate_camera():
     
 
 def ball_tracking(image_path):
-    """Get's the outline of a golf ball"""
+    """Get's the outline of a golf ball as well as distinguishing between
+        falsely detected golf balls """
+    #Some constraints to limit detection of false golf balls
+    MIN_Y = 160
+    MIN_CIRC = 0.49
+    MIN_RAD = 10
+    MAX_RAD = 50
+
     image = cv2.imread(image_path)
     if image is None:
         print(f"Failed to load image from {image_path}")
@@ -31,12 +38,13 @@ def ball_tracking(image_path):
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
+    # Necessary HSV thresholds for seperating orangeness from background
     orange_lower = np.array([1, 100, 150])
     orange_upper = np.array([25, 255, 255])
 
     mask = cv2.inRange(hsv, orange_lower, orange_upper)
-    mask = cv2.erode(mask, None, iterations=3)
-    mask = cv2.dilate(mask, None, iterations=4)
+    mask = cv2.erode(mask, None, iterations=3) #rid of noise
+    mask = cv2.dilate(mask, None, iterations=4) #recover ball shape from eroding
 
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
@@ -54,7 +62,7 @@ def ball_tracking(image_path):
         circularity = (4 * np.pi * area) / (perimeter ** 2)
         ((x, y), radius) = cv2.minEnclosingCircle(c)
 
-        if circularity > 0.4 and radius > 10:
+        if circularity > MIN_CIRC and MIN_RAD < radius < MAX_RAD and y > MIN_Y:
             candidates.append((c, x, y, radius, circularity))
 
     print(f"\nImage: {os.path.basename(image_path)} | {len(candidates)} candidate(s) found")
@@ -72,7 +80,7 @@ def ball_tracking(image_path):
             cv2.putText(frame, label, (cx - r, cy - r - 5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,255,0), 1)
 
-        # Pick closest to camera = largest radius
+        # Pick closest to camera a.k.a highest y-pixel value
         best = max(candidates, key=lambda item: item[2])
         best_c, best_x, best_y, best_radius, best_circ = best
 
@@ -89,19 +97,27 @@ def ball_tracking(image_path):
                     (int(best_x) - int(best_radius), int(best_y) - int(best_radius) - 15),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
-        print(f"  Winner → center: {center}, radius: {best_radius:.1f}, circularity: {best_circ:.2f}")
+        result_winner = (f"  Winner → center: {center}, radius: {best_radius:.1f}, circularity: {best_circ:.2f}")
+        print(result_winner)
         for i, (_, x, y, r, circ) in enumerate(candidates):
-            print(f"  #{i} → pos: ({int(x)}, {int(y)}), radius: {r:.1f}, circularity: {circ:.2f}")
+            result = (f"  #{i} → pos: ({int(x)}, {int(y)}), radius: {r:.1f}, circularity: {circ:.2f}")
     else:
-        print(f"  No circular candidates found")
+        result = (f"  No circular candidates found")
+    print(result)
+    with open("pattern_analysis_w_ball_test1.txt","a") as f:
+        try:  
+            f.write(f"{result}\n")
+            f.write(f"{result_winner}\n")
+            f.write()
+        except:
+            pass
+    # cv2.imshow("Ball Tracking", frame)
+    # cv2.imshow("Mask", mask)
 
-    cv2.imshow("Ball Tracking", frame)
-    cv2.imshow("Mask", mask)
+    # key = cv2.waitKey(0) & 0xFF
+    # cv2.destroyAllWindows()
 
-    key = cv2.waitKey(0) & 0xFF
-    cv2.destroyAllWindows()
-
-    return center, best_radius, key
+    return center, best_radius
 
 def erosion_values(img_original,mask,desired_value):
     """To try various erosion values for optimization of HSV mask"""
@@ -290,8 +306,8 @@ if __name__ == "__main__":
 # orange_lower = np.array([0, 33, 38])
 #   orange_upper = np.array([32, 255, 255])
 
-
-    folder_path = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/other/"
+    
+    folder_path = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/"
     extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
     image_paths = []
     for ext in extensions:
@@ -315,10 +331,10 @@ if __name__ == "__main__":
             # test_outliers(img3,folder_path,4)
 
 
-            center, radius, key = ball_tracking(image_path)
-            if key == ord("q"):  # press Q to quit early
-                print("Quitting early")
-                break
+            center, radius = ball_tracking(image_path)
+            # if key == ord("q"):  # press Q to quit early
+            #     print("Quitting early")
+            #     break
 
     cv2.destroyAllWindows()
     print("Done")
