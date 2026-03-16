@@ -46,8 +46,8 @@ class SEdge:
     edge_nInterval = 0
     edgeIntervalSetup = 0.1
     # line detection levels
-    lineValidThreshold = 750  # 1000 is calibrated white
-    crossingThreshold = 700  # average above this is assumed to be crossing line
+    lineValidThreshold = 650  # 1000 is calibrated white
+    crossingThreshold = 600  # average above this is assumed to be crossing line
     # level for relevant white values
     low = lineValidThreshold - 100
     # line detection values
@@ -69,13 +69,9 @@ class SEdge:
     # follow line controller
     lineCtrl = False  # private
     # try with a P-Lead controller
-    lineKd_filter_result = 0
-    lineKp = 1.2
-    lineKd = 0.7
-    e_prev = 0
-    tau = 0.4
-    # lineTauZ = 0.8
-    # lineTauP = 0.25
+    lineKp = 1.0  # 5  (rad/s per sensor value)
+    lineTauZ = 0.8  # 0.8 (second)
+    lineTauP = 0.25  # 0.15 (second)
     # Lead pre-calculated factors
     tauP2pT = 1.0
     tauP2mT = 0.0
@@ -302,16 +298,14 @@ class SEdge:
         return used
 
     ##########################################################
-
     def LineDetect(self):
-        sum_val = 0.0
-        high = 0.0
-
+        sum_val = 0
+        high = 1
+        # find levels and average
         for i in range(8):
-            val = self.edge_n[i]
-            sum_val += val
-            if val > high:
-                high = val
+            sum_val += self.edge_n[i]
+            if self.edge_n[i] > high:
+                high = self.edge_n[i]
 
         self.high = high
         self.average = sum_val / 8.0
@@ -319,33 +313,45 @@ class SEdge:
         self.lineValid = self.high >= self.lineValidThreshold
 
         if self.lineValid:
-            cog_sum_l = 0.0
-            cog_pos_l = 0.0
-            low_cutoff = self.lineValidThreshold - 100.0
+            # --- Linear Interpolation Logic ---
+            def get_interp_pos(side):
+                # side is 'left' (indices 0-3) or 'right' (indices 4-7)
+                indices = range(0, 8) if side == "left" else range(7, -1, -1)
+                for i in indices:
+                    if self.edge_n[i] >= self.lineValidThreshold:
+                        if (side == "left" and i == 0) or (side == "right" and i == 7):
+                            return i - 3.5
 
-            for i in range(8):
-                v = self.edge_n[i] - low_cutoff
-                if v > 0:
-                    cog_sum_l += v
-                    cog_pos_l += (i + 1) * v
-                    if i < 7 and self.edge_n[i + 1] < self.lineValidThreshold:
-                        break
+                        # Find neighbor index based on search direction
+                        prev_i = i - 1 if side == "left" else i + 1
+                        v_curr = self.edge_n[i]
+                        v_prev = self.edge_n[prev_i]
 
-            cog_sum_r = 0.0
-            cog_pos_r = 0.0
-            for i in range(7, -1, -1):
-                v = self.edge_n[i] - low_cutoff
-                if v > 0:
-                    cog_sum_r += v
-                    cog_pos_r += (i + 1) * v
-                    if i > 0 and self.edge_n[i - 1] < self.lineValidThreshold:
-                        break
+                        denom = v_curr - v_prev
+                        if denom != 0:
+                            fraction = (self.lineValidThreshold - v_prev) / denom
+                            # Calculate position relative to the array center
+                            return (
+                                (prev_i + fraction) - 3.5
+                                if side == "left"
+                                else (prev_i - fraction) - 3.5
+                            )
+                        return i - 3.5
+                return -3.5 if side == "left" else 3.5
 
-            if cog_sum_l > 0:
-                self.posLeft = (cog_pos_l / cog_sum_l) - 4.5
-            if cog_sum_r > 0:
-                self.posRight = (cog_pos_r / cog_sum_r) - 4.5
+            rawLeft = get_interp_pos("left")
+            rawRight = get_interp_pos("right")
 
+            # --- Complementary Filter (EMA) ---
+            # alpha: 1.0 = no filter, 0.1 = heavy lag/smoothing.
+            # 0.8 is a good balance for high-speed response.
+            alpha = 0.8
+
+            # Update positions with full precision
+            self.posLeft = (alpha * rawLeft) + ((1 - alpha) * self.posLeft)
+            self.posRight = (alpha * rawRight) + ((1 - alpha) * self.posRight)
+
+        # Update confidence counters
         if self.lineValid and self.lineValidCnt < 20:
             self.lineValidCnt += 1
         elif not self.lineValid:
@@ -356,7 +362,6 @@ class SEdge:
         elif not self.crossingLine:
             self.crossingLineCnt = max(0, self.crossingLineCnt - 1)
         pass
-        # print(f"% Edge (sedge.py):: ({self.edge_n[0]} {self.edge_n[1]} {self.edge_n[2]} {self.edge_n[3]} {self.edge_n[4]} {self.edge_n[5]} {self.edge_n[6]}), high={self.high}, left={self.posLeft:.2f}, right={self.posRight:.2f}.")
 
     ##########################################################
 
@@ -375,9 +380,9 @@ class SEdge:
 
         # some parameters depend on sample time, adjust
         # print(f"LineCtrl:: sample time {self.edge_nInterval}")
-        # if abs(self.edge_nInterval - self.edgeIntervalSetup) > 2.0:  # ms
-        # self.PIDrecalculate()
-        # self.edgeIntervalSetup = self.edge_nInterva
+        if abs(self.edge_nInterval - self.edgeIntervalSetup) > 2.0:  # ms
+            self.PIDrecalculate()
+            self.edgeIntervalSetup = self.edge_nInterval
         if self.followLeft:
             e = self.refPosition - self.posLeft
         else:
@@ -386,17 +391,11 @@ class SEdge:
         # The robot is thus too much to the left.
         # To correct we need a negative turn rate (CV),
         # so sign of e is OK
-        #
-        self.lineKp_result = self.lineKp * e  # error times Kp
-        self.line_e_dervative = (e - self.e_prev) / self.edge_nInterval
-        self.lineKd_filter_result = (
-            self.lineKd * self.line_e_dervative + self.tau * self.lineKd_filter_result
-        ) / (self.edge_nInterval + self.tau)
-        self.e_prev = e
-
-        self.linePD = self.lineKp_result + self.lineKd_filter_result
+        if abs(e) < 0.4:
+            e = 0.0
+        # calculate action (P-Lead controller)
+        self.u = self.lineKp * e  # error times Kp
         # Lead filter
-        """
         self.lineY = (
             self.u * self.tauZ2pT
             - self.lineE1 * self.tauZ2mT
@@ -411,12 +410,7 @@ class SEdge:
         self.lineE1 = self.u
         self.lineY1 = self.lineY
         # make response
-        """
-        if self.linePD > 4:
-            self.linePD = 4
-        elif self.linePD < -4:
-            self.linePD = -4
-        par = f"rc {self.velocity:.3f} {self.linePD:.3f} {t.time()}"
+        par = f"rc {self.velocity:.3f} {self.lineY:.3f} {t.time()}"
         # debug - no action, go straight
         # par = f"{self.velocity:.3f} 0 {t.time()}"
         # debug end
@@ -424,10 +418,10 @@ class SEdge:
             "robobot/cmd/ti", par
         )  # send new turn command, maintaining velocity
         # debug print
-        # if True:  # self.edge_nUpdCnt % 20 == 0:
-        # print(
-        #    f"% Edge::followLine: ctrl: e={e:.3f}, u={self.u:.3f}, y={self.lineY:.3f}, cnt {self.lineValidCnt}, -> {par}"
-        # )
+        if True:  # self.edge_nUpdCnt % 20 == 0:
+            print(
+                f"% Edge::followLine: ctrl: e={e:.3f}, u={self.u:.3f}, y={self.lineY:.3f}, cnt {self.lineValidCnt}, -> {par}"
+            )
 
     ##########################################################
 
@@ -567,3 +561,4 @@ class SEdge:
 
 # create the data object
 edge = SEdge()
+
