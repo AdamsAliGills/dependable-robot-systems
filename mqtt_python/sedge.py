@@ -54,7 +54,7 @@ class SEdge:
     posLeft = 0.0
     posRight = 0.0
     followLeft = True
-    refPosition = 0.0  # distance from detected edge
+    refPosition = 0  # distance from detected edge
     lineValid = False
     lineValidCnt = 0  # a value up to 20 for most confident line detect
     crossingLine = False
@@ -365,7 +365,9 @@ class SEdge:
 
     ##########################################################
 
-    def lineControl(self, velocity, followLeft=True, refPosition=0):
+    def lineControl(
+        self, velocity, followLeft=True, refPosition=-1 if followLeft else 1
+    ):
         self.velocity = velocity
         self.followLeft = followLeft
         self.refPosition = refPosition
