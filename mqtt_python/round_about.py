@@ -71,7 +71,7 @@ class roundAbout():
                 # start turning 90 degrees
                 self.start_yaw = get_yaw()
                 angular_speed = math.copysign(0.7, -self.target_angle)
-                service.send("robobot/cmd/ti", f"rc 0.0 {angular_speed}")
+                service.send("robobot/cmd/ti", f"rc -0.02 {angular_speed}")
                 self.state = 12
 
             elif self.state == 12:
