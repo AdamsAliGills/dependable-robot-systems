@@ -418,18 +418,18 @@ class SEdge:
         # so sign of e is OK
         # Logic inside your update loop
         abs_e = abs(e)
-        if abs_e < 2.8:
-            if abs_e < 0.5:
-                self.lineKp = 0.0
-                self.lineTauZ = 0.0
-            elif 3.3 > abs_e > 0.5:
-                self.lineKp = 0.25
-                self.lineTauZ = 0.8
+        # if abs_e < 3.4:
+        if abs_e < 0.5:
+            self.lineKp = 0.0
+            self.lineTauZ = 0.0
+        elif 3.4 > abs_e > 0.5:
+            self.lineKp = 0.33
+            self.lineTauZ = 0.8
         # self.velocity = self.map_velocity(abs_e, 2, 0, 0.2, 0.4, exponent=3)
 
-        if abs_e > 3.3:
+        elif abs_e > 3.4:
             # self.velocity = self.map_velocity(abs_e, 2, 3.5, 0.4, 0.2, exponent=2)
-            self.lineKp = 1
+            self.lineKp = 0.9
             self.lineTauZ = 0.8
 
         """
@@ -607,3 +607,4 @@ class SEdge:
 
 # create the data object
 edge = SEdge()
+
