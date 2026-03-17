@@ -12,6 +12,36 @@ import imutils
 import time
 import pytest
 
+
+
+#------------------------------
+# Folder paths for test images
+BALL_FOLDER    = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/"
+NO_BALL_FOLDER = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/other/"
+#------------------------------
+
+#------------------------------
+# Expected results for images with the ball in, based on pixel coordinates
+EXPECTED_RESULTS = {
+    "image_2026_Feb_25_174717_001.jpg": (458, 329),
+    "image_2026_Feb_25_174718_002.jpg": (320, 213),
+    "image_2026_Feb_25_174719_003.jpg": (221, 233),
+    "image_2026_Feb_25_174720_004.jpg": (292, 268),
+    "image_2026_Feb_25_174721_005.jpg": (268, 314),
+    "image_2026_Feb_25_174722_006.jpg": (275, 397),
+    "image_2026_Feb_25_174723_007.jpg": (582, 425),
+    "image_2026_Feb_25_174724_008.jpg": (370, 291),
+    "image_2026_Feb_25_174725_009.jpg": (172, 288),
+    "image_2026_Feb_25_174726_010.jpg": (325, 378),
+    "image_2026_Feb_25_174727_011.jpg": (280, 313),
+    "image_2026_Feb_25_174728_012.jpg": (390, 376),
+    "image_2026_Feb_25_174729_013.jpg": (375, 437),
+    "image_2026_Feb_25_174730_014.jpg": (299, 353),
+}
+ 
+CENTER_TOLERANCE = 5  # wiggle-room
+
+
 def main():
     pass
 
@@ -20,7 +50,7 @@ def calibrate_camera():
     pass
     
 
-def ball_tracking(image_path):
+def ball_tracking(image_path,display = True):
     """Get's the outline of a golf ball as well as distinguishing between
         falsely detected golf balls """
     #Some constraints to limit detection of false golf balls
@@ -67,57 +97,111 @@ def ball_tracking(image_path):
 
     print(f"\nImage: {os.path.basename(image_path)} | {len(candidates)} candidate(s) found")
 
+    result_log = []
+    result_winner_log = None
+
     if candidates:
-        # Draw ALL candidates in green with their stats
         for i, (c, x, y, radius, circularity) in enumerate(candidates):
             cx, cy = int(x), int(y)
-            r = int(radius)
-            # green circle for all candidates
-            cv2.circle(frame, (cx, cy), r, (0,255,0), 1)
-            # Label: index, radius, circularity
-            label = f"#{i} r={r} c={circularity:.2f}"
+            r      = int(radius)
+            cv2.circle(frame, (cx, cy), r, (0, 255, 0), 1)
             label = f"#{i} r={r} circ={circularity:.2f} y={cy}"
             cv2.putText(frame, label, (cx - r, cy - r - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,255,0), 1)
-
-        # Pick closest to camera a.k.a highest y-pixel value
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
+            result_log.append(
+                f"  #{i} → pos: ({int(x)}, {int(y)}), radius: {radius:.1f}, circularity: {circularity:.2f}"
+            )
+ 
+        # Pick closest to camera = highest y pixel value
         best = max(candidates, key=lambda item: item[2])
         best_c, best_x, best_y, best_radius, best_circ = best
-
-        M = cv2.moments(best_c)
+ 
+        M      = cv2.moments(best_c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-
-        # Draw winner in yellow, center dot in red
+ 
         cv2.circle(frame, (int(best_x), int(best_y)), int(best_radius), (0, 255, 255), 2)
         cv2.circle(frame, center, 5, (0, 0, 255), -1)
-
-        # Winner label
+ 
         winner_label = f"BEST r={int(best_radius)} circ={best_circ:.2f} y={int(best_y)}"
         cv2.putText(frame, winner_label,
                     (int(best_x) - int(best_radius), int(best_y) - int(best_radius) - 15),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
-
-        result_winner = (f"  Winner → center: {center}, radius: {best_radius:.1f}, circularity: {best_circ:.2f}")
-        print(result_winner)
-        for i, (_, x, y, r, circ) in enumerate(candidates):
-            result = (f"  #{i} → pos: ({int(x)}, {int(y)}), radius: {r:.1f}, circularity: {circ:.2f}")
+ 
+        result_winner_log = (
+            f"  Winner → center: {center}, radius: {best_radius:.1f}, circularity: {best_circ:.2f}"
+        )
+        print(result_winner_log)
     else:
-        result = (f"  No circular candidates found")
-    print(result)
-    with open("pattern_analysis_w_ball_test1.txt","a") as f:
-        try:  
-            f.write(f"{result}\n")
-            f.write(f"{result_winner}\n")
-            f.write()
-        except:
-            pass
-    # cv2.imshow("Ball Tracking", frame)
-    # cv2.imshow("Mask", mask)
+        print("  No circular candidates found")
+ 
+    for line in result_log:
+        print(line)
+    
+    
+    
+    if display:
+        with open("pattern_analysis_w_ball_test1.txt", "a") as f:
+            for line in result_log:
+                f.write(line + "\n")
+            if result_winner_log:
+                f.write(result_winner_log + "\n")
+    
+    
+    if display:
+        cv2.imshow("Ball Tracking", frame)
+        cv2.imshow("Mask", mask)
+        key = cv2.waitKey(0) & 0xFF
+        cv2.destroyAllWindows()
 
-    # key = cv2.waitKey(0) & 0xFF
-    # cv2.destroyAllWindows()
+   
 
     return center, best_radius
+
+def _get_images_from_folder(folder): 
+    """Get images from folder for pytests"""
+    paths = []
+    for ext in ["*.jpg", "*.jpeg", "*.png", "*.bmp"]:
+        paths.extend(glob.glob(os.path.join(folder, ext)))
+    return sorted(paths)
+
+
+# ---------------------------------------------------------------------------
+# Test 1 — no ball images should never produce a detection
+# ---------------------------------------------------------------------------
+ 
+@pytest.mark.parametrize("image_path", _get_images_from_folder(NO_BALL_FOLDER))
+def test_no_false_positive(image_path):
+    """Assert no ball is detected in images known to contain no ball."""
+    center, _ = ball_tracking(image_path, display=False)
+    assert center is None, (
+        f"False positive in {os.path.basename(image_path)}: detected ball at center={center}"
+    )
+ 
+ 
+# ---------------------------------------------------------------------------
+# Test 2 — ball images should match expected center positions
+# ---------------------------------------------------------------------------
+ 
+@pytest.mark.parametrize("filename,expected_center", EXPECTED_RESULTS.items())
+def test_ball_detected_correctly(filename, expected_center):
+    """Assert the detected ball center matches the logged expected position."""
+    image_path = os.path.join(BALL_FOLDER, filename)
+ 
+    if not os.path.exists(image_path):
+        pytest.skip(f"Image not found: {filename}")
+ 
+    center, _ = ball_tracking(image_path, display=False)
+ 
+    assert center is not None, (
+        f"No ball detected in {filename} — expected center={expected_center}"
+    )
+    assert abs(center[0] - expected_center[0]) <= CENTER_TOLERANCE, (
+        f"{filename}: x off — got {center[0]}, expected {expected_center[0]} (±{CENTER_TOLERANCE}px)"
+    )
+    assert abs(center[1] - expected_center[1]) <= CENTER_TOLERANCE, (
+        f"{filename}: y off — got {center[1]}, expected {expected_center[1]} (±{CENTER_TOLERANCE}px)"
+    )
+
 
 def erosion_values(img_original,mask,desired_value):
     """To try various erosion values for optimization of HSV mask"""
@@ -131,9 +215,6 @@ def erosion_values(img_original,mask,desired_value):
     mask8= cv2.erode(mask, None, iterations=8)
     mask9= cv2.erode(mask, None, iterations=9)
     mask10= cv2.erode(mask, None, iterations=10)
-
-    # mask = cv2.dilate(mask, None, iterations=2)
-
 
     fig, ax = plt.subplots(nrows = 2, ncols = 6, figsize = (30,10))
     ax[0][0].imshow(mask1, cmap = 'gray')
@@ -291,50 +372,20 @@ def tune_hsv(image_path):
     cv2.destroyAllWindows()
 
 
-if __name__ == "__main__":
-
-#TODO: 3 Trouble images
-# "image_2026_Feb_25_174723_007.jpg"
-#  orange_lower = np.array([0, 64, 2])
-#   orange_upper = np.array([33, 255, 255])
-
-# "image_2026_Feb_25_174724_008.jpg
-# orange_lower = np.array([0, 57, 5])
-#   orange_upper = np.array([30, 255, 255])
-
-# "# image_2026_Feb_25_174725_009.jpg
-# orange_lower = np.array([0, 33, 38])
-#   orange_upper = np.array([32, 255, 255])
-
-    
-    folder_path = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/"
+if __name__ == "__main__":    
     extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
     image_paths = []
     for ext in extensions:
-        image_paths.extend(glob.glob(os.path.join(folder_path, ext)))
+        image_paths.extend(glob.glob(os.path.join(BALL_FOLDER, ext)))
     image_paths.sort()
 
-    if len(image_paths) == 0:
-        print(f"No images found in {folder_path}")
+    if not image_paths:
+        print(f"No images found in {BALL_FOLDER}")
     else:
-        print(f"Found {len(image_paths)} images. Press any key to advance, Q to quit.")
+        print(f"Found {len(image_paths)} images. Press any key to advance - Q to quit. ")
         for i, image_path in enumerate(image_paths):
-            print(f"\n[{i+1}/{len(image_paths)}]")
-
-
-
-            # img1 = "image_2026_Feb_25_174723_007.jpg"
-            # img2 = "image_2026_Feb_25_174724_008.jpg"
-            # img3 = "image_2026_Feb_25_174725_009.jpg"
-            # test_outliers(img1,folder_path,4)
-            # test_outliers(img2,folder_path,4)
-            # test_outliers(img3,folder_path,4)
-
-
-            center, radius = ball_tracking(image_path)
-            # if key == ord("q"):  # press Q to quit early
-            #     print("Quitting early")
-            #     break
+            print(f"\n[{i+1}/{len(image_paths)}]")    
+            center , radius = ball_tracking(image_path,display = True)
 
     cv2.destroyAllWindows()
     print("Done")
