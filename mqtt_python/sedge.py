@@ -69,9 +69,11 @@ class SEdge:
     # follow line controller
     lineCtrl = False  # private
     # try with a P-Lead controller
-    lineKp = 1.0  # 5  (rad/s per sensor value)
+    lineKp = 0.25  # 5  (rad/s per sensor value)
     lineTauZ = 0.8  # 0.8 (second)
-    lineTauP = 0.25  # 0.15 (second)
+    lineTauP = 0.2  # 0.15 (second)
+    errmin = 1.35  # Below this, we stay at base gains
+    errmax = 3.5  # At this error, we hit maximum cornering gains
     # Lead pre-calculated factors
     tauP2pT = 1.0
     tauP2mT = 0.0
@@ -365,9 +367,7 @@ class SEdge:
 
     ##########################################################
 
-    def lineControl(
-        self, velocity, followLeft=True, refPosition=-1 if followLeft else 1
-    ):
+    def lineControl(self, velocity, followLeft=True, refPosition=0):
         self.velocity = velocity
         self.followLeft = followLeft
         self.refPosition = refPosition
@@ -376,6 +376,29 @@ class SEdge:
         pass
 
     ##########################################################
+    # def map_value(val, in_min, in_max, out_min, out_max):
+    # return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    def map_gains(self, val, in_min, in_max, out_min, out_max, exponent):
+        normalized_val = (val - in_min) / (in_max - in_min)
+
+        normalized_val = max(0, min(1, normalized_val))
+
+        curved_val = pow(normalized_val, exponent)
+
+        return curved_val * (out_max - out_min) + out_min
+
+    def map_velocity(self, val, in_min, in_max, out_start, out_end, exponent=3):
+        if in_max == in_min:
+            return out_start
+
+        # Normalize error
+        norm = max(0.0, min(1.0, (val - in_min) / (in_max - in_min)))
+
+        # Apply exponent
+        factor = pow(norm, exponent)
+
+        # This formula works for BOTH (0.4, 0.2) and (0.2, 0.4)
+        return out_start + factor * (out_end - out_start)
 
     def followLine(self):
         from uservice import service
@@ -393,9 +416,30 @@ class SEdge:
         # The robot is thus too much to the left.
         # To correct we need a negative turn rate (CV),
         # so sign of e is OK
-        if abs(e) < 0.4:
-            e = 0.0
-        # calculate action (P-Lead controller)
+        # Logic inside your update loop
+        abs_e = abs(e)
+        if abs_e < 2.3:
+            if abs_e < 0.5:
+                self.lineKp = 0.0
+                self.lineTauZ = 0.0
+            elif 2 > abs_e > 0.5:
+                self.lineKp = 0.3
+                self.lineTauZ = 0.8
+        self.velocity = self.map_velocity(abs_e, 2, 0, 0.2, 0.4, exponent=3)
+
+        if abs_e > 2.3:
+            self.velocity = self.map_velocity(abs_e, 2, 3.5, 0.4, 0.2, exponent=3)
+            self.lineKp = 1
+            self.lineTauZ = 0.8
+
+        """
+        self.lineKp = self.map_gains(
+            abs_e, self.errmin, self.errmax, 0.25, 2.0, exponent=2
+        )
+        self.lineTauZ = self.map_gains(
+            abs_e, self.errmin, self.errmax, 0.8, 1, exponent=2
+        )
+        """
         self.u = self.lineKp * e  # error times Kp
         # Lead filter
         self.lineY = (
@@ -563,4 +607,3 @@ class SEdge:
 
 # create the data object
 edge = SEdge()
-
