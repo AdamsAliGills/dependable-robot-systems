@@ -376,8 +376,6 @@ class SEdge:
         pass
 
     ##########################################################
-    # def map_value(val, in_min, in_max, out_min, out_max):
-    # return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
     def map_gains(self, val, in_min, in_max, out_min, out_max, exponent):
         normalized_val = (val - in_min) / (in_max - in_min)
 
@@ -390,21 +388,13 @@ class SEdge:
     def map_velocity(self, val, in_min, in_max, out_start, out_end, exponent=3):
         if in_max == in_min:
             return out_start
-
-        # Normalize error
         norm = max(0.0, min(1.0, (val - in_min) / (in_max - in_min)))
-
-        # Apply exponent
         factor = pow(norm, exponent)
-
-        # This formula works for BOTH (0.4, 0.2) and (0.2, 0.4)
         return out_start + factor * (out_end - out_start)
 
     def followLine(self):
         from uservice import service
 
-        # some parameters depend on sample time, adjust
-        # print(f"LineCtrl:: sample time {self.edge_nInterval}")
         if abs(self.edge_nInterval - self.edgeIntervalSetup) > 2.0:  # ms
             self.PIDrecalculate()
             self.edgeIntervalSetup = self.edge_nInterval
@@ -412,23 +402,14 @@ class SEdge:
             e = self.refPosition - self.posLeft
         else:
             e = self.refPosition - self.posRight
-        # when line (posLeft or posRight) is to (much) to the right edge position is positive.
-        # The robot is thus too much to the left.
-        # To correct we need a negative turn rate (CV),
-        # so sign of e is OK
-        # Logic inside your update loop
         abs_e = abs(e)
-        # if abs_e < 3.4:
         if abs_e < 0.5:
             self.lineKp = 0.0
             self.lineTauZ = 0.0
         elif 3.4 > abs_e > 0.5:
-            self.lineKp = 0.33
+            self.lineKp = self.map_gains(abs_e, 3.5, 0.5, 0.75, 0.28, exponent=1.5)
             self.lineTauZ = 0.8
-        # self.velocity = self.map_velocity(abs_e, 2, 0, 0.2, 0.4, exponent=3)
-
         elif abs_e > 3.4:
-            # self.velocity = self.map_velocity(abs_e, 2, 3.5, 0.4, 0.2, exponent=2)
             self.lineKp = 0.9
             self.lineTauZ = 0.8
 
@@ -440,8 +421,7 @@ class SEdge:
             abs_e, self.errmin, self.errmax, 0.8, 1, exponent=2
         )
         """
-        self.u = self.lineKp * e  # error times Kp
-        # Lead filter
+        self.u = self.lineKp * e
         self.lineY = (
             self.u * self.tauZ2pT
             - self.lineE1 * self.tauZ2mT
@@ -452,19 +432,11 @@ class SEdge:
             self.lineY = 4
         elif self.lineY < -4:
             self.lineY = -4
-        # save old values
         self.lineE1 = self.u
         self.lineY1 = self.lineY
-        # make response
         par = f"rc {self.velocity:.3f} {self.lineY:.3f} {t.time()}"
-        # debug - no action, go straight
-        # par = f"{self.velocity:.3f} 0 {t.time()}"
-        # debug end
-        service.send(
-            "robobot/cmd/ti", par
-        )  # send new turn command, maintaining velocity
-        # debug print
-        if True:  # self.edge_nUpdCnt % 20 == 0:
+        service.send("robobot/cmd/ti", par)
+        if True:
             print(
                 f"% Edge::followLine: ctrl: e={e:.3f}, u={self.u:.3f}, y={self.lineY:.3f}, cnt {self.lineValidCnt}, -> {par}"
             )
@@ -607,4 +579,3 @@ class SEdge:
 
 # create the data object
 edge = SEdge()
-
