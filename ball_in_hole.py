@@ -1,4 +1,3 @@
-from ball_tracking import ball_tracking
 
 class BallInHole():
 

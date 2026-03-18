@@ -1,5 +1,6 @@
 from uservice import service
 from round_about import roundAbout
+from ball_in_hole import BallInHole
 
 
 class missionPlanner():
@@ -21,7 +22,11 @@ class missionPlanner():
         '''Caller for the see saw mission'''
         pass
 
-    def ballInHoleCaller(self):
+    def ballInHoleCaller(self,image):
         '''Caller for the ball in hole mission'''
-        pass
+        print("---------------------------")
+        print("Executing image analysis...")
+        print("---------------------------")
+        BallInHole()
+        
 
