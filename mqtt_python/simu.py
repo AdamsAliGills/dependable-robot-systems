@@ -31,6 +31,7 @@ class SImu:
     gyroUpdCnt = 0
     gyroTime =datetime.now()
     gyroInterval = 1
+    gyroIntegral = [0, 0, 0]
 
     acc  = [0, 0, 0]
     accTime = datetime.now()
@@ -99,6 +100,9 @@ class SImu:
               self.gyroInterval = (t1 -t0).total_seconds()
             else:
               self.gyroInterval = (self.gyroInterval * 99 + (t1 -t0).total_seconds()) / 100
+            self.gyroIntegral[0] += self.gyro[0] * self.gyroInterval
+            self.gyroIntegral[1] += self.gyro[1] * self.gyroInterval
+            self.gyroIntegral[2] += self.gyro[2] * self.gyroInterval
             self.gyroUpdCnt += 1
             # self.print()
         elif topic == "T0/acc":
