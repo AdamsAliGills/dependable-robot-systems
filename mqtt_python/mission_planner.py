@@ -2,7 +2,8 @@ from uservice import service
 from round_about import roundAbout
 from ball_in_hole import BallInHole
 from scam import cam
-from ball_in_hole import BallInHole
+from ball_in_hole import BallInHolefrom ball_in_hole import BallInHole
+
 
 class missionPlanner():
     def __init__(self):
@@ -28,7 +29,13 @@ class missionPlanner():
         pass
 
     def ballInHoleCaller(self,image):
+    def ballInHoleCaller(self,image):
         '''Caller for the ball in hole mission'''
+        print("---------------------------")
+        print("Executing image analysis...")
+        print("---------------------------")
+        BallInHole()
+        
         print("---------------------------")
         print("Executing image analysis...")
         print("---------------------------")
