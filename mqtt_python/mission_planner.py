@@ -20,9 +20,10 @@ class missionPlanner():
     def planMission(self):
         edge.lineControl(0.3, followLeft=True)
 
-        wait_turn(20)
+        wait_turn(25)
+        sleep(1)
 
-        edge.lineControl(0.1, followLeft=True)
+        edge.lineControl(0.05, followLeft=True)
 
         r = roundAbout(-225)
         r.execute()
@@ -47,13 +48,13 @@ class missionPlanner():
         
         edge.lineControl(0)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
-        sleep(1.5)
+        sleep(1)
 
         edge.lineControl(0.2, followLeft=True)
 
-        sleep(3)
+        sleep(3.5)
 
-        edge.lineControl(0.1, followLeft=True)
+        edge.lineControl(0.05, followLeft=True)
 
         r = roundAbout(-225)
         r.execute()
