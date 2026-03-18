@@ -6,6 +6,10 @@ from random import choice
 import time
 import math
 
+
+def get_tilt():
+    return imu.gyroIntegral[1]
+
 def get_yaw():
     return imu.gyroIntegral[2]
 
@@ -15,14 +19,13 @@ class roundAbout():
         self.name = "RoundAbout"
         self.state = 0
         self.target_angle = target_angle
-        self.stable_count = 0
         print("-----------------------------------------")
-        print("INITIALIZING ROUNDABOUT MISSION")
+        print("     INITIALIZING ROUNDABOUT MISSION     ")
         print("-----------------------------------------")
 
     def setup_logger(self):
         '''Logs the tilt to a loggings_.txt file for debugging'''
-                # determine log file name (don't overwrite existing)
+        # determine log file name (don't overwrite existing)
         log_path = "loggings_IMU.txt"
         counter = 1
         while True:
@@ -35,34 +38,21 @@ class roundAbout():
 
         self.f = open(log_path, "w")
 
-    def get_delta_tilt(self):
-        '''Gets the tilt and returns it in degrees'''
-        tilt_old = pose.pose[3]*180.0/3.14159 #radians to degrees
-        time.sleep(0.2)
-        tilt_new = pose.pose[3]*180.0/3.14159 #radians to degrees
-        delta_tilt = abs(tilt_new - tilt_old)
-        return delta_tilt
-
     def execute(self):
         """Call this while following the line - blocking state machine"""
         print("% RoundAbout: starting")
         while not service.stop:
 
-            imu_tilt = imu.gyroIntegral[1]
-            timestamp = time.strftime(f"{time.time() % 60}")
-            line = f"{timestamp}, {imu_tilt:.6f}\n"
-
-            time.sleep(0.1)
-            if self.state == 0:  # TODO: Synchronize this state with line following mission
-                self.starting_tilt = imu.gyroIntegral[1] # store the original tilt in degrees
+            if self.state == 0:
+                self.starting_tilt = get_tilt() # store the original tilt in degrees
                 self.state = 1
 
             elif self.state == 1:
-                current_tilt = imu.gyroIntegral[1]
+                current_tilt = get_tilt()
                 if current_tilt < self.starting_tilt - 3:
                     self.state = 2
             elif self.state == 2:  # slow down to climb
-                current_tilt = imu.gyroIntegral[1]
+                current_tilt = get_tilt()
                 if current_tilt > self.starting_tilt - 2:
                     edge.lineControl(0)
                     self.state = 11

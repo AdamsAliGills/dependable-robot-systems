@@ -18,9 +18,9 @@ class missionPlanner():
         tot_tests = 10
         n = roundAbout.test(tot_tests)
         print()
-        print(f"===================== TESTS RESULTS ============================")
+        print(f"===================== TESTS RESULTS =====================")
         print(f"{n} tests out of {tot_tests} were successful")
-        print(f"---------TESTS RESULTS-------------")
+        print(f"=========================================================")
         print()
 
     
