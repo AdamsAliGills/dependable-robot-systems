@@ -1,41 +1,66 @@
 from uservice import service
 from round_about import roundAbout
 from sedge import edge
-from detection_utils import wait_ramp_bottom, wait_ramp_top
+from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end
+import time
 
 LONG_RAMP_TILT = 8 # TODO check real value
 SHORT_RAMP_TILT = 15 # TODO check real value
 
+def sleep(t):
+    start = time.time()
+    while (time.time() - start < t) and not service.stop:
+
+        time.sleep(0.01)
+
 class missionPlanner():
     def __init__(self):
-        try:
-            self.planMission()
-        except Exception as e:
-            print(f"Error in mission planner: {e}")
+        self.planMission()
 
     def planMission(self):
-        print(f"Mission planner is planning the mission...")
+        edge.lineControl(0.3, followLeft=True)
+
+        wait_turn(20)
+
+        edge.lineControl(0.1, followLeft=True)
+
+        r = roundAbout(-225)
+        r.execute()
+
+        edge.lineControl(0.3, followLeft=False)
+        sleep(2)
+
+        wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
+        print(f"START FIRST RAMP")
+        wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
+        print(f"END FIRST RAMP")
+
+        wait_ramp_top(SHORT_RAMP_TILT, tolerance = 3)
+        print(f"START SECOND RAMP")
+        wait_ramp_bottom(SHORT_RAMP_TILT, tolerance = 3)
+        print(f"END SECOND RAMP")
+
+        edge.lineControl(0.15, followLeft=True)
+        wait_turn(80)
+        print(f"TURN DETECTED")
+        sleep(1.5)
+        
+        edge.lineControl(0)
+        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+        sleep(1.5)
 
         edge.lineControl(0.2, followLeft=True)
+
+        sleep(3)
+
+        edge.lineControl(0.1, followLeft=True)
 
         r = roundAbout(-225)
         r.execute()
 
-        edge.lineControl(0.2, followLeft=False)
-
-        wait_ramp_bottom(LONG_RAMP_TILT)
-        wait_ramp_top(LONG_RAMP_TILT)
-
-        wait_ramp_top(SHORT_RAMP_TILT)
-        wait_ramp_bottom(SHORT_RAMP_TILT)
-        return
-
-        # TODO detect 90 degrees and then go straight (?)
-
         edge.lineControl(0.2, followLeft=True)
+        wait_end()
 
-        r = roundAbout(-225)
-        r.execute()
 
 
 

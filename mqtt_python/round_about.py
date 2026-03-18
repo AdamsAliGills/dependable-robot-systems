@@ -49,12 +49,22 @@ class roundAbout():
 
             elif self.state == 1:
                 current_tilt = get_tilt()
+                print(f"tilt: {current_tilt}")
                 if current_tilt < self.starting_tilt - 3:
+                    self.timer = time.time()
                     self.state = 2
-            elif self.state == 2:  # slow down to climb
-                current_tilt = get_tilt()
-                if current_tilt > self.starting_tilt - 2:
+            elif self.state == 2:
+                if time.time() - self.timer > 0.7:
                     edge.lineControl(0)
+                    service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+                    self.state = 3
+
+            elif self.state == 3:  # slow down to climb
+                current_tilt = get_tilt()
+                print(f"{current_tilt} > {self.starting_tilt - 1} ???")
+                if current_tilt > self.starting_tilt - 1:
+                    print(f"{current_tilt} > {self.starting_tilt - 1} !!!!")
+                    service.send("robobot/cmd/ti", f"rc 0.0 0.0")
                     self.state = 11
 
             elif self.state == 11:
