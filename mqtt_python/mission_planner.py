@@ -18,7 +18,7 @@ class missionPlanner():
         self.planMission()
 
     def planMission(self):
-        edge.lineControl(0.3, followLeft=True)
+        edge.lineControl(0.2, followLeft=True)
 
         wait_turn(25)
         sleep(1)
@@ -28,24 +28,30 @@ class missionPlanner():
         r = roundAbout(-225)
         r.execute()
 
-        edge.lineControl(0.3, followLeft=False)
-        sleep(2)
+        edge.lineControl(0.2, followLeft=False)
+        sleep(3)
 
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
         print(f"START FIRST RAMP")
+        sleep(1)
+        edge.lineControl(0.3, followLeft=False)
+
         wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
         print(f"END FIRST RAMP")
+        edge.lineControl(0.2, followLeft=False)
 
         wait_ramp_top(SHORT_RAMP_TILT, tolerance = 3)
         print(f"START SECOND RAMP")
+        edge.lineControl(0.25, followLeft=False)
+
         wait_ramp_bottom(SHORT_RAMP_TILT, tolerance = 3)
         print(f"END SECOND RAMP")
-
         edge.lineControl(0.15, followLeft=True)
+
         wait_turn(80)
         print(f"TURN DETECTED")
+
         sleep(1.5)
-        
         edge.lineControl(0)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
         sleep(1)
