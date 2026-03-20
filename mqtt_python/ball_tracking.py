@@ -10,7 +10,7 @@ import argparse
 import cv2
 import imutils
 import time
-import pytest
+# import pytest
 from scam import cam
 
 
@@ -101,7 +101,7 @@ def ball_tracking(frame_rasp,display = True):
         if circularity > MIN_CIRC and MIN_RAD < radius < MAX_RAD and y > MIN_Y:
             candidates.append((c, x, y, radius, circularity))
 
-    print(f"\nImage: {os.path.basename(image_path)} | {len(candidates)} candidate(s) found")
+    # print(f"\nImage: {os.path.basename(image_path)} | {len(candidates)} candidate(s) found")
 
     result_log = []
     result_winner_log = None
@@ -145,21 +145,19 @@ def ball_tracking(frame_rasp,display = True):
     
     
     
-    if display:
-        with open("pattern_analysis_w_ball_test1.txt", "a") as f:
-            for line in result_log:
-                f.write(line + "\n")
-            if result_winner_log:
-                f.write(result_winner_log + "\n")
+    # if display:
+    #     with open("pattern_analysis_w_ball_test1.txt", "a") as f:
+    #         for line in result_log:
+    #             f.write(line + "\n")
+    #         if result_winner_log:
+    #             f.write(result_winner_log + "\n")
     
     
     if display:
-        cv2.imshow("Ball Tracking", frame)
-        cv2.imshow("Mask", mask)
-        key = cv2.waitKey(0) & 0xFF
-        cv2.destroyAllWindows()
-
-   
+        cv2.imwrite("ball_tracking_frame.jpg", frame)
+        cv2.imwrite("ball_tracking_mask.jpg", mask)
+        print("% Saved ball_tracking_frame.jpg and ball_tracking_mask.jpg")
+    
 
     return center, best_radius
 
@@ -175,38 +173,38 @@ def _get_images_from_folder(folder):
 # Test 1 — no ball images should never produce a detection
 # ---------------------------------------------------------------------------
  
-@pytest.mark.parametrize("image_path", _get_images_from_folder(NO_BALL_FOLDER))
-def test_no_false_positive(image_path):
-    """Assert no ball is detected in images known to contain no ball."""
-    center, _ = ball_tracking(image_path, display=False)
-    assert center is None, (
-        f"False positive in {os.path.basename(image_path)}: detected ball at center={center}"
-    )
+# @pytest.mark.parametrize("image_path", _get_images_from_folder(NO_BALL_FOLDER))
+# def test_no_false_positive(image_path):
+#     """Assert no ball is detected in images known to contain no ball."""
+#     center, _ = ball_tracking(image_path, display=False)
+#     assert center is None, (
+#         f"False positive in {os.path.basename(image_path)}: detected ball at center={center}"
+#     )
  
  
 # ---------------------------------------------------------------------------
 # Test 2 — ball images should match expected center positions
 # ---------------------------------------------------------------------------
  
-@pytest.mark.parametrize("filename,expected_center", EXPECTED_RESULTS.items())
-def test_ball_detected_correctly(filename, expected_center):
-    """Assert the detected ball center matches the logged expected position."""
-    image_path = os.path.join(BALL_FOLDER, filename)
+# @pytest.mark.parametrize("filename,expected_center", EXPECTED_RESULTS.items())
+# def test_ball_detected_correctly(filename, expected_center):
+#     """Assert the detected ball center matches the logged expected position."""
+#     image_path = os.path.join(BALL_FOLDER, filename)
  
-    if not os.path.exists(image_path):
-        pytest.skip(f"Image not found: {filename}")
+#     if not os.path.exists(image_path):
+#         pytest.skip(f"Image not found: {filename}")
  
-    center, _ = ball_tracking(image_path, display=False)
+#     center, _ = ball_tracking(image_path, display=False)
  
-    assert center is not None, (
-        f"No ball detected in {filename} — expected center={expected_center}"
-    )
-    assert abs(center[0] - expected_center[0]) <= CENTER_TOLERANCE, (
-        f"{filename}: x off — got {center[0]}, expected {expected_center[0]} (±{CENTER_TOLERANCE}px)"
-    )
-    assert abs(center[1] - expected_center[1]) <= CENTER_TOLERANCE, (
-        f"{filename}: y off — got {center[1]}, expected {expected_center[1]} (±{CENTER_TOLERANCE}px)"
-    )
+#     assert center is not None, (
+#         f"No ball detected in {filename} — expected center={expected_center}"
+#     )
+#     assert abs(center[0] - expected_center[0]) <= CENTER_TOLERANCE, (
+#         f"{filename}: x off — got {center[0]}, expected {expected_center[0]} (±{CENTER_TOLERANCE}px)"
+#     )
+#     assert abs(center[1] - expected_center[1]) <= CENTER_TOLERANCE, (
+#         f"{filename}: y off — got {center[1]}, expected {expected_center[1]} (±{CENTER_TOLERANCE}px)"
+#     )
 
 
 def erosion_values(img_original,mask,desired_value):

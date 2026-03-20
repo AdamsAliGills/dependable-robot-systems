@@ -15,47 +15,59 @@ class BallInHole():
 
     def __init__(self):
         self.state = 0
+        self.execute()
 
     def execute(self):
         '''Start functionality'''
         if self.state == 0: #searching
             img = self.get_img()
-            if img == None:
-                self.state = 99
+            # if img == None:
+            #     self.state = 99
             center = self._searching_golf_ball(img)
             if center:
                 self.state = 1
-        elif self.state == 99:
-            return 
+        if self.state == 2:
+            self.approaching(center)
+            
+        
+
+        
 
 
     def step(self):
         '''State machine for states'''
         pass
 
-    def get_img(self,trys):
-        try: 
+    def get_img(self, trys=0):
+        try:
             ok, img, imgTime = cam.getImage()
+            return img
         except Exception as e:
-            print(f"Error in getting image from Rasp: {e}")
-            trys +=1 
-        if trys == 3:
-            print(f"Error in getting images from Rasp: {e}, attempts met {trys}")
-            return None
-        time.sleep(0.2) #Abitrary number
+            print(f"Error getting image: {e}")
+            trys += 1
+            if trys >= 3:
+                print(f"Max attempts reached")
+                return None
+            time.sleep(0.2)
+            return self.get_img(trys)
 
     def _searching_golf_ball(self,img):
         '''Searching for the golf ball'''
-        center, radius = ball_tracking(img)
+        center, radius = ball_tracking(img,display = True)
         return center
     
     def _aligning(self):
         '''Steer robot such the ball center is centered in frame'''
-        pass
+        center = self._searching_golf_ball(img)
 
-    def _approaching(self):
+
+
+    def _approaching(self,at_end = False):
         '''Driving towards ball with CV'''
-        pass
+        if at_end == True:
+            self.state = 3
+            return
+        self.searching
 
     def _picking_up(self):
         '''Pick up golf ball with servo arms and CV'''

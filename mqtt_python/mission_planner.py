@@ -17,8 +17,9 @@ def sleep(t):
 
 class missionPlanner():
     def __init__(self):
-        self.planMission()
 
+        self.ballInHoleCaller()
+    
     def planMission(self):
         edge.lineControl(0.2, followLeft=True)
 
@@ -99,10 +100,17 @@ class missionPlanner():
         '''Caller for the ball in hole mission'''
 
         edge.lineControl(0) # stop for detecting ball
-        service.send("robobot/cmd/ti", f"rc 0.0 -0.2") #TODO: Does this turn left???
+        # service.send("robobot/cmd/ti", f"rc 0.0 -0.2") #TODO: Does this turn left???
 
         try: 
             cam.setup()
         except Exception as e:
             print(f"Error in set up of camera: {e}")
         
+        BallInHole()
+
+
+     
+
+if  __name__ == "__main__":
+    mp = missionPlanner()
