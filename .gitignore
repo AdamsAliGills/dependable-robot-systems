@@ -1,3 +1,7 @@
 *.pyc
 .venv/*
 mqtt_python/*.jpg
+teensy_interface/build/log*
+local_save_editable/
+oscar_program/
+local_save/
