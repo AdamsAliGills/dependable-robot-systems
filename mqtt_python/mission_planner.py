@@ -12,6 +12,5 @@ class missionPlanner():
 
     def stairClimbCaller(self):
         '''Caller for the stair climb mission'''
-        edge.lineControl(0.2, True)
         s = stairClimb()
         s.execute()
