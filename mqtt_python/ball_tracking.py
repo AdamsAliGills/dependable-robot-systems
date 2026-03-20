@@ -59,7 +59,7 @@ def get_image():
     
 
 
-def ball_tracking(image_path,display = True):
+def ball_tracking(frame_rasp,display = True):
     """Get's the outline of a golf ball as well as distinguishing between
         falsely detected golf balls """
     #Some constraints to limit detection of false golf balls
@@ -68,12 +68,9 @@ def ball_tracking(image_path,display = True):
     MIN_RAD = 10
     MAX_RAD = 50
 
-    image = cv2.imread(image_path)
-    if image is None:
-        print(f"Failed to load image from {image_path}")
-        return None, None, None
+   
 
-    frame = imutils.resize(image, width=600)
+    frame = imutils.resize(frame_rasp, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 

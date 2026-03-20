@@ -3,6 +3,8 @@ from round_about import roundAbout
 from sedge import edge
 from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end
 import time
+from scam import cam
+from ball_in_hole import BallInHole
 
 LONG_RAMP_TILT = 8 # TODO check real value
 SHORT_RAMP_TILT = 15 # TODO check real value
@@ -38,7 +40,13 @@ class missionPlanner():
 
         wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
         print(f"END FIRST RAMP")
-        edge.lineControl(0.2, followLeft=False)
+
+
+
+        # Deal with camera
+        self.ballInHoleCaller()
+       
+
 
         wait_ramp_top(SHORT_RAMP_TILT, tolerance = 3)
         print(f"START SECOND RAMP")
@@ -89,4 +97,12 @@ class missionPlanner():
 
     def ballInHoleCaller(self):
         '''Caller for the ball in hole mission'''
-        pass
+
+        edge.lineControl(0) # stop for detecting ball
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.2") #TODO: Does this turn left???
+
+        try: 
+            cam.setup()
+        except Exception as e:
+            print(f"Error in set up of camera: {e}")
+        
