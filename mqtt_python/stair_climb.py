@@ -48,9 +48,11 @@ class stairClimb():
             # Step 6: stronger forward
             service.send("robobot/cmd/ti", "rc 0.15 0.0")
 
-            sleep(1.5)
+            sleep(1)
 
-        sleep(1.5)
+        service.send("robobot/cmd/T0", "servo 1 -400 0")
+        sleep(1)
+        service.send("robobot/cmd/T0", "servo 1 10000 0")
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
 
         print("% Stair climb: complete")
