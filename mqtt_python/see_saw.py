@@ -5,7 +5,7 @@ from simu import imu
 import time
 import math
 
-MIDDLE_DISTANCE = 0.8 # TODO check real value
+MIDDLE_DISTANCE = 0.3 # TODO check real value
 BOTTOM_DISTANCE = 1.3 # TODO check real value
 
 def get_tilt():
@@ -48,7 +48,7 @@ class SeeSaw():
                     #
                     #
                     pose.tripBreset()
-                    edge.lineControl(0.1, followLeft=True)
+                    edge.lineControl(0.05, followLeft=True)
                     self.state = 3   
             
             elif self.state == 3:
