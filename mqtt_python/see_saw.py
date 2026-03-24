@@ -5,7 +5,7 @@ from simu import imu
 import time
 import math
 
-MIDDLE_DISTANCE = 1.0 # TODO check real value
+MIDDLE_DISTANCE = 0.8 # TODO check real value
 BOTTOM_DISTANCE = 1.3 # TODO check real value
 
 def get_tilt():
