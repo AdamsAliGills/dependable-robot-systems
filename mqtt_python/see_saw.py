@@ -2,14 +2,21 @@ from uservice import service
 from spose import pose
 from sedge import edge
 from simu import imu
+from datetime import *
 import time
 import math
 
-MIDDLE_DISTANCE = 0.3 # TODO check real value
-BOTTOM_DISTANCE = 1.3 # TODO check real value
+MIDDLE_DISTANCE = 0.85 # TODO check real value
+BOTTOM_DISTANCE = 1.0 # TODO check real value
 
-def get_tilt():
-    return imu.gyroIntegral[1]
+def get_yaw():
+    return imu.gyroIntegral[2]
+
+
+stateTime = datetime.now()
+
+def stateTimePassed():
+  return (datetime.now() - stateTime).total_seconds()
 
 class SeeSaw():
     def __init__(self):
@@ -25,15 +32,15 @@ class SeeSaw():
         print("% SeeSaw: starting")
         while not service.stop:
             if self.state == 0:
-                self.starting_tilt = get_tilt() # store the original tilt in degrees
+                self.starting_yaw = get_yaw() # store the original yaw in degrees
                 self.state = 1
 
             elif self.state == 1:
-                current_tilt = get_tilt()
-                print(f"tilt: {current_tilt}")
-                if abs(current_tilt-self.starting_tilt) >= 0.5: #detect the ramp - reach the see-saw
+                current_yaw = get_yaw()
+                print(f"yaw: {current_yaw}")
+                if abs(current_yaw-self.starting_yaw) >= 75: #detect the turning - reach the see-saw
                     pose.tripBreset()  #reset the distance record
-                    edge.lineControl(0.1, followLeft=True) # slow down the speed
+                    edge.lineControl(0.15, followLeft=True) # slow down the speed
                     self.state = 2
 
             elif self.state == 2:
@@ -41,17 +48,25 @@ class SeeSaw():
                 print(f"distance: {pose.tripB}")
                 if pose.tripB > MIDDLE_DISTANCE:     # pose.tripB is the variable to record distance
                     edge.lineControl(0)
-                    time.sleep(10) # TODO Control the servo to pick up the golf ball
+                    service.send("robobot/cmd/ti","rc 0.0 0.0")
+                    time.sleep(5) # TODO Control the servo to pick up the golf ball
                     #
                     #
                     # Pick up function
                     #
                     #
                     pose.tripBreset()
-                    edge.lineControl(0.05, followLeft=True)
-                    self.state = 3   
-            
+                    edge.lineControl(0.04, followLeft=True)
+                    self.state = 3  
+
             elif self.state == 3:
+                if pose.tripBtimePassed() > 7:
+                    pose.tripBreset()
+                    edge.lineControl(0.10, followLeft=True)
+                    self.state = 4 
+            
+            
+            elif self.state == 4:
                 print(f"distance: {pose.tripB}")
                
                 if pose.tripB > BOTTOM_DISTANCE: # When robot leave the see-saw
