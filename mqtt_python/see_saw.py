@@ -31,7 +31,7 @@ class SeeSaw():
             elif self.state == 1:
                 current_tilt = get_tilt()
                 print(f"tilt: {current_tilt}")
-                if abs(current_tilt-self.starting_tilt) >= 1: #detect the ramp - reach the see-saw
+                if abs(current_tilt-self.starting_tilt) >= 0.5: #detect the ramp - reach the see-saw
                     pose.tripBreset()  #reset the distance record
                     edge.lineControl(0.1, followLeft=True) # slow down the speed
                     self.state = 2
