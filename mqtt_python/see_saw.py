@@ -41,7 +41,7 @@ class SeeSaw():
                 print(f"distance: {pose.tripB}")
                 if pose.tripB > MIDDLE_DISTANCE:     # pose.tripB is the variable to record distance
                     edge.lineControl(0)
-                    time.sleep(3) # TODO Control the servo to pick up the golf ball
+                    time.sleep(10) # TODO Control the servo to pick up the golf ball
                     #
                     #
                     # Pick up function
