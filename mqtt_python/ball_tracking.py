@@ -43,12 +43,6 @@ EXPECTED_RESULTS = {
 CENTER_TOLERANCE = 5  # wiggle-room
 
 
-def main():
-    pass
-
-
-def calibrate_camera():
-    pass
 
 def get_image():
     if cam.useCam:
