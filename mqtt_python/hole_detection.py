@@ -16,15 +16,15 @@ detector = cv2.SimpleBlobDetector_create()
 params = cv2.SimpleBlobDetector_Params()
 
 params.minThreshold = 10
-params.maxThreshold = 200
-params.thresholdStep = 15
+params.maxThreshold = 210
+params.thresholdStep = 10
 
 # params.filterByArea = True
-params.minArea = 150
+params.minArea = 170
 # params.maxArea = 40000
 
 # params.filterByCircularity = True
-params.minCircularity = 0.75
+params.minCircularity = 0.65
 
 # params.filterByConvexity = False
 # params.minConvexity = 0.87
@@ -32,7 +32,7 @@ params.minCircularity = 0.75
 # params.filterByInertia = True
 # params.minInertiaRatio = 0.8
 
-params.minDistBetweenBlobs = 185
+params.minDistBetweenBlobs = 2000
 
 # Create a detector with the parameters
 detector = cv2.SimpleBlobDetector_create(params)
