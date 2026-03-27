@@ -24,7 +24,7 @@ params.minArea = 170
 # params.maxArea = 40000
 
 # params.filterByCircularity = True
-params.minCircularity = 0.65
+params.minCircularity = 0.25
 
 # params.filterByConvexity = False
 # params.minConvexity = 0.87
@@ -68,4 +68,3 @@ if __name__ == "__main__":
             loop()
         service.terminate()
     print("% Main Terminated")
-
