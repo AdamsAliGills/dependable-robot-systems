@@ -12,5 +12,6 @@ class missionPlanner():
 
     def stairClimbCaller(self):
         '''Caller for the stair climb mission'''
-        s = stairClimb()
-        s.execute()
+        tot = 10
+        succ = stairClimb.test(tot)
+        print(f"{succ}/{tot} tests successful")
