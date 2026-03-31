@@ -17,7 +17,6 @@ class stairClimb():
         print("% Stair climb: starting")
         edge.lineControl(0.15, True)
 
-        service.send("robobot/cmd/T0", "servo 1 1 300")#activates the servo????
         for _ in range(5):
 
             # Step 1: move servo to straight position
@@ -53,7 +52,6 @@ class stairClimb():
 
         service.send("robobot/cmd/T0", "servo 1 -400 0")
         sleep(1)
-        service.send("robobot/cmd/T0", "servo 1 10000 0")
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
 
         if service.stop:
