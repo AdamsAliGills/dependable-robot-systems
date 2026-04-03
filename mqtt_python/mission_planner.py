@@ -45,6 +45,10 @@ class missionPlanner():
 
 
         # Deal with camera
+        service.send("robobot/cmd/ti", f"rc 0 1.3") #Rotate 75 degrees to the left for first ball 
+        sleep(1)
+        service.send("robobot/cmd/ti", f"rc 0 0") 
+        
         self.ballInHoleCaller()
        
 
@@ -100,13 +104,7 @@ class missionPlanner():
         '''Caller for the ball in hole mission'''
 
         edge.lineControl(0) # stop for detecting ball
-        # service.send("robobot/cmd/ti", f"rc 0.0 -0.2") #TODO: Does this turn left???
-
-        try: 
-            cam.setup()
-        except Exception as e:
-            print(f"Error in set up of camera: {e}")
-        
+       
         BallInHole()
 
 

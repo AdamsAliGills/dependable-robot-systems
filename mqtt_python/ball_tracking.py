@@ -13,6 +13,7 @@ import time
 # import pytest
 from scam import cam
 
+from sgpio import gpio
 
 
 #------------------------------
@@ -53,7 +54,7 @@ def get_image():
     
 
 
-def ball_tracking(frame_rasp,display = True):
+def ball_tracking(frame_rasp,display = False):
     """Get's the outline of a golf ball as well as distinguishing between
         falsely detected golf balls """
     #Some constraints to limit detection of false golf balls
@@ -62,7 +63,7 @@ def ball_tracking(frame_rasp,display = True):
     MIN_RAD = 10
     MAX_RAD = 50
 
-   
+    
 
     frame = imutils.resize(frame_rasp, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
@@ -137,7 +138,7 @@ def ball_tracking(frame_rasp,display = True):
     for line in result_log:
         print(line)
     
-    
+   
     
     # if display:
     #     with open("pattern_analysis_w_ball_test1.txt", "a") as f:
@@ -146,11 +147,15 @@ def ball_tracking(frame_rasp,display = True):
     #         if result_winner_log:
     #             f.write(result_winner_log + "\n")
     
-    
-    if display:
-        cv2.imwrite("ball_tracking_frame.jpg", frame)
-        cv2.imwrite("ball_tracking_mask.jpg", mask)
-        print("% Saved ball_tracking_frame.jpg and ball_tracking_mask.jpg")
+    target_x, target_y, target_r = 284, 357, 44
+    cv2.circle(frame, (target_x, target_y), target_r, (255, 0, 0), 2)        # outer circle
+    cv2.line(frame, (target_x - target_r, target_y), (target_x + target_r, target_y), (255, 0, 0), 1)  # horizontal
+    cv2.line(frame, (target_x, target_y - target_r), (target_x, target_y + target_r), (255, 0, 0), 1)  # vertical
+    cv2.circle(frame, (target_x, target_y), 3, (255, 0, 0), -1)              # center dot
+
+    cv2.imwrite("ball_tracking_frame2.jpg", frame)
+    cv2.imwrite("ball_tracking_mask2.jpg", mask)
+    print("% Saved ball_tracking_frame.jpg and ball_tracking_mask.jpg")
     
 
     return center, best_radius
@@ -370,22 +375,5 @@ def tune_hsv(image_path):
     cv2.destroyAllWindows()
 
 
-if __name__ == "__main__":    
-    # extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
-    # image_paths = []
-    # for ext in extensions:
-    #     image_paths.extend(glob.glob(os.path.join(BALL_FOLDER, ext)))
-    # image_paths.sort()
 
-    # if not image_paths:
-    #     print(f"No images found in {BALL_FOLDER}")
-    # else:
-    #     print(f"Found {len(image_paths)} images. Press any key to advance - Q to quit. ")
-    #     for i, image_path in enumerate(image_paths):
-    #         print(f"\n[{i+1}/{len(image_paths)}]")    
-    #         center , radius = ball_tracking(image_path,display = True)
-
-    # cv2.destroyAllWindows()
-    # print("Done")
-    get_image()
 
