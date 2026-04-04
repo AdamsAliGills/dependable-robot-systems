@@ -1,0 +1,7 @@
+[thresholds]
+low_H = 0
+high_H = 35
+low_S = 85
+high_S = 200
+low_V = 40
+high_V = 200

@@ -12,6 +12,13 @@ so that we can detect the exact hole in asta.
 TO DO param tuning for holes in asta
 """
 
+low_H = 6
+high_H = 30
+low_S = 40
+high_S = 160
+low_V = 40
+high_V = 200
+
 detector = cv2.SimpleBlobDetector_create()
 params = cv2.SimpleBlobDetector_Params()
 
@@ -38,19 +45,51 @@ params.minDistBetweenBlobs = 2000
 detector = cv2.SimpleBlobDetector_create(params)
 
 
+def hole_tacking(img):
+    frame = img[int(img.shape[0] / 2) : int(img.shape[0])]
+    frame = cv2.GaussianBlur(frame, (5, 5), 0)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    frame = cv2.inRange(frame, (low_H, low_S, low_V), (high_H, high_S, high_V))
+
+    keypoints = detector.detect(frame)
+    largest_size = 0
+    largest_keypoint = None
+    for keypoint in keypoints:
+        if keypoint.size > largest_size:
+            largest_size = keypoint.size
+            largest_keypoint = keypoint
+    if largest_keypoint:
+        print(largest_keypoint.pt)
+    return largest_keypoint
+
+
+"""
 def loop():
     while not (service.stop):
-        ok, im, imgTime = cam.getImage()
-        overlay = im.copy()
+        ok, frame, imgTime = cam.getImage()
+        if frame is None:
+            break
 
-        keypoints = detector.detect(im)
-        for k in keypoints:
-            cv2.circle(
-                overlay, (int(k.pt[0]), int(k.pt[1])), int(k.size / 2), (0, 0, 255), -1
-            )
-            print(f"x_hole: {k.pt[0]}, y_hole {k.pt[1]}")
-        opacity = 0.5
-        cv2.addWeighted(overlay, opacity, im, 1 - opacity, 0, im)
+        frame = cv2.GaussianBlur(frame, (5, 5), 0)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        frame = cv2.inRange(frame, (low_H, low_S, low_V), (high_H, high_S, high_V))
+        keypoints = detector.detect(frame)
+        largest_size = 0
+        largest_keypoint = None
+        for keypoint in keypoints:
+            if keypoint.size > largest_size:
+                largest_size = keypoint.size
+                largest_keypoint = keypoint
+        if largest_keypoint:
+            print(largest_keypoint.pt)
+        frame = cv2.drawKeypoints(
+            frame, keypoints, 0, (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS
+        )
+        cv2.imshow("result", frame)
+
+        key = cv2.waitKey(30)
+        if key == ord("q"):
+            break
 
 
 if __name__ == "__main__":
@@ -68,3 +107,4 @@ if __name__ == "__main__":
             loop()
         service.terminate()
     print("% Main Terminated")
+    """
