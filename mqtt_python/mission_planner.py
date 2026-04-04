@@ -17,42 +17,50 @@ def sleep(t):
 
 class missionPlanner():
     def __init__(self):
-
-        self.ballInHoleCaller()
-    
+        self.planMission()
+        # self.ballInHoleCaller()    
     def planMission(self):
-        edge.lineControl(0.2, followLeft=True)
+        # edge.lineControl(0.2, followLeft=True)
 
-        wait_turn(25)
-        sleep(1)
+        # wait_turn(25)
+        # sleep(1)
 
-        edge.lineControl(0.05, followLeft=True)
+        # edge.lineControl(0.05, followLeft=True)
 
-        r = roundAbout(-225)
-        r.execute()
+        # r = roundAbout(-225)
+        # r.execute()
 
         edge.lineControl(0.2, followLeft=False)
         sleep(3)
 
+        print("#############################################")
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
+        print("#############################################")
         print(f"START FIRST RAMP")
-        sleep(1)
-        edge.lineControl(0.3, followLeft=False)
 
-        wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
+        sleep(1)
+        edge.lineControl(0.3, followLeft=False) #DO NOT CHANGE THIS VALUE, IT WILL MESS WITH THE ballInHole timing
+        
+        print("#############################################")
+        wait_ramp_top(LONG_RAMP_TILT, tolerance = 2)
+        print("#############################################")        
         print(f"END FIRST RAMP")
 
 
 
         # Deal with camera
-        service.send("robobot/cmd/ti", f"rc 0 1.3") #Rotate 75 degrees to the left for first ball 
-        sleep(1)
-        service.send("robobot/cmd/ti", f"rc 0 0") 
-        
+        edge.lineControl(0.0, followLeft=False)
+        service.send("robobot/cmd/ti", f"rc 0 0.0")
+
+        print("#############################################")
+        print("STARTING BALL IN HOLE OP")
+        print("#############################################")
+
         self.ballInHoleCaller()
        
-
-
+        print("#############################################")
+        print("DONE WITH BALL OP")
+        print("#############################################")
         wait_ramp_top(SHORT_RAMP_TILT, tolerance = 3)
         print(f"START SECOND RAMP")
         edge.lineControl(0.25, followLeft=False)
