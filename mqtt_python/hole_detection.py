@@ -12,10 +12,10 @@ so that we can detect the exact hole in asta.
 TO DO param tuning for holes in asta
 """
 
-low_H = 6
-high_H = 30
-low_S = 40
-high_S = 160
+low_H = 0
+high_H = 35
+low_S = 85
+high_S = 200
 low_V = 40
 high_V = 200
 

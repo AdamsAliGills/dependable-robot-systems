@@ -245,9 +245,7 @@ class BallInHole:
         time.sleep(3)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
 
-    def _navigating_hole(
-        self,
-    ):
+    def _navigating_hole(self):
         """Drive to hole with no line following
         service.send("robobot/cmd/ti", f"rc 0 -1.3") #Rotate 75 degrees to the left for first ball
         time.sleep(1.25)
@@ -263,4 +261,3 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
-
