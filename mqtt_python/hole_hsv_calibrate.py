@@ -186,18 +186,3 @@ if __name__ == "__main__":
             loop()
         service.terminate()
     print("% Main Terminated")
-if __name__ == "__main__":
-    if service.process_running("mqtt-client"):
-        print("% mqtt-client is already running - terminating")
-        print("%   if it is partially crashed in the background, then try:")
-        print("%     pkill mqtt-client")
-        print("%   or, if that fails use the most brutal kill")
-        print("%     pkill -9 mqtt-client")
-    else:
-        setproctitle("mqtt-client")
-        print("% Starting")
-        service.setup("localhost")  # localhost
-        if service.connected:
-            loop()
-        service.terminate()
-    print("% Main Terminated")

@@ -253,6 +253,11 @@ class BallInHole:
         service.send("robobot/cmd/ti", "rc 0.2 0")
         time.sleep(2)
         service.send("robobot/cmd/ti", "rc 0 0")"""
+        img = self.get_img()
+        if img is None:
+            return False
+        xy_hole = hole_tacking(img)
+        x_hole, y_hole = int(xy_hole.pt[0]), int(xy_hole.pt[1])
 
     def _dropping(self):
         """Open servo to release ball into hole"""
