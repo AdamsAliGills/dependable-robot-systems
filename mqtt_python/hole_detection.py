@@ -9,7 +9,7 @@ from setproctitle import setproctitle
 hole detector draft script, with various params to tune
 so that we can detect the exact hole in asta. 
 
-TO DO param tuning for holes in asta
+param tuning for holes in asta
 """
 
 low_H = 0
@@ -22,16 +22,15 @@ high_V = 200
 detector = cv2.SimpleBlobDetector_create()
 params = cv2.SimpleBlobDetector_Params()
 
-params.minThreshold = 10
-params.maxThreshold = 210
-params.thresholdStep = 10
+params.filterByColor = True
+params.blobColor = 255
 
 # params.filterByArea = True
 params.minArea = 170
 # params.maxArea = 40000
 
 # params.filterByCircularity = True
-params.minCircularity = 0.25
+# params.minCircularity = 0.25
 
 # params.filterByConvexity = False
 # params.minConvexity = 0.87
