@@ -30,7 +30,7 @@ params.minArea = 170
 # params.maxArea = 40000
 
 # params.filterByCircularity = True
-# params.minCircularity = 0.25
+params.minCircularity = 0.15
 
 # params.filterByConvexity = False
 # params.minConvexity = 0.87
