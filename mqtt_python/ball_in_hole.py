@@ -155,7 +155,7 @@ class BallInHole:
                 break
 
     def _back_to_line(self):
-        service.send("robobot/cmd/ti", "rc 0.0 1.1")
+        service.send("robobot/cmd/ti", "rc 0.0 -0.2")
         time.sleep(3)
         # service.send("robobot/cmd/ti/", "rc 2.0 0.0")
         if edge.lineValidCnt > 4:
