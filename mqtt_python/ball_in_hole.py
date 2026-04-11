@@ -17,7 +17,7 @@ class BallInHole:
     NAVIGATING_HOLE = 4
     APPROACHING_HOLE = 5
     DROPPING = 6
-    DONE = 7
+    BACK_TO_LINE = 7
 
     def __init__(self):
         self.state = 0
@@ -150,8 +150,16 @@ class BallInHole:
             elif self.state == self.DROPPING:
                 self._dropping()
                 break
+            elif self.state == self.BACK_TO_LINE:
+                self._back_to_line()
+                break
 
-            time.sleep(0.05)
+    def _back_to_line(self):
+        service.send("robobot/cmd/ti", "rc 0.0 1.1")
+        time.sleep(3)
+        # service.send("robobot/cmd/ti/", "rc 2.0 0.0")
+        if edge.lineValidCnt > 4:
+            edge.lineControl(0.2, True)
 
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
@@ -289,7 +297,7 @@ class BallInHole:
     def _navigating_hole(self):
         """Drive to hole with no line following"""
         service.send(
-            "robobot/cmd/ti", f"rc 0 -1.3"
+            "robobot/cmd/ti", f"rc 0 -1.1"
         )  # Rotate 75 degrees to the left for first ball
         time.sleep(1.25)
         service.send("robobot/cmd/ti", f"rc 0 0")
