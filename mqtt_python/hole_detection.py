@@ -4,106 +4,82 @@ import numpy as np
 from scam import cam
 from uservice import service
 from setproctitle import setproctitle
+import imutils
 
 """
 hole detector draft script, with various params to tune
 so that we can detect the exact hole in asta. 
-
-param tuning for holes in asta
 """
 
-low_H = 0
-high_H = 35
-low_S = 85
-high_S = 200
-low_V = 40
-high_V = 200
 
-detector = cv2.SimpleBlobDetector_create()
-params = cv2.SimpleBlobDetector_Params()
+def hole_tacking(frame_rasp, display=True):
+    MIN_Y = 50
+    MIN_CIRC = 0.15
+    MIN_AREA = 400
 
-params.filterByColor = True
-params.blobColor = 255
+    low_H, low_S, low_V = 0, 85, 40
+    high_H, high_S, high_V = 35, 200, 200
 
-# params.filterByArea = True
-params.minArea = 170
-# params.maxArea = 40000
+    frame = imutils.resize(frame_rasp, width=600)
+    blurred = cv2.GaussianBlur(frame, (7, 7), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
-# params.filterByCircularity = True
-params.minCircularity = 0.15
+    mask = cv2.inRange(hsv, (low_H, low_S, low_V), (high_H, high_S, high_V))
 
-# params.filterByConvexity = False
-# params.minConvexity = 0.87
+    kernel = np.ones((5, 5), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
 
-# params.filterByInertia = True
-# params.minInertiaRatio = 0.8
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = imutils.grab_contours(cnts)
 
-params.minDistBetweenBlobs = 2000
+    center = None
+    best_area = 0
+    candidates = []
 
-# Create a detector with the parameters
-detector = cv2.SimpleBlobDetector_create(params)
+    for c in cnts:
+        area = cv2.contourArea(c)
+        perimeter = cv2.arcLength(c, True)
 
+        if perimeter == 0 or area < MIN_AREA:
+            continue
 
-def hole_tacking(img):
-    frame = img[int(img.shape[0] / 2) : int(img.shape[0])]
-    frame = cv2.GaussianBlur(frame, (5, 5), 0)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    frame = cv2.inRange(frame, (low_H, low_S, low_V), (high_H, high_S, high_V))
+        circularity = (4 * np.pi * area) / (perimeter**2)
+        M = cv2.moments(c)
+        if M["m00"] == 0:
+            continue
 
-    keypoints = detector.detect(frame)
-    largest_size = 0
-    largest_keypoint = None
-    for keypoint in keypoints:
-        if keypoint.size > largest_size:
-            largest_size = keypoint.size
-            largest_keypoint = keypoint
-    if largest_keypoint:
-        print(largest_keypoint.pt)
-    return largest_keypoint
+        cx = int(M["m10"] / M["m00"])
+        cy = int(M["m01"] / M["m00"])
 
+        if circularity > MIN_CIRC and cy > MIN_Y:
+            candidates.append((c, cx, cy, area, circularity))
 
-"""
-def loop():
-    while not (service.stop):
-        ok, frame, imgTime = cam.getImage()
-        if frame is None:
-            break
+    if candidates:
+        best = max(candidates, key=lambda item: item[3])
+        best_c, best_x, best_y, best_area, best_circ = best
+        center = (best_x, best_y)
 
-        frame = cv2.GaussianBlur(frame, (5, 5), 0)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        frame = cv2.inRange(frame, (low_H, low_S, low_V), (high_H, high_S, high_V))
-        keypoints = detector.detect(frame)
-        largest_size = 0
-        largest_keypoint = None
-        for keypoint in keypoints:
-            if keypoint.size > largest_size:
-                largest_size = keypoint.size
-                largest_keypoint = keypoint
-        if largest_keypoint:
-            print(largest_keypoint.pt)
-        frame = cv2.drawKeypoints(
-            frame, keypoints, 0, (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS
+        cv2.drawContours(frame, [best_c], -1, (0, 255, 255), 2)
+        cv2.circle(frame, center, 5, (0, 0, 255), -1)
+
+        label = f"HOLE area={int(best_area)} circ={best_circ:.2f}"
+        cv2.putText(
+            frame,
+            label,
+            (best_x - 50, best_y - 20),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 255, 255),
+            2,
         )
-        cv2.imshow("result", frame)
 
-        key = cv2.waitKey(30)
-        if key == ord("q"):
-            break
-
-
-if __name__ == "__main__":
-    if service.process_running("mqtt-client"):
-        print("% mqtt-client is already running - terminating")
-        print("%   if it is partially crashed in the background, then try:")
-        print("%     pkill mqtt-client")
-        print("%   or, if that fails use the most brutal kill")
-        print("%     pkill -9 mqtt-client")
+        print(f"  Hole found at {center}, Area: {best_area}")
     else:
-        setproctitle("mqtt-client")
-        print("% Starting")
-        service.setup("localhost")  # localhost
-        if service.connected:
-            loop()
-        service.terminate()
-    print("% Main Terminated")
-    """
+        print("  No hole candidates found")
+
+    if display:
+        cv2.imwrite("hole_tracking_debug.jpg", frame)
+        cv2.imwrite("hole_mask_debug.jpg", mask)
+
+    return center
