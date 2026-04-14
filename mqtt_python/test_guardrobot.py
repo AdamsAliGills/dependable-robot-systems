@@ -23,23 +23,29 @@ def Distence_test():
     while not service.stop:
         dis = ir.ir[1]
         print(f"Distance between Oscar and Guard robot: {dis} \n")
-        t.sleep(0.1)
+        t.sleep(0.3)
 
 '''Check the value of MISSION_DISTANCE'''
 def Mission_Lenght_test():
     pose.tripBreset()
-    dis = pose.tripB
+    edge.lineControl(0.15, False)
     while not service.stop:
+        dis = pose.tripB
         print(f"Distance: {dis} \n")
-        t.sleep(0.1)
+        t.sleep(0.5)
 
 
 if __name__ == "__main__":
-    task = int(input("Choose task: "))
-    if task == 1:
-        Distence_test()
-    if task == 2:
-        Mission_Lenght_test()
-    if task == 3:
-        test = GuardRobot()
-        test.execute()
+    service.setup('localhost')
+    if service.connected:
+        t.sleep(1)
+        task = int(input("Choose task: "))
+        if task == 1:
+            Distence_test()
+        if task == 2:
+            Mission_Lenght_test()
+        if task == 3:
+            test = GuardRobot()
+            test.execute()
+
+    service.terminate()
