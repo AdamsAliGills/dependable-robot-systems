@@ -18,6 +18,7 @@ class BallInHole:
     APPROACHING_HOLE = 5
     DROPPING = 6
     BACK_TO_LINE = 7
+    DONE = 8
 
     def __init__(self):
         self.state = 0
@@ -153,13 +154,18 @@ class BallInHole:
                 self._dropping()
                 self.state = self.BACK_TO_LINE
             elif self.state == self.BACK_TO_LINE:
-                self._back_to_line()
+                on_line = self._back_to_line()
+                if on_line:
+                    self.state == self.DONE
+            elif self.state == self.DONE:
+                break
+        return
 
     def _back_to_line(self):
         service.send("robobot/cmd/ti", "rc 0.0 -0.2")
         # service.send("robobot/cmd/ti/", "rc 2.0 0.0")
         if edge.lineValidCnt > 4:
-            edge.lineControl(0.2, True)
+            return True
 
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
@@ -325,4 +331,3 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
-
