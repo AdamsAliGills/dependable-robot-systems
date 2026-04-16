@@ -148,19 +148,15 @@ class BallInHole:
                         service.send("robobot/cmd/ti", "rc 0 0")
                         print("hole approached, going to drop")
                         self.state = self.DROPPING
-                    print("hole approached, going to drop")
-                    self.state = self.DROPPING
 
             elif self.state == self.DROPPING:
                 self._dropping()
-                break
+                self.state = self.BACK_TO_LINE
             elif self.state == self.BACK_TO_LINE:
                 self._back_to_line()
-                break
 
     def _back_to_line(self):
         service.send("robobot/cmd/ti", "rc 0.0 -0.2")
-        time.sleep(3)
         # service.send("robobot/cmd/ti/", "rc 2.0 0.0")
         if edge.lineValidCnt > 4:
             edge.lineControl(0.2, True)
@@ -255,7 +251,7 @@ class BallInHole:
             TARGET_Y - center_hole[1]
         )  # positive = ball too far (low y), need to drive forward
         print(
-            f"[Approaching] ball y={center_hole[1]}, target y={TARGET_Y}, error={error_y}"
+            f"[Approaching] hole  y={center_hole[1]}, target y={TARGET_Y}, error={error_y}"
         )
 
         if abs(error_y) < TOLERANCE_Y:
@@ -329,3 +325,4 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
+
