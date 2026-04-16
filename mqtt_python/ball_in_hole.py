@@ -143,7 +143,11 @@ class BallInHole:
 
                 if aligned:
                     print("Hole Aligned, approaching hole")
-                    self._approaching_hole()
+                    approach_hole = self._approaching_hole()
+                    if approach_hole:
+                        service.send("robobot/cmd/ti", "rc 0 0")
+                        print("hole approached, going to drop")
+                        self.state = self.DROPPING
                     print("hole approached, going to drop")
                     self.state = self.DROPPING
 
@@ -302,7 +306,7 @@ class BallInHole:
         time.sleep(1.25)
         service.send("robobot/cmd/ti", f"rc 0 0")
         service.send("robobot/cmd/ti", "rc 0.2 0")
-        time.sleep(2)
+        time.sleep(2.5)
         service.send("robobot/cmd/ti", "rc 0 0")
         return True
 
