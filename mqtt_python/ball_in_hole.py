@@ -304,6 +304,7 @@ class BallInHole:
         service.send("robobot/cmd/ti", "rc 0.2 0")
         time.sleep(2)
         service.send("robobot/cmd/ti", "rc 0 0")
+        return True
 
     def _searching_hole(self, img):
         """Searching for the hole"""
