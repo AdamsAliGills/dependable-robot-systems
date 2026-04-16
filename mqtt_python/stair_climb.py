@@ -21,10 +21,10 @@ class stairClimb():
 
             # Step 1: move servo to straight position
             service.send("robobot/cmd/T0", "servo 1 -400 0")
-
+            
             # Step 2: wait until first step is detected
             while not service.stop:
-                if ir.ir[1] < 0.09:
+                if ir.ir[1] < 0.08:
                     break
                 time.sleep(0.01)
 
@@ -48,7 +48,7 @@ class stairClimb():
             # Step 6: stronger forward
             service.send("robobot/cmd/ti", "rc 0.15 0.0")
 
-            sleep(1)
+            sleep(0.85)
 
         service.send("robobot/cmd/T0", "servo 1 -400 0")
         sleep(1)
