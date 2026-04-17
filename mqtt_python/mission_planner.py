@@ -3,6 +3,8 @@ from round_about import roundAbout
 from sedge import edge
 from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end
 import time
+from scam import cam
+from ball_in_hole import BallInHole
 
 LONG_RAMP_TILT = 8 # TODO check real value
 SHORT_RAMP_TILT = 15 # TODO check real value
@@ -16,30 +18,49 @@ def sleep(t):
 class missionPlanner():
     def __init__(self):
         self.planMission()
-
+        # self.ballInHoleCaller()    
     def planMission(self):
-        edge.lineControl(0.2, followLeft=True)
+        # edge.lineControl(0.2, followLeft=True)
 
-        wait_turn(25)
-        sleep(1)
+        # wait_turn(25)
+        # sleep(1)
 
-        edge.lineControl(0.05, followLeft=True)
+        # edge.lineControl(0.05, followLeft=True)
 
-        r = roundAbout(-225)
-        r.execute()
+        # r = roundAbout(-225)
+        # r.execute()
 
         edge.lineControl(0.2, followLeft=False)
         sleep(3)
 
+        print("#############################################")
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
+        print("#############################################")
         print(f"START FIRST RAMP")
+
         sleep(1)
-        edge.lineControl(0.3, followLeft=False)
-
-        wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
+        edge.lineControl(0.3, followLeft=False) #DO NOT CHANGE THIS VALUE, IT WILL MESS WITH THE ballInHole timing
+        
+        print("#############################################")
+        wait_ramp_top(LONG_RAMP_TILT, tolerance = 2)
+        print("#############################################")        
         print(f"END FIRST RAMP")
-        edge.lineControl(0.2, followLeft=False)
 
+
+
+        # Deal with camera
+        edge.lineControl(0.0, followLeft=False)
+        service.send("robobot/cmd/ti", f"rc 0 0.0")
+
+        print("#############################################")
+        print("STARTING BALL IN HOLE OP")
+        print("#############################################")
+
+        self.ballInHoleCaller()
+       
+        print("#############################################")
+        print("DONE WITH BALL OP")
+        print("#############################################")
         wait_ramp_top(SHORT_RAMP_TILT, tolerance = 3)
         print(f"START SECOND RAMP")
         edge.lineControl(0.25, followLeft=False)
@@ -89,5 +110,13 @@ class missionPlanner():
 
     def ballInHoleCaller(self):
         '''Caller for the ball in hole mission'''
-        pass
 
+        edge.lineControl(0) # stop for detecting ball
+       
+        BallInHole()
+
+
+     
+
+if  __name__ == "__main__":
+    mp = missionPlanner()
