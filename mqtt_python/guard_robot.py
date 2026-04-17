@@ -56,33 +56,30 @@ class GuardRobot:
                 if pose.tripB > self.MISSION_DISTANCE: #Already pass two gates
                     edge.lineControl(0)
                     pose.tripBreset()
-                    service.send("robobot/cmd/ti","rc 0.2 0.0")
+                    service.send("robobot/cmd/ti","rc 0.15 0.0")
                     self.state = 3
 
             elif self.state == 3:
                 if pose.tripB > 0.2:
-                    service.send("robobot/cmd/ti","rc 0.0 0.0")
+                    service.send("robobot/cmd/ti","rc -0.2 -0.03")
+                    self.start_time = t.time()
                     t.sleep(0.1)
+                    self.state = 4
+
+            elif self.state == 4:
+                if edge.lineValidCnt > 4 and (t.time() - self.start_time > 4):
                     self.start_yaw = imu.gyroIntegral[2]
                     service.send("robobot/cmd/ti","rc 0.0 1.0") # Turn around
-                    self.state = 4
+                    self.state = 5
                     #self.state = 99
 
-            elif self.state == 4: #turn around the robot and prepare for going back to the ramp
+            elif self.state == 5: #turn around the robot and prepare for going back to the ramp
                 current_yaw = imu.gyroIntegral[2] - self.start_yaw
-                if abs(current_yaw) >= 170: 
+                if abs(current_yaw) >= 100: 
                     service.send("robobot/cmd/ti","rc 0.0 0.0")
                     t.sleep(0.1)
                     pose.tripBreset()
-                    service.send("robobot/cmd/ti","rc 0.4 0.0")
-                    self.state = 5
-
-            elif self.state == 5:
-                if pose.tripB > 0.7:
-                    service.send("robobot/cmd/ti","rc 0.0 0.0")
                     self.state = 99
-
-
 
             else:
                 print("GuardRobot: complete")

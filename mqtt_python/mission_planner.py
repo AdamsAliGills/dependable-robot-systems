@@ -55,7 +55,7 @@ class missionPlanner():
         
         guard_robot = GuardRobot()
         guard_robot.execute()
-        return # TODO go back on track
+        edge.lineControl(0.2, followLeft=False)
 
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
         print(f"START FIRST RAMP")
