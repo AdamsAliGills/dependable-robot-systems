@@ -1,5 +1,6 @@
 from uservice import service
 from round_about import roundAbout
+from guard_robot import GuardRobot
 from sedge import edge
 from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end
 import time
@@ -30,6 +31,31 @@ class missionPlanner():
 
         edge.lineControl(0.2, followLeft=False)
         sleep(3)
+
+        wait_turn(80)
+        print(f"FIRST TURN")
+        sleep(2)
+        wait_turn(80)
+        print(f"SECOND TURN")
+        edge.lineControl(0)
+        
+        service.send("robobot/cmd/ti", f"rc -0.15 0.0")
+        sleep(8.3)
+
+        service.send("robobot/cmd/ti", f"rc -0.1 -0.7")
+        wait_turn(80)
+        service.send("robobot/cmd/ti", f"rc 0.1 0.0")
+        wait_end()
+        service.send("robobot/cmd/ti", f"rc -0.1 0.0")
+        sleep(2.6)
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(95)
+        
+        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+        
+        guard_robot = GuardRobot()
+        guard_robot.execute()
+        return # TODO go back on track
 
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
         print(f"START FIRST RAMP")
