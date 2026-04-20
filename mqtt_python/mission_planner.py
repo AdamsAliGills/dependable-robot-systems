@@ -59,10 +59,7 @@ class missionPlanner:
         print("#############################################")
 
         self.ballInHoleCaller()
-        if edge.lineValidCnt > 4:
-            # start follow line
-            service.send("robobot/cmd/ti", f"rc 0 0.0")
-            edge.lineControl(0.2, True)
+        edge.lineControl(0.2, True)
 
         print("#############################################")
         print("DONE WITH BALL OP")
@@ -119,4 +116,3 @@ class missionPlanner:
 
 if __name__ == "__main__":
     mp = missionPlanner()
-
