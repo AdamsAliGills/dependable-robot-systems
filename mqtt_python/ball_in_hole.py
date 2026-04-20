@@ -159,14 +159,14 @@ class BallInHole:
             elif self.state == self.BACK_TO_LINE:
                 on_line = self._back_to_line()
                 if on_line:
-                    self.state == self.DONE
+                    self.state = self.DONE
             elif self.state == self.DONE:
                 break
         return
 
     def _back_to_line(self):
-        service.send("robobot/cmd/ti", "rc 0.0 0.2")
-        # service.send("robobot/cmd/ti/", "rc 2.0 0.0")
+        # service.send("robobot/cmd/ti", "rc 0.0 0.2")
+        service.send("robobot/cmd/ti", "rc -0.07 0")
         if edge.lineValidCnt > 4:
             return True
 
@@ -199,7 +199,7 @@ class BallInHole:
         # angle_error = angle_x - target_angle_x
 
         # if abs(angle_error) < TOLERANCE:
-        #     service.send("robobot/cmd/ti", "rc 0 0")
+        #      service.send("robobot/cmd/ti", "rc 0 0")
         #     return True
 
         # turn_time = abs(angle_error) / TURN_RATE
@@ -272,8 +272,7 @@ class BallInHole:
     def _approaching(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
         TARGET_Y = 357
-        TOLERANCE_Y = 20
-        # pixels, tune this
+        TOLERANCE_Y = 20  # pixels, tune this
 
         img = self.get_img()
         if img is None:
