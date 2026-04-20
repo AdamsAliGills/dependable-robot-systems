@@ -61,16 +61,16 @@ class missionPlanner:
 
         # Rotate 75 degrees to the left for first ball
         service.send("robobot/cmd/ti", f"rc 0.0 0.7")
-        time.sleep(1)
+        sleep(1)
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
 
         ball_in_hole.ball_pick_up()
 
         # navigating hole
         service.send("robobot/cmd/ti", f"rc 0 -1.35")
-        time.sleep(1.25)
+        sleep(1.25)
         service.send("robobot/cmd/ti", "rc 0.2 0")
-        time.sleep(2.5)
+        sleep(2.5)
         service.send("robobot/cmd/ti", "rc 0 0")
 
         ball_in_hole.ball_drop_down()

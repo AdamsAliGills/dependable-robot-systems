@@ -8,6 +8,10 @@ import cv2
 from sedge import edge
 from spose import pose
 
+def sleep(t):
+    start = time.time()
+    while (time.time() - start < t) and not service.stop:
+        time.sleep(0.01)
 
 class BallInHole:
     SEARCHING_BALL = 0
@@ -28,11 +32,6 @@ class BallInHole:
         self.calib = CameraCalib()
         pose.tripBreset()
 
-    def sleep(t):
-        start = time.time()
-        while (time.time() - start < t) and not service.stop:
-            time.sleep(0.01)
-
     def _wait_for_camera(self, timeout=10.0):
         """Block until camera produces a valid frame or timeout."""
         print("[BallInHole] Waiting for camera...")
@@ -42,7 +41,7 @@ class BallInHole:
             if ok and img is not None:
                 print("[BallInHole] Camera ready.")
                 return
-            time.sleep(0.2)
+            sleep(0.2)
         print(
             "[BallInHole] WARNING: Camera not ready after timeout, proceeding anyway."
         )
@@ -62,7 +61,7 @@ class BallInHole:
                 # cv2.imshow("BallInHole Search", img)
                 if center is not None:
                     service.send("robobot/cmd/ti", "rc 0 0")
-                    time.sleep(0.5)
+                    sleep(0.5)
                     self.ball_center = center  # store for next states
                     self.ball_radius = radius
                     print("###################################################")
@@ -83,7 +82,7 @@ class BallInHole:
                 center, radius = self._searching_golf_ball(img)
                 if center is None:
                     service.send("robobot/cmd/ti", "rc 0 0")
-                    time.sleep(0.3)
+                    sleep(0.3)
                     print(
                         "[BallInHole] Lost ball during alignment, back to SEARCHING_BALL"
                     )
@@ -130,7 +129,7 @@ class BallInHole:
                 center_hole = self._searching_hole(img)
                 if center_hole is None:
                     service.send("robobot/cmd/ti", "rc 0 0")
-                    time.sleep(0.3)
+                    sleep(0.3)
                     print("Hole lost during alignment")
                     continue
                 aligned = self._aligning(center_hole)
@@ -279,13 +278,13 @@ class BallInHole:
     def _picking_up(self):
         """Pick up golf ball with servo arms and CV"""
 
-        time.sleep(0.5)
+        sleep(0.5)
         service.send("robobot/cmd/T0", "servo 1 657 100")  # Lower gripper down
-        time.sleep(2)
+        sleep(2)
         service.send(
             "robobot/cmd/T0", "servo 2 400 150"
         )  # close gripper ### to open its -200
-        time.sleep(3)
+        sleep(2)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
 
     def _searching_hole(self, img):
@@ -295,13 +294,13 @@ class BallInHole:
 
     def _dropping(self):
         """Open servo to release ball into hole"""
-        time.sleep(0.5)
+        sleep(0.5)
         service.send("robobot/cmd/T0", "servo 1 650 100")  # Lower gripper down
-        time.sleep(2)
+        sleep(2)
         service.send(
             "robobot/cmd/T0", "servo 2 -200 150"
         )  # close gripper ### to open its -200
-        time.sleep(3)
+        sleep(2)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
 
     def _record_start_pose(self):
