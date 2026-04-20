@@ -27,17 +27,6 @@ class BallInHole:
         self.final_alignment = False
         self.calib = CameraCalib()
         pose.tripBreset()
-        self.start_heading = 0
-
-        # service.send("robobot/cmd/T0", "servo 1 -400 50")
-        self.desired_turn_angle = 0.7
-        service.send(
-            "robobot/cmd/ti", f"rc 0 {self.desired_turn_angle}"
-        )  # Rotate 75 degrees to the left for first ball
-        time.sleep(1)
-        service.send("robobot/cmd/ti", f"rc 0 0")
-
-        self.execute()
 
     def sleep(t):
         start = time.time()
@@ -58,8 +47,10 @@ class BallInHole:
             "[BallInHole] WARNING: Camera not ready after timeout, proceeding anyway."
         )
 
-    def execute(self):
-        """Start functionality"""
+    def ball_pick_up(self):
+        """Find, approach and pick up the ping pong ball"""
+        self.state = self.SEARCHING_BALL
+
         while not service.stop:
             if self.state == self.SEARCHING_BALL:
                 img = self.get_img()
@@ -123,16 +114,18 @@ class BallInHole:
             elif self.state == self.PICKING_UP_GOLF_BALL:
                 self._picking_up()
                 print(f"[BallInHole] Ball picked up, transitioning to NAVIGATING_HOLE")
-                self.state = self.NAVIGATING_HOLE
+                self.state = self.DONE
 
-            elif self.state == self.NAVIGATING_HOLE:
-                reached = self._navigating_hole()
-                if reached:
-                    service.send("robobot/cmd/ti", "rc 0 0")
-                    print(f"[BallInHole] near hole, transitioning to approaching")
-                    self.state = self.ALIGNING_HOLE
+            elif self.state == self.DONE:
+                break
 
-            elif self.state == self.ALIGNING_HOLE:
+
+    def ball_drop_down(self):
+        """Find and approach the hole, drop the ping pong ball"""
+        self.state = self.ALIGNING_HOLE
+
+        while not service.stop:
+            if self.state == self.ALIGNING_HOLE:
                 img = self.get_img()
                 center_hole = self._searching_hole(img)
                 if center_hole is None:
@@ -155,20 +148,10 @@ class BallInHole:
 
             elif self.state == self.DROPPING:
                 self._dropping()
-                self.state = self.BACK_TO_LINE
-            elif self.state == self.BACK_TO_LINE:
-                on_line = self._back_to_line()
-                if on_line:
-                    self.state = self.DONE
+                self.state = self.DONE
+
             elif self.state == self.DONE:
                 break
-        return
-
-    def _back_to_line(self):
-        # service.send("robobot/cmd/ti", "rc 0.0 0.2")
-        service.send("robobot/cmd/ti", "rc -0.07 0")
-        if edge.lineValidCnt > 4:
-            return True
 
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
@@ -304,18 +287,6 @@ class BallInHole:
         )  # close gripper ### to open its -200
         time.sleep(3)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
-
-    def _navigating_hole(self):
-        """Drive to hole with no line following"""
-        service.send(
-            "robobot/cmd/ti", f"rc 0 -1.35"
-        )  # Rotate 75 degrees to the left for first ball
-        time.sleep(1.25)
-        service.send("robobot/cmd/ti", f"rc 0 0")
-        service.send("robobot/cmd/ti", "rc 0.2 0")
-        time.sleep(2.5)
-        service.send("robobot/cmd/ti", "rc 0 0")
-        return True
 
     def _searching_hole(self, img):
         """Searching for the hole"""

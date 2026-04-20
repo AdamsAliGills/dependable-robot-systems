@@ -1,7 +1,7 @@
 from uservice import service
 from round_about import roundAbout
 from sedge import edge
-from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end
+from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end, wait_line
 import time
 from scam import cam
 from ball_in_hole import BallInHole
@@ -52,13 +52,33 @@ class missionPlanner:
 
         # Deal with camera
         edge.lineControl(0.0, followLeft=False)
-        service.send("robobot/cmd/ti", f"rc 0 0.0")
 
         print("#############################################")
         print("STARTING BALL IN HOLE OP")
         print("#############################################")
 
-        self.ballInHoleCaller()
+        ball_in_hole = BallInHole()
+
+        # Rotate 75 degrees to the left for first ball
+        service.send("robobot/cmd/ti", f"rc 0.0 0.7")
+        time.sleep(1)
+        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+
+        ball_in_hole.ball_pick_up()
+
+        # navigating hole
+        service.send("robobot/cmd/ti", f"rc 0 -1.35")
+        time.sleep(1.25)
+        service.send("robobot/cmd/ti", "rc 0.2 0")
+        time.sleep(2.5)
+        service.send("robobot/cmd/ti", "rc 0 0")
+
+        ball_in_hole.ball_drop_down()
+
+        # back to line
+        service.send("robobot/cmd/ti", "rc -0.07 0")
+        wait_line()
+
         edge.lineControl(0.2, True)
 
         print("#############################################")
@@ -92,26 +112,6 @@ class missionPlanner:
         edge.lineControl(0.2, followLeft=True)
         wait_end()
 
-    def roundAboutCaller(self):
-        """Caller for the roundabout mission"""
-        tot_tests = 10
-        n = roundAbout.test(tot_tests)
-        print()
-        print(f"===================== TESTS RESULTS =====================")
-        print(f"{n} tests out of {tot_tests} were successful")
-        print(f"=========================================================")
-        print()
-
-    def seeSawCaller(self):
-        """Caller for the see saw mission"""
-        pass
-
-    def ballInHoleCaller(self):
-        """Caller for the ball in hole mission"""
-
-        edge.lineControl(0)  # stop for detecting ball
-
-        BallInHole()
 
 
 if __name__ == "__main__":
