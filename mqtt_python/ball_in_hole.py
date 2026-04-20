@@ -308,7 +308,7 @@ class BallInHole:
     def _navigating_hole(self):
         """Drive to hole with no line following"""
         service.send(
-            "robobot/cmd/ti", f"rc 0 -1.15"
+            "robobot/cmd/ti", f"rc 0 -1.3"
         )  # Rotate 75 degrees to the left for first ball
         time.sleep(1.25)
         service.send("robobot/cmd/ti", f"rc 0 0")
