@@ -245,8 +245,8 @@ class BallInHole:
 
     def _approaching_hole(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
-        TARGET_Y = 382
-        TOLERANCE_Y = 25  # pixels, tune this
+        TARGET_Y = 385
+        TOLERANCE_Y = 15  # pixels, tune this
 
         img = self.get_img()
         if img is None:
