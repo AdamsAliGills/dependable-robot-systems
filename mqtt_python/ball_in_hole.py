@@ -165,7 +165,7 @@ class BallInHole:
         return
 
     def _back_to_line(self):
-        service.send("robobot/cmd/ti", "rc 0.0 -0.2")
+        service.send("robobot/cmd/ti", "rc 0.0 0.2")
         # service.send("robobot/cmd/ti/", "rc 2.0 0.0")
         if edge.lineValidCnt > 4:
             return True
@@ -337,3 +337,4 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
+
