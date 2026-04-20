@@ -272,7 +272,8 @@ class BallInHole:
     def _approaching(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
         TARGET_Y = 357
-        TOLERANCE_Y = 15  # pixels, tune this
+        TOLERANCE_Y = 20
+        # pixels, tune this
 
         img = self.get_img()
         if img is None:
@@ -336,4 +337,3 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
-
