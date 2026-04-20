@@ -15,10 +15,11 @@ class BallInHole:
     APPROACHING_BALL = 2
     PICKING_UP_GOLF_BALL = 3
     NAVIGATING_HOLE = 4
-    APPROACHING_HOLE = 5
-    DROPPING = 6
-    BACK_TO_LINE = 7
-    DONE = 8
+    ALIGNING_HOLE = 5
+    APPROACHING_HOLE = 6
+    DROPPING = 7
+    BACK_TO_LINE = 8
+    DONE = 9
 
     def __init__(self):
         self.state = 0
@@ -129,12 +130,11 @@ class BallInHole:
                 if reached:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     print(f"[BallInHole] near hole, transitioning to approaching")
-                    self.state = self.APPROACHING_HOLE
+                    self.state = self.ALIGNING_HOLE
 
-            elif self.state == self.APPROACHING_HOLE:
+            elif self.state == self.ALIGNING_HOLE:
                 img = self.get_img()
                 center_hole = self._searching_hole(img)
-
                 if center_hole is None:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     time.sleep(0.3)
@@ -144,11 +144,14 @@ class BallInHole:
 
                 if aligned:
                     print("Hole Aligned, approaching hole")
-                    approach_hole = self._approaching_hole()
-                    if approach_hole:
-                        service.send("robobot/cmd/ti", "rc 0 0")
-                        print("hole approached, going to drop")
-                        self.state = self.DROPPING
+                    self.state = self.APPROACHING_HOLE
+
+            elif self.state == self.APPROACHING_HOLE:
+                approach_hole = self._approaching_hole()
+                if approach_hole:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    print("hole approached, going to drop")
+                    self.state = self.DROPPING
 
             elif self.state == self.DROPPING:
                 self._dropping()
@@ -187,7 +190,7 @@ class BallInHole:
         self, center
     ):  # TODO: Need to adjust this such that it doesn't get stuck on minor adjustments
         """Steer robot such the ball center is centered in frame for x-axis"""
-        TARGET_X = 284
+        TARGET_X = 286
         TURN_RATE = 0.5
         TOLERANCE = 0.025
 
@@ -242,7 +245,7 @@ class BallInHole:
 
     def _approaching_hole(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
-        TARGET_Y = 357
+        TARGET_Y = 377
         TOLERANCE_Y = 20  # pixels, tune this
 
         img = self.get_img()
@@ -294,16 +297,18 @@ class BallInHole:
         """Pick up golf ball with servo arms and CV"""
 
         time.sleep(0.5)
-        service.send("robobot/cmd/T0", "servo 1 650 100")  # Lower gripper down
+        service.send("robobot/cmd/T0", "servo 1 655 100")  # Lower gripper down
         time.sleep(2)
-        # service.send("robobot/cmd/T0", "servo 2 400 150") #close gripper ### to open its -200
+        service.send(
+            "robobot/cmd/T0", "servo 2 400 150"
+        )  # close gripper ### to open its -200
         time.sleep(3)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
 
     def _navigating_hole(self):
         """Drive to hole with no line following"""
         service.send(
-            "robobot/cmd/ti", f"rc 0 -1.1"
+            "robobot/cmd/ti", f"rc 0 -1.15"
         )  # Rotate 75 degrees to the left for first ball
         time.sleep(1.25)
         service.send("robobot/cmd/ti", f"rc 0 0")
@@ -331,3 +336,4 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
+
