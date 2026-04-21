@@ -16,9 +16,9 @@ def sleep(t):
 
 
 class BallsInGrid:
-    KNOCK_BALLS = 0  #
-    INITIAL_CORNER_POS = 1  #
-    ADDITIONAL_TIME = 2
+    ADDITIONAL_TIME = 0
+    KNOCK_BALLS = 1  #
+    INITIAL_CORNER_POS = 2  #
     APPROACHING_BALL_BLUE = 3  # kris
     PICKING_UP_BALL_BLUE = 4  # kris
     NAVIGATING_GRID_C = 5  # adam
@@ -54,13 +54,13 @@ class BallsInGrid:
     def additional_time(self):
         pose.tripBreset()
         service.send("robobot/cmd/ti", "rc 0.2 0.0")
-        service.send("robobot/cmd/T0", "servo 1 -800 300")
-        if pose.tripB > 1.95:
+        if pose.tripB > 2.7:
             service.send("robobot/cmd/ti", "rc 0.0 -0.7")
             time.sleep(1)
             service.send("robobot/cmd/ti", "rc 0.1 0.0")
-            time.sleep(0.3)
+            time.sleep(0.15)
             service.send("robobot/cmd/ti", "rc -0.1 0.0")
+            time.sleep(0.15)
         else:
             print(
                 f"# drive 1.95m drove {pose.tripB:.3f}m in {pose.tripBtimePassed():.3f} seconds"
