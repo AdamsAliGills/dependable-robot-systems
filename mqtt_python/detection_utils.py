@@ -1,5 +1,6 @@
 import time
 from simu import imu
+from sedge import edge
 from uservice import service
 from sir import ir
 
@@ -57,3 +58,10 @@ def wait_end():
         if ir.ir[1] < 0.14:
             return
         time.sleep(0.01)
+
+def wait_line():
+    while not service.stop:
+        if edge.lineValidCnt > 4:
+            return
+        time.sleep(0.01)
+        
