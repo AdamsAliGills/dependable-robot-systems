@@ -100,7 +100,7 @@ class missionPlanner:
         edge.lineControl(0.0, followLeft=True)
         service.send("robobot/cmd/ti", "rc 0 0")
         balls_in_grid = BallsInGrid()
-        balls_in_grid.ADDITIONAL_TIME
+        balls_in_grid.additional_time()
         wait_turn(80)
         print(f"TURN DETECTED")
 
