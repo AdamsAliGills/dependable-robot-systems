@@ -1,7 +1,13 @@
 from uservice import service
 from round_about import roundAbout
 from sedge import edge
-from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end, wait_line
+from detection_utils import (
+    wait_ramp_bottom,
+    wait_ramp_top,
+    wait_turn,
+    wait_end,
+    wait_line,
+)
 import time
 from scam import cam
 from ball_in_hole import BallInHole
@@ -90,7 +96,7 @@ class missionPlanner:
 
         wait_ramp_bottom(SHORT_RAMP_TILT, tolerance=3)
         print(f"END SECOND RAMP")
-        edge.lineControl(0.15, followLeft=True)
+        edge.lineControl(0.0, followLeft=True)
 
         wait_turn(80)
         print(f"TURN DETECTED")
@@ -111,7 +117,6 @@ class missionPlanner:
 
         edge.lineControl(0.2, followLeft=True)
         wait_end()
-
 
 
 if __name__ == "__main__":

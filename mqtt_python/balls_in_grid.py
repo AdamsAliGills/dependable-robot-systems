@@ -18,16 +18,17 @@ def sleep(t):
 class BallsInGrid:
     KNOCK_BALLS = 0  #
     INITIAL_CORNER_POS = 1  #
-    APPROACHING_BALL_BLUE = 2  # kris
-    PICKING_UP_BALL_BLUE = 3  # kris
-    NAVIGATING_GRID_C = 4  # adam
-    RAMP_CORNER_POS = 5  # adam
-    APPROACHING_BALL_RED = 6  # kris
-    PICKING_UP_BALL_RED = 7  # kris
+    ADDITIONAL_TIME = 2
+    APPROACHING_BALL_BLUE = 3  # kris
+    PICKING_UP_BALL_BLUE = 4  # kris
+    NAVIGATING_GRID_C = 5  # adam
+    RAMP_CORNER_POS = 6  # adam
+    APPROACHING_BALL_RED = 7  # kris
+    PICKING_UP_BALL_RED = 8  # kris
     # WILL GO BACK TO RAMP CORNER
-    NAVIGATING_GRID_B = 8  # adam
-    BACK_TO_LINE = 9  # adam
-    DONE = 10  # adam
+    NAVIGATING_GRID_B = 9  # adam
+    BACK_TO_LINE = 10  # adam
+    DONE = 11  # adam
 
     def __init__(self):
         self.state = 0
@@ -49,3 +50,18 @@ class BallsInGrid:
         print(
             "[BallsInGrid] WARNING: Camera not ready after timeout, proceeding anyway."
         )
+
+    def additional_time(self):
+        pose.tripBreset()
+        service.send("robobot/cmd/ti", "rc 0.2 0.0")
+        service.send("robobot/cmd/T0", "servo 1 -800 300")
+        if pose.tripB > 1.95:
+            service.send("robobot/cmd/ti", "rc 0.0 -0.7")
+            time.sleep(1)
+            service.send("robobot/cmd/ti", "rc 0.1 0.0")
+            time.sleep(0.3)
+            service.send("robobot/cmd/ti", "rc -0.1 0.0")
+        else:
+            print(
+                f"# drive 1.95m drove {pose.tripB:.3f}m in {pose.tripBtimePassed():.3f} seconds"
+            )
