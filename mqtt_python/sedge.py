@@ -360,9 +360,12 @@ class SEdge:
         self.lineValid = self.high >= self.lineValidThreshold
         # Off line if max sensor reading is closer to ground than (ground + threshold)
         if self.edge_n_g_calibrated:
-            self.off_line = (
-                max(self.edge_n) < min(self.edge_n_g) + self.lineValidGroundThreshold
+            ground_min = min(self.edge_n_g)
+            current_max = max(self.edge_n)
+            print(
+                f"Ground: {ground_min}, Current max: {current_max}, Diff: {current_max - ground_min}"
             )
+            self.off_line = current_max < ground_min + self.lineValidGroundThreshold
         else:
             self.off_line = False  # not calibrated, can't detect off line
         if self.lineValid:
