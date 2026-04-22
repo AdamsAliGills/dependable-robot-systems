@@ -27,9 +27,40 @@ import time as t
 from threading import Thread
 import cv2 as cv
 from ulog import flog
+import os
+import json
 
 
 class SEdge:
+    CALIB_FILE = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "ground_calibration.json"
+    )
+
+    def __init__(self):
+        self.load_ground_calibration()
+
+    def load_ground_calibration(self):
+        if os.path.exists(self.CALIB_FILE):
+            try:
+                with open(self.CALIB_FILE, "r") as f:
+                    data = json.load(f)
+                    self.edge_n_g = data.get("edge_n_g", [0] * 8)
+                    self.edge_n_g_calibrated = True
+                    print(f"% Edge:: loaded ground calibration: {self.edge_n_g}")
+            except Exception as e:
+                print(f"% Edge:: failed to load ground calibration: {e}")
+                self.edge_n_g_calibrated = False
+        else:
+            self.edge_n_g_calibrated = False
+
+    def save_ground_calibration(self):
+        try:
+            with open(self.CALIB_FILE, "w") as f:
+                json.dump({"edge_n_g": self.edge_n_g}, f)
+            print(f"% Edge:: saved ground calibration: {self.edge_n_g}")
+        except Exception as e:
+            print(f"% Edge:: failed to save ground calibration: {e}")
+
     # raw AD values
     edge = [0, 0, 0, 0, 0, 0, 0, 0]
     edgeUpdCnt = 0
@@ -179,6 +210,7 @@ class SEdge:
         if self.edge_nUpdCnt > 0:
             self.edge_n_g = self.edge_n.copy()
             self.edge_n_g_calibrated = True
+            self.save_ground_calibration()
             print("##########################")
             print(f"ground value: {self.edge_n_g}")
             print("##########################")
