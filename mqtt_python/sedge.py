@@ -362,16 +362,16 @@ class SEdge:
             ground_min = min(self.edge_n_g)
             current_max = max(self.edge_n)
             new_off_line = current_max < ground_min + self.lineValidGroundThreshold
-            if new_off_line != self.off_line or not hasattr(self, "_off_line_printed"):
+            if new_off_line != getattr(self, "_prev_off_line", None):
                 print(
                     f"off_line={new_off_line} (Ground:{ground_min}, Max:{current_max}, Diff:{current_max - ground_min})"
                 )
-                self._off_line_printed = True
+                self._prev_off_line = new_off_line
             self.off_line = new_off_line
         else:
-            if not hasattr(self, "_not_calib_printed"):
+            if not getattr(self, "_calib_warning_shown", False):
                 print("ground NOT CALIBRATED - run with -b flag")
-                self._not_calib_printed = True
+                self._calib_warning_shown = True
             self.off_line = False
         if self.lineValid:
             # --- Linear Interpolation Logic ---
