@@ -43,28 +43,30 @@ class missionPlanner:
 
         balls_in_grid = BallsInGrid()
         balls_in_grid.off_line_check()
+        sleep(2)
         balls_in_grid.additional_time()
 
         # wait_turn(80)
-        print(f"TURN DETECTED")
+        # print(f"TURN DETECTED")
 
         sleep(1.5)
         edge.lineControl(0)
-        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
         sleep(1)
 
-        edge.lineControl(0.2, followLeft=True)
+        # edge.lineControl(0.2, followLeft=True)
 
-        sleep(3.5)
+        # sleep(3.5)
 
-        edge.lineControl(0.05, followLeft=True)
+        # edge.lineControl(0.05, followLeft=True)
 
-        r = roundAbout(-225)
-        r.execute()
+        # r = roundAbout(-225)
+        # r.execute()
 
-        edge.lineControl(0.2, followLeft=True)
-        wait_end()
+        # edge.lineControl(0.2, followLeft=True)
+        # wait_end()
 
 
 if __name__ == "__main__":
     mp = missionPlanner()
+

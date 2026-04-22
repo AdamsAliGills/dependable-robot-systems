@@ -52,19 +52,18 @@ class BallsInGrid:
         )
 
     def off_line_check(self):
-        on_line = True
-        while on_line:
-            if edge.lineValidCnt < 4:
+        while not service.stop:
+            if not edge.off_line:
+                print("line lost --------------------------------------- yaaay")
+                edge.lineControl(0, followLeft=False)
                 service.send("robobot/cmd/ti", "rc 0 0")
-                on_line = False
                 return True
 
     def additional_time(self):
-        run_loop = True
-        while run_loop:
+        while not service.stop:
             pose.tripBreset()
             service.send("robobot/cmd/ti", "rc 0.2 0.0")
-            if pose.tripB > 1.95:
+            if pose.tripB > 1 or pose.tripBtimePassed() > 15:
                 service.send("robobot/cmd/ti", "rc 0.0 -0.7")
                 time.sleep(1)
                 service.send("robobot/cmd/ti", "rc 0.1 0.0")
@@ -74,5 +73,5 @@ class BallsInGrid:
                 service.send("robobot/cmd/ti", "rc 0.0 -0.7")
                 time.sleep(1)
                 service.send("robobot/cmd/ti", "rc -0.2 0.0")
-                run_loop = False
                 return True
+

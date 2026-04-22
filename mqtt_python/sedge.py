@@ -48,6 +48,7 @@ class SEdge:
     # line detection levels
     lineValidThreshold = 650  # 1000 is calibrated white
     crossingThreshold = 600  # average above this is assumed to be crossing line
+    line_off_threshold = 810
     # level for relevant white values
     low = lineValidThreshold - 100
     # line detection values
@@ -313,7 +314,7 @@ class SEdge:
         self.average = sum_val / 8.0
         self.crossingLine = self.average >= self.crossingThreshold
         self.lineValid = self.high >= self.lineValidThreshold
-
+        self.off_line = self.high >= self.line_off_threshold
         if self.lineValid:
             # --- Linear Interpolation Logic ---
             def get_interp_pos(side):
@@ -401,7 +402,7 @@ class SEdge:
         if self.followLeft:
             e = self.refPosition - self.posLeft
         else:
-            e = self.refPosition - self.posRight
+            e = 0  # self.refPosition - self.posRight
         abs_e = abs(e)
         if abs_e < 0.5:
             self.lineKp = 0.0
@@ -579,3 +580,4 @@ class SEdge:
 
 # create the data object
 edge = SEdge()
+
