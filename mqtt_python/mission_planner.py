@@ -97,11 +97,10 @@ class missionPlanner:
 
         wait_ramp_bottom(SHORT_RAMP_TILT, tolerance=3)
         print(f"END SECOND RAMP")
+        balls_in_grid = BallsInGrid()
+        balls_in_grid.off_line_check()
+        balls_in_grid.additional_time()
 
-        if edge.lineValidCnt < 4:
-            service.send("robobot/cmd/ti", "rc 0 0")
-            balls_in_grid = BallsInGrid()
-            balls_in_grid.additional_time()
         wait_turn(80)
         print(f"TURN DETECTED")
 

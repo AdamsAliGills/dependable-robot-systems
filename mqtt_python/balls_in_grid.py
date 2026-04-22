@@ -51,6 +51,14 @@ class BallsInGrid:
             "[BallsInGrid] WARNING: Camera not ready after timeout, proceeding anyway."
         )
 
+    def off_line_check(self):
+        on_line = True
+        while on_line:
+            if edge.lineValidCnt < 4:
+                service.send("robobot/cmd/ti", "rc 0 0")
+                on_line = False
+                return True
+
     def additional_time(self):
         pose.tripBreset()
         service.send("robobot/cmd/ti", "rc 0.2 0.0")
