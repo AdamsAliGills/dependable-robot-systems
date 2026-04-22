@@ -81,6 +81,7 @@ class missionPlanner:
 
         edge.lineControl(0.2, True)
 
+       
         print("#############################################")
         print("DONE WITH BALL OP")
         print("#############################################")
@@ -114,5 +115,35 @@ class missionPlanner:
 
 
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     mp = missionPlanner()
+=======
+
+
+    def roundAboutCaller(self):
+        '''Caller for the roundabout mission'''
+        tot_tests = 10
+        n = roundAbout.test(tot_tests)
+        print()
+        print(f"===================== TESTS RESULTS =====================")
+        print(f"{n} tests out of {tot_tests} were successful")
+        print(f"=========================================================")
+        print()
+
+    
+    def seeSawCaller(self):
+        '''Caller for the see saw mission'''
+        pass
+
+    def ballInHoleCallerBall(self,ball_color):
+        '''Caller for the ball in hole mission'''
+
+        edge.lineControl(0) # stop for detecting ball
+       
+        BallInHole(ball_color=ball_color)
+
+
+if  __name__ == "__main__":
+    mp = missionPlanner()
+>>>>>>> 683f04b (introduced blue and red balls)
