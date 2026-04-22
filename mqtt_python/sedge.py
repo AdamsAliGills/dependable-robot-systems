@@ -358,16 +358,21 @@ class SEdge:
         self.average = sum_val / 8.0
         self.crossingLine = self.average >= self.crossingThreshold
         self.lineValid = self.high >= self.lineValidThreshold
-        # Off line if max sensor reading is closer to ground than (ground + threshold)
         if self.edge_n_g_calibrated:
             ground_min = min(self.edge_n_g)
             current_max = max(self.edge_n)
-            print(
-                f"Ground: {ground_min}, Current max: {current_max}, Diff: {current_max - ground_min}"
-            )
-            self.off_line = current_max < ground_min + self.lineValidGroundThreshold
+            new_off_line = current_max < ground_min + self.lineValidGroundThreshold
+            if new_off_line != self.off_line or not hasattr(self, "_off_line_printed"):
+                print(
+                    f"off_line={new_off_line} (Ground:{ground_min}, Max:{current_max}, Diff:{current_max - ground_min})"
+                )
+                self._off_line_printed = True
+            self.off_line = new_off_line
         else:
-            self.off_line = False  # not calibrated, can't detect off line
+            if not hasattr(self, "_not_calib_printed"):
+                print("ground NOT CALIBRATED - run with -b flag")
+                self._not_calib_printed = True
+            self.off_line = False
         if self.lineValid:
             # --- Linear Interpolation Logic ---
             def get_interp_pos(side):
