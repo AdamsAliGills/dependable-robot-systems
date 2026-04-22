@@ -43,6 +43,8 @@ class SEdge:
     edge_n_g = [0, 0, 0, 0, 0, 0, 0, 0]
     edge_n_gUpdCnt = 0
     edge_n_gTime = datetime.now()
+    # calibrated ground values (set during -b calibration)
+    edge_n_g_calibrated = False
     # normalized after white calibration
     edge_n = [0, 0, 0, 0, 0, 0, 0, 0]
     edge_nUpdCnt = 0
@@ -176,7 +178,7 @@ class SEdge:
 
         if self.edge_nUpdCnt > 0:
             self.edge_n_g = self.edge_n.copy()
-            self.edge_n_gUpdCnt = 1
+            self.edge_n_g_calibrated = True
             print(f"% Edge:: ground calibrated: {self.edge_n_g}")
         else:
             print("% Edge:: no sensor data available for ground calibration")
@@ -356,13 +358,13 @@ class SEdge:
         self.average = sum_val / 8.0
         self.crossingLine = self.average >= self.crossingThreshold
         self.lineValid = self.high >= self.lineValidThreshold
-        # Off line if all sensors close to ground level (no white line detected)
-        if self.edge_n_gUpdCnt > 0:
+        # Off line if max sensor reading is closer to ground than (ground + threshold)
+        if self.edge_n_g_calibrated:
             self.off_line = (
                 max(self.edge_n) < min(self.edge_n_g) + self.lineValidGroundThreshold
             )
         else:
-            self.off_line = self.high <= self.line_off_threshold
+            self.off_line = False  # not calibrated, can't detect off line
         if self.lineValid:
             # --- Linear Interpolation Logic ---
             def get_interp_pos(side):
