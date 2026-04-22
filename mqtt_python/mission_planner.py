@@ -2,7 +2,7 @@ from uservice import service
 from round_about import roundAbout
 from guard_robot import GuardRobot
 from sedge import edge
-from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end
+from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end, wait_line
 import time
 
 LONG_RAMP_TILT = 8 # TODO check real value
@@ -72,6 +72,27 @@ class missionPlanner():
 
         wait_ramp_bottom(SHORT_RAMP_TILT, tolerance = 3)
         print(f"END SECOND RAMP")
+        edge.lineControl(0.15, followLeft=False)
+
+        sleep(2.5)
+        edge.lineControl(0.0)
+
+        service.send("robobot/cmd/ti", f"rc 0.3 0.0")
+        sleep(5)
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc 0.1 0.0")
+        wait_end()
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc 0.3 0.0")
+        sleep(5.5)
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc 0.1 0.0")
+        wait_line()
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
         edge.lineControl(0.15, followLeft=True)
 
         wait_turn(80)
