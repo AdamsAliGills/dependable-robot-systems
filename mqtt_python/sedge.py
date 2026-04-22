@@ -487,9 +487,9 @@ class SEdge:
         par = f"rc {self.velocity:.3f} {self.lineY:.3f} {t.time()}"
         service.send("robobot/cmd/ti", par)
         if True:
-            print(
-                f"% Edge::followLine: ctrl: e={e:.3f}, u={self.u:.3f}, y={self.lineY:.3f}, cnt {self.lineValidCnt}, -> {par}"
-            )
+            #print(
+            #   f"% Edge::followLine: ctrl: e={e:.3f}, u={self.u:.3f}, y={self.lineY:.3f}, cnt {self.lineValidCnt}, -> {par}"
+        #)
 
     ##########################################################
 

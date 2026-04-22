@@ -52,6 +52,7 @@ class BallsInGrid:
         )
 
     def off_line_check(self):
+        print("off_line_check started")
         while not service.stop:
             if edge.off_line:
                 print("line lost --------------------------------------- yaaay")
