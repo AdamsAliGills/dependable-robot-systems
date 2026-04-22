@@ -39,6 +39,10 @@ class SEdge:
     edge_n_w = [0, 0, 0, 0, 0, 0, 0, 0]
     edge_n_wUpdCnt = 0
     edge_n_wTime = datetime.now()
+    # normalized ground values (dark surface)
+    edge_n_g = [0, 0, 0, 0, 0, 0, 0, 0]
+    edge_n_gUpdCnt = 0
+    edge_n_gTime = datetime.now()
     # normalized after white calibration
     edge_n = [0, 0, 0, 0, 0, 0, 0, 0]
     edge_nUpdCnt = 0
@@ -47,6 +51,7 @@ class SEdge:
     edgeIntervalSetup = 0.1
     # line detection levels
     lineValidThreshold = 650  # 1000 is calibrated white
+    lineValidGroundThreshold = 150  # below this = off line (relative to ground)
     crossingThreshold = 600  # average above this is assumed to be crossing line
     line_off_threshold = 808
     # level for relevant white values
@@ -136,11 +141,18 @@ class SEdge:
                 else:
                     t.sleep(0.25)
                     service.args.white = False
-                    print(
-                        f"% Edge (sedge.py):: calibration should be fine, terminates."
-                    )
+                    print(f"% Edge (sedge.py):: white calibration fine, terminates.")
                     # terminate mission
                     service.stop = True
+            # black (ground) calibrate requested
+            elif service.args.black:
+                if self.edge_nUpdCnt > 0:
+                    self.calibrateGround()
+                    service.args.black = False
+                    print("% Edge (sedge.py):: ground calibration fine, terminates.")
+                    service.stop = True
+                else:
+                    t.sleep(0.1)
             elif self.edge_n_wUpdCnt == 0:
                 # get calibrated white value
                 service.send(self.topicCmdT0, "liwi")
@@ -158,6 +170,21 @@ class SEdge:
                 )
                 break
         pass
+
+    def calibrateGround(self):
+        from uservice import service
+
+        if self.edge_nUpdCnt > 0:
+            self.edge_n_g = self.edge_n.copy()
+            self.edge_n_gUpdCnt = 1
+            print(f"% Edge:: ground calibrated: {self.edge_n_g}")
+        else:
+            print("% Edge:: no sensor data available for ground calibration")
+
+    def requestGroundValues(self):
+        from uservice import service
+
+        service.send(self.topicCmdT0, "lig")
 
     ##########################################################
 
@@ -296,6 +323,21 @@ class SEdge:
                 self.edge_n_w[7] = int(gg[8])
                 self.edge_n_wUpdCnt += 1
                 # self.printnw()
+        elif topic == "T0/lig":  # get ground level
+            from uservice import service
+
+            gg = msg.split(" ")
+            if len(gg) >= 4:
+                self.edge_n_gTime = datetime.fromtimestamp(float(gg[0]))
+                self.edge_n_g[0] = int(gg[1])
+                self.edge_n_g[1] = int(gg[2])
+                self.edge_n_g[2] = int(gg[3])
+                self.edge_n_g[3] = int(gg[4])
+                self.edge_n_g[4] = int(gg[5])
+                self.edge_n_g[5] = int(gg[6])
+                self.edge_n_g[6] = int(gg[7])
+                self.edge_n_g[7] = int(gg[8])
+                self.edge_n_gUpdCnt += 1
         else:
             used = False
         return used
@@ -314,7 +356,13 @@ class SEdge:
         self.average = sum_val / 8.0
         self.crossingLine = self.average >= self.crossingThreshold
         self.lineValid = self.high >= self.lineValidThreshold
-        self.off_line = self.high >= self.line_off_threshold
+        # Off line if all sensors close to ground level (no white line detected)
+        if self.edge_n_gUpdCnt > 0:
+            self.off_line = (
+                max(self.edge_n) < min(self.edge_n_g) + self.lineValidGroundThreshold
+            )
+        else:
+            self.off_line = self.high <= self.line_off_threshold
         if self.lineValid:
             # --- Linear Interpolation Logic ---
             def get_interp_pos(side):
