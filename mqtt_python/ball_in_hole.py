@@ -25,12 +25,13 @@ class BallInHole:
     BACK_TO_LINE = 8
     DONE = 9
 
-    def __init__(self):
+    def __init__(self,ball_color):
         self.state = 0
         self.in_center = False
         self.final_alignment = False
         self.calib = CameraCalib()
         pose.tripBreset()
+        self.ball_color = ball_color
 
     def _wait_for_camera(self, timeout=10.0):
         """Block until camera produces a valid frame or timeout."""
@@ -56,7 +57,7 @@ class BallInHole:
 
                 print("###################################################")
 
-                center, radius = self._searching_golf_ball(img)
+                center, radius = self._searching_golf_ball(img,self.ball_color)
 
                 # cv2.imshow("BallInHole Search", img)
                 if center is not None:
@@ -79,7 +80,7 @@ class BallInHole:
                 # img = self.get_img(trys = 10)
 
                 img = self.get_img()
-                center, radius = self._searching_golf_ball(img)
+                center, radius = self._searching_golf_ball(img,self.ball_color)
                 if center is None:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     sleep(0.3)
@@ -163,9 +164,9 @@ class BallInHole:
         # else:
         #     return self.calib.undistort(img.copy())
 
-    def _searching_golf_ball(self, img):
+    def _searching_golf_ball(self, img, ball_color):
         """Searching for the golf ball"""
-        center, radius = ball_tracking(img, display=False)
+        center, radius = ball_tracking(img, display=False,ball_color=ball_color)
         return center, radius
 
     def _aligning(
@@ -260,7 +261,7 @@ class BallInHole:
         if img is None:
             return False
 
-        center, radius = self._searching_golf_ball(img)
+        center, radius = self._searching_golf_ball(img,self.ball_color)
         if center is None:
             return False
 
