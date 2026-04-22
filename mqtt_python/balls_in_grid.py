@@ -53,10 +53,8 @@ class BallsInGrid:
 
     def off_line_check(self):
         while not service.stop:
-            print(
-                f"high={edge.high}, off_line={edge.off_line}, lineValid={edge.lineValid}"
-            )
-            if not edge.off_line:
+            print(f"off_line={edge.off_line}")
+            if edge.off_line:
                 print("line lost --------------------------------------- yaaay")
                 edge.lineControl(0, followLeft=False)
                 service.send("robobot/cmd/ti", "rc 0 0")
