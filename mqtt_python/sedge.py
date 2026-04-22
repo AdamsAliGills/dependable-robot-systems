@@ -171,6 +171,7 @@ class SEdge:
                     f"% Edge (sedge.py):: got no data after {loops} (continues edge_n_wUpdCnt={self.edge_n_wUpdCnt}, edgeUpdCnt={self.edgeUpdCnt}, edge_nUpdCnt={self.edge_nUpdCnt})"
                 )
                 break
+        self._loadGroundCalibration()
         pass
 
     def calibrateGround(self):
@@ -180,8 +181,31 @@ class SEdge:
             self.edge_n_g = self.edge_n.copy()
             self.edge_n_g_calibrated = True
             print(f"% Edge:: ground calibrated: {self.edge_n_g}")
+            # save to file
+            self._saveGroundCalibration()
         else:
             print("% Edge:: no sensor data available for ground calibration")
+
+    def _saveGroundCalibration(self):
+        import json
+        import os
+
+        path = "/tmp/edge_ground_calib.json"
+        with open(path, "w") as f:
+            json.dump({"edge_n_g": self.edge_n_g, "calibrated": True}, f)
+        print(f"% Edge:: saved ground calibration to {path}")
+
+    def _loadGroundCalibration(self):
+        import json
+        import os
+
+        path = "/tmp/edge_ground_calib.json"
+        if os.path.exists(path):
+            with open(path, "r") as f:
+                data = json.load(f)
+                self.edge_n_g = data["edge_n_g"]
+                self.edge_n_g_calibrated = data["calibrated"]
+                print(f"% Edge:: loaded ground calibration: {self.edge_n_g}")
 
     def requestGroundValues(self):
         from uservice import service
