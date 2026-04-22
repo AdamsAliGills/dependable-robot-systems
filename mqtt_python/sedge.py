@@ -395,6 +395,9 @@ class SEdge:
         if self.edge_n_g_calibrated:
             ground_min = min(self.edge_n_g)
             current_max = max(self.edge_n)
+            print(
+                f"ground_min={ground_min}, current_max={current_max}, diff={current_max - ground_min}"
+            )
             self.off_line = current_max < ground_min + self.lineValidGroundThreshold
         else:
             self.off_line = False
