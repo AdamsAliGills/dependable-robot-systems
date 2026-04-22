@@ -60,19 +60,19 @@ class BallsInGrid:
                 return True
 
     def additional_time(self):
-        pose.tripBreset()
-        service.send("robobot/cmd/ti", "rc 0.2 0.0")
-        if pose.tripB > 1.95:
-            service.send("robobot/cmd/ti", "rc 0.0 -0.7")
-            time.sleep(1)
-            service.send("robobot/cmd/ti", "rc 0.1 0.0")
-            time.sleep(0.15)
-            service.send("robobot/cmd/ti", "rc -0.1 0.0")
-            time.sleep(0.15)
-            service.send("robobot/cmd/ti", "rc 0.0 -0.7")
-            time.sleep(1)
-            service.send("robobot/cmd/ti", "rc -0.2 0.0")
-        else:
-            print(
-                f"# drive 1.95m drove {pose.tripB:.3f}m in {pose.tripBtimePassed():.3f} seconds"
-            )
+        run_loop = True
+        while run_loop:
+            pose.tripBreset()
+            service.send("robobot/cmd/ti", "rc 0.2 0.0")
+            if pose.tripB > 1.95:
+                service.send("robobot/cmd/ti", "rc 0.0 -0.7")
+                time.sleep(1)
+                service.send("robobot/cmd/ti", "rc 0.1 0.0")
+                time.sleep(0.15)
+                service.send("robobot/cmd/ti", "rc -0.1 0.0")
+                time.sleep(0.15)
+                service.send("robobot/cmd/ti", "rc 0.0 -0.7")
+                time.sleep(1)
+                service.send("robobot/cmd/ti", "rc -0.2 0.0")
+                run_loop = False
+                return True
