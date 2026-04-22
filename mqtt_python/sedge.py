@@ -48,7 +48,7 @@ class SEdge:
     # line detection levels
     lineValidThreshold = 650  # 1000 is calibrated white
     crossingThreshold = 600  # average above this is assumed to be crossing line
-    line_off_threshold = 810
+    line_off_threshold = 808
     # level for relevant white values
     low = lineValidThreshold - 100
     # line detection values
@@ -580,4 +580,3 @@ class SEdge:
 
 # create the data object
 edge = SEdge()
-
