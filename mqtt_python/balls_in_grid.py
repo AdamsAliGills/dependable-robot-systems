@@ -52,20 +52,12 @@ class BallsInGrid:
         )
 
     def off_line_check(self):
-        print("off_line_check started")
         while not service.stop:
-            if edge.off_line:
+            if not edge.off_line:
                 print("line lost --------------------------------------- yaaay")
                 edge.lineControl(0, followLeft=False)
                 service.send("robobot/cmd/ti", "rc 0 0")
                 return True
-            # debug - only print once
-            if not getattr(edge, "_off_line_check_printed", False):
-                if edge.edge_n_g_calibrated:
-                    print(f"gCalibrated, off_line={edge.off_line}")
-                else:
-                    print("ground NOT CALIBRATED - run with -b flag")
-                edge._off_line_check_printed = True
 
     def additional_time(self):
         while not service.stop:
@@ -82,3 +74,4 @@ class BallsInGrid:
                 time.sleep(1)
                 service.send("robobot/cmd/ti", "rc -0.2 0.0")
                 return True
+
