@@ -53,7 +53,6 @@ class BallsInGrid:
 
     def off_line_check(self):
         while not service.stop:
-            print(f"off_line={edge.off_line}")
             if edge.off_line:
                 print("line lost --------------------------------------- yaaay")
                 edge.lineControl(0, followLeft=False)
