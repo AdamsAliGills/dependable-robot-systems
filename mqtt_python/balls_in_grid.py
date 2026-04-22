@@ -54,7 +54,7 @@ class BallsInGrid:
     def additional_time(self):
         pose.tripBreset()
         service.send("robobot/cmd/ti", "rc 0.2 0.0")
-        if pose.tripB > 2.7:
+        if pose.tripB > 1.95:
             service.send("robobot/cmd/ti", "rc 0.0 -0.7")
             time.sleep(1)
             service.send("robobot/cmd/ti", "rc 0.1 0.0")
