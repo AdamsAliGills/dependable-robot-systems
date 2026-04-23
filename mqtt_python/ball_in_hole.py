@@ -1,0 +1,268 @@
+from ball_tracking import ball_tracking
+from hole_detection import hole_tacking
+from scam import cam
+import time
+from uservice import service
+from scam_calibration import CameraCalib
+import cv2
+from sedge import edge
+from spose import pose
+
+
+class BallInHole:
+    SEARCHING = 0
+    ALIGNING = 1
+    APPROACHING = 2
+    PICKING_UP_GOLF_BALL = 3
+    NAVIGATING_HOLE = 4
+    DROPPING = 5
+    DONE = 6
+
+    def __init__(self):
+        self.state = 0
+        self.in_center = False
+        self.final_alignment = False
+        self.calib = CameraCalib()
+        pose.tripBreset()
+        self.start_heading = 0
+
+        # service.send("robobot/cmd/T0", "servo 1 -400 50")
+        self.desired_turn_angle = 0.7
+        service.send(
+            "robobot/cmd/ti", f"rc 0 {self.desired_turn_angle}"
+        )  # Rotate 75 degrees to the left for first ball
+        time.sleep(1)
+        service.send("robobot/cmd/ti", f"rc 0 0")
+
+        self.execute()
+
+    def sleep(t):
+        start = time.time()
+        while (time.time() - start < t) and not service.stop:
+            time.sleep(0.01)
+
+    def _wait_for_camera(self, timeout=10.0):
+        """Block until camera produces a valid frame or timeout."""
+        print("[BallInHole] Waiting for camera...")
+        start = time.time()
+        while time.time() - start < timeout:
+            ok, img, _ = cam.getImage()
+            if ok and img is not None:
+                print("[BallInHole] Camera ready.")
+                return
+            time.sleep(0.2)
+        print(
+            "[BallInHole] WARNING: Camera not ready after timeout, proceeding anyway."
+        )
+
+    def execute(self):
+        """Start functionality"""
+        while not service.stop:
+            if self.state == self.SEARCHING:
+                img = self.get_img()
+
+                print("###################################################")
+
+                center, radius = self._searching_golf_ball(img)
+
+                # cv2.imshow("BallInHole Search", img)
+                if center is not None:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    time.sleep(0.5)
+                    self.ball_center = center  # store for next states
+                    self.ball_radius = radius
+                    print("###################################################")
+                    print(
+                        f"[BallInHole] Ball found at {center}, transitioning to ALIGNING"
+                    )
+                    print("###################################################")
+                    self.state = self.ALIGNING
+
+                else:
+                    # No ball yet — rotate slowly to scan
+                    service.send("robobot/cmd/ti", "rc 0 0.2")
+
+            elif self.state == self.ALIGNING:
+                # img = self.get_img(trys = 10)
+
+                img = self.get_img()
+                center, radius = self._searching_golf_ball(img)
+                if center is None:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    time.sleep(0.3)
+                    print("[BallInHole] Lost ball during alignment, back to SEARCHING")
+                    self.state = self.SEARCHING
+                    continue
+
+                self.ball_center = center
+                aligned = self._aligning(center)  # does one timed correction
+
+                if aligned:  # only True when already within tolerance
+                    print("[BallInHole] Aligned, transitioning to APPROACHING")
+                    self.state = self.APPROACHING
+
+            elif self.state == self.APPROACHING:
+                reached = self._approaching()
+
+                if reached:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    if self.final_alignment == False:
+                        print("#####################")
+                        print("CHECKING FINAL ALLIGNMENT")
+                        print("#####################")
+                        self.state = self.ALIGNING
+                        self.final_alignment = True
+                    self.state = self.PICKING_UP_GOLF_BALL
+                    print(f"[BallInHole] Ball in reach, transitioning to PICKING_UP")
+
+            elif self.state == self.PICKING_UP_GOLF_BALL:
+                self._picking_up()
+                print(f"[BallInHole] Ball picked up, transitioning to NAVIGATING_HOLE")
+                self.state = self.NAVIGATING_HOLE
+
+            elif self.state == self.NAVIGATING_HOLE:
+                reached = self._navigating_hole()
+
+                if reached:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    print(f"[BallInHole] At hole, transitioning to DROPPING")
+                    self.state = self.DROPPING
+
+            elif self.state == self.DROPPING:
+                self._dropping()
+                print(f"[BallInHole] Ball dropped, DONE")
+                self.state = self.DONE
+
+            elif self.state == self.DONE:
+                break
+
+            time.sleep(0.05)
+
+    def get_img(self):
+        """get image from rasp camera and return it also undistorted via calibration"""
+        if cam.useCam:
+            ok, img, imgTime = cam.getImage()
+            if not ok:  # size(img) == 0):
+                if cam.imageFailCnt < 5:
+                    print("% Failed to get image.")
+        return img
+        # else:
+        #     return self.calib.undistort(img.copy())
+
+    def _searching_golf_ball(self, img):
+        """Searching for the golf ball"""
+        center, radius = ball_tracking(img, display=False)
+        return center, radius
+
+    def _aligning(
+        self, center
+    ):  # TODO: Need to adjust this such that it doesn't get stuck on minor adjustments
+        """Steer robot such the ball center is centered in frame for x-axis"""
+        TARGET_X = 284
+        TURN_RATE = 0.5
+        TOLERANCE = 0.025
+
+        # angle_x, _ = self.calib.pixel_to_angle(center[0], center[1])
+        # target_angle_x, _ = self.calib.pixel_to_angle(TARGET_X, center[1])
+        # angle_error = angle_x - target_angle_x
+
+        # if abs(angle_error) < TOLERANCE:
+        #     service.send("robobot/cmd/ti", "rc 0 0")
+        #     return True
+
+        # turn_time = abs(angle_error) / TURN_RATE
+        # turn = -TURN_RATE if angle_error > 0 else TURN_RATE
+        # service.send("robobot/cmd/ti", f"rc 0 {turn}")
+
+        # start = time.time()
+        # while (time.time() - start < turn_time) and not service.stop:
+        #     time.sleep(0.01)
+
+        # service.send("robobot/cmd/ti", "rc 0 0")
+        # return False  # return False so execute re-detects and verifies
+
+        KP = 0.5  # tune this
+        MIN_TURN = 0.2  # minimum to overcome friction
+        MAX_TURN = 0.6  # safety clamp
+        TOLERANCE = 0.017  # radians
+
+        angle_x, _ = self.calib.pixel_to_angle(center[0], center[1])
+        target_angle_x, _ = self.calib.pixel_to_angle(TARGET_X, center[1])
+        error = angle_x - target_angle_x
+
+        print(f"[Align] error={error:.4f}")
+
+        # Stop condition
+        if abs(error) < TOLERANCE:
+            service.send("robobot/cmd/ti", "rc 0 0")
+            return True
+
+        # Proportional control
+        turn = -KP * error
+
+        # Deadband compensation (THIS FIXES YOUR ISSUE)
+        if abs(turn) < MIN_TURN:
+            turn = MIN_TURN * (1 if turn > 0 else -1)
+
+        # Clamp
+        turn = max(min(turn, MAX_TURN), -MAX_TURN)
+
+        service.send("robobot/cmd/ti", f"rc 0 {turn}")
+
+        return False
+
+    def _approaching(self, at_end=False):
+        """Driving towards ball, maybe parallel thread with camera input?"""
+        TARGET_Y = 357
+        TOLERANCE_Y = 20  # pixels, tune this
+
+        img = self.get_img()
+        if img is None:
+            return False
+
+        center, radius = self._searching_golf_ball(img)
+        if center is None:
+            return False
+
+        error_y = (
+            TARGET_Y - center[1]
+        )  # positive = ball too far (low y), need to drive forward
+        print(f"[Approaching] ball y={center[1]}, target y={TARGET_Y}, error={error_y}")
+
+        if abs(error_y) < TOLERANCE_Y:
+            return True  # reached pickup position
+
+        service.send("robobot/cmd/ti", "rc 0.07 0")
+        return False
+
+    def _picking_up(self):
+        """Pick up golf ball with servo arms and CV"""
+
+        time.sleep(0.5)
+        service.send("robobot/cmd/T0", "servo 1 650 100")  # Lower gripper down
+        time.sleep(2)
+        # service.send("robobot/cmd/T0", "servo 2 400 150") #close gripper ### to open its -200
+        time.sleep(3)
+        service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
+
+    def _navigating_hole(self):
+        """Drive to hole with no line following
+        service.send("robobot/cmd/ti", f"rc 0 -1.3") #Rotate 75 degrees to the left for first ball
+        time.sleep(1.25)
+        service.send("robobot/cmd/ti", f"rc 0 0")
+        service.send("robobot/cmd/ti", "rc 0.2 0")
+        time.sleep(2)
+        service.send("robobot/cmd/ti", "rc 0 0")"""
+        img = self.get_img()
+        if img is None:
+            return False
+        xy_hole = hole_tacking(img)
+        x_hole, y_hole = int(xy_hole.pt[0]), int(xy_hole.pt[1])
+
+    def _dropping(self):
+        """Open servo to release ball into hole"""
+        pass
+
+    def _record_start_pose(self):
+        """Get initial pose"""
+        pass
