@@ -283,13 +283,13 @@ class BallInHole:
         """Pick up golf ball with servo arms and CV"""
 
         sleep(0.5)
-        service.send("robobot/cmd/T0", "servo 1 657 100")  # Lower gripper down
+        service.send("robobot/cmd/T0", "servo 1 665 100")  # Lower gripper down
         sleep(2)
         service.send(
             "robobot/cmd/T0", "servo 2 400 150"
         )  # close gripper ### to open its -200
         sleep(2)
-        service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
+        #service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
 
     def _searching_hole(self, img):
         """Searching for the hole"""
