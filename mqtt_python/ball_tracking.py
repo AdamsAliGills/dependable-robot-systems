@@ -1,9 +1,10 @@
+import datetime
+from datetime import datetime
 import os
 import matplotlib.pyplot as plt
 import sys
 import imutils 
 import glob
-from collections import deque
 from imutils.video import VideoStream
 import numpy as np
 import argparse
@@ -12,14 +13,20 @@ import imutils
 import time
 # import pytest
 from scam import cam
-
 from sgpio import gpio
-
+from matplotlib import image as io
 
 #------------------------------
 # Folder paths for test images
-BALL_FOLDER    = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/golf_ball/"
-NO_BALL_FOLDER = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_new/other/"
+BLUE_BALL_FOLDER    = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_weird_balls_local/images_weird_balls/blue_ball"
+RED_BALL_FOLDER    = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_weird_balls_local/images_weird_balls/red_ball"
+WHITE_BALL_FOLDER    = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_weird_balls_local/images_weird_balls/white_ball"
+NO_BALL_FOLDER    = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_weird_balls_local/images_weird_balls/no_ball"
+ALL_BALLS_FOLDER    = "/home/kkristjansson/DTU/spring2026/34755_dependableRobotSystems/images_weird_balls_local/images_weird_balls/all_balls"
+
+
+
+
 #------------------------------
 
 #------------------------------
@@ -52,31 +59,58 @@ def get_image():
     cv2.imshow("image",img)
     cv2.waitKey(0)
     
+def check_if_in_exclusion_zone(x, y):
+    EXCLUSION_ZONES = [
+        (0,   274, 147, 176),
+    (487, 268, 112, 181),
+    ]
+    for (zx,zy,zw,zh) in EXCLUSION_ZONES:
+        if zx <= x <= zx+zw and zy <= y <= zy+zh:
+            return True
+    return False
 
-
-def ball_tracking(frame_rasp,display = False):
+def ball_tracking(frame_rasp,display = False, ball_color = type(str)):
     """Get's the outline of a golf ball as well as distinguishing between
         falsely detected golf balls """
     #Some constraints to limit detection of false golf balls
-    MIN_Y = 160
-    MIN_CIRC = 0.49
-    MIN_RAD = 10
-    MAX_RAD = 50
+    if ball_color == "orange":
+        MIN_Y = 160
+        MIN_CIRC = 0.49
+        MIN_RAD = 10
+        MAX_RAD = 50
+    else:
+        MIN_Y = 100
+        MIN_CIRC = 0.40
+        MIN_RAD = 10
+        MAX_RAD = 60
 
-    
+
 
     frame = imutils.resize(frame_rasp, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
     # Necessary HSV thresholds for seperating orangeness from background
-    orange_lower = np.array([1, 100, 150])
-    orange_upper = np.array([25, 255, 255])
+    if ball_color == "orange":
+        lower_hsv = np.array([1, 100, 150])
+        upper_hsv = np.array([25, 255, 255])
+    elif ball_color == "red":
+        lower_hsv = np.array([120, 71, 138])
+        upper_hsv = np.array([179, 255, 255])
+    elif ball_color == "blue":
+        lower_hsv = np.array([89, 33, 64])
+        upper_hsv = np.array([112, 250, 255])
+    else:
+        pass
 
-    mask = cv2.inRange(hsv, orange_lower, orange_upper)
-    mask = cv2.erode(mask, None, iterations=3) #rid of noise
+    if ball_color in ["orange", "red", "blue"]:
+        mask = cv2.inRange(hsv, lower_hsv, upper_hsv)
+        mask = cv2.erode(mask, None, iterations=3) #rid of noise
+
+    else:
+        mask = cv2.erode(frame, None, iterations=3) #rid of noise
+
     mask = cv2.dilate(mask, None, iterations=4) #recover ball shape from eroding
-
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
 
@@ -100,7 +134,11 @@ def ball_tracking(frame_rasp,display = False):
 
     result_log = []
     result_winner_log = None
-
+    candidates = [
+        (c, x, y, radius, circularity)
+        for (c, x, y, radius, circularity) in candidates
+        if not check_if_in_exclusion_zone(x, y)
+    ]
     if candidates:
         for i, (c, x, y, radius, circularity) in enumerate(candidates):
             cx, cy = int(x), int(y)
@@ -117,7 +155,7 @@ def ball_tracking(frame_rasp,display = False):
         best = max(candidates, key=lambda item: item[2])
         best_c, best_x, best_y, best_radius, best_circ = best
  
-        M      = cv2.moments(best_c)
+        M = cv2.moments(best_c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
  
         cv2.circle(frame, (int(best_x), int(best_y)), int(best_radius), (0, 255, 255), 2)
@@ -138,7 +176,6 @@ def ball_tracking(frame_rasp,display = False):
     for line in result_log:
         print(line)
     
-   
     
     # if display:
     #     with open("pattern_analysis_w_ball_test1.txt", "a") as f:
@@ -153,9 +190,13 @@ def ball_tracking(frame_rasp,display = False):
     cv2.line(frame, (target_x, target_y - target_r), (target_x, target_y + target_r), (255, 0, 0), 1)  # vertical
     cv2.circle(frame, (target_x, target_y), 3, (255, 0, 0), -1)              # center dot
 
-    cv2.imwrite("ball_tracking_frame2.jpg", frame)
-    cv2.imwrite("ball_tracking_mask2.jpg", mask)
-    print("% Saved ball_tracking_frame.jpg and ball_tracking_mask.jpg")
+    saved_time = time.time()
+    dt_object = datetime.fromtimestamp(saved_time)
+    formatted_time = dt_object.strftime("%Y-%m-%d_%H-%M-%S-%f")
+
+    cv2.imwrite(f"ball_tracking_frame_{ball_color}_{formatted_time}.jpg", frame)
+    cv2.imwrite(f"ball_tracking_mask_{ball_color}_{formatted_time}.jpg", mask)
+    print(f"% Saved ball_tracking_frame_{ball_color}_{formatted_time}.jpg and ball_tracking_mask_{ball_color}_{formatted_time}.jpg")
     
 
     return center, best_radius
@@ -166,44 +207,6 @@ def _get_images_from_folder(folder):
     for ext in ["*.jpg", "*.jpeg", "*.png", "*.bmp"]:
         paths.extend(glob.glob(os.path.join(folder, ext)))
     return sorted(paths)
-
-
-# ---------------------------------------------------------------------------
-# Test 1 — no ball images should never produce a detection
-# ---------------------------------------------------------------------------
- 
-# @pytest.mark.parametrize("image_path", _get_images_from_folder(NO_BALL_FOLDER))
-# def test_no_false_positive(image_path):
-#     """Assert no ball is detected in images known to contain no ball."""
-#     center, _ = ball_tracking(image_path, display=False)
-#     assert center is None, (
-#         f"False positive in {os.path.basename(image_path)}: detected ball at center={center}"
-#     )
- 
- 
-# ---------------------------------------------------------------------------
-# Test 2 — ball images should match expected center positions
-# ---------------------------------------------------------------------------
- 
-# @pytest.mark.parametrize("filename,expected_center", EXPECTED_RESULTS.items())
-# def test_ball_detected_correctly(filename, expected_center):
-#     """Assert the detected ball center matches the logged expected position."""
-#     image_path = os.path.join(BALL_FOLDER, filename)
- 
-#     if not os.path.exists(image_path):
-#         pytest.skip(f"Image not found: {filename}")
- 
-#     center, _ = ball_tracking(image_path, display=False)
- 
-#     assert center is not None, (
-#         f"No ball detected in {filename} — expected center={expected_center}"
-#     )
-#     assert abs(center[0] - expected_center[0]) <= CENTER_TOLERANCE, (
-#         f"{filename}: x off — got {center[0]}, expected {expected_center[0]} (±{CENTER_TOLERANCE}px)"
-#     )
-#     assert abs(center[1] - expected_center[1]) <= CENTER_TOLERANCE, (
-#         f"{filename}: y off — got {center[1]}, expected {expected_center[1]} (±{CENTER_TOLERANCE}px)"
-#     )
 
 
 def erosion_values(img_original,mask,desired_value):
@@ -374,6 +377,56 @@ def tune_hsv(image_path):
 
     cv2.destroyAllWindows()
 
+def find_first_ball(img):
+    img = cv2.imread(img)
+    
+    prevCircle = None
+    dist = lambda x1,y1,x2,y2: ((x1-x2)**2 + (y1-y2)**2)
+    
+    grayFrame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(grayFrame, 230, 255, cv2.THRESH_BINARY)    
+    cv2.imshow("Thresholded", thresh)
+    blurFrame = cv2.GaussianBlur(thresh, (11,11), 2)
 
+    circles = cv2.HoughCircles(blurFrame, cv2.HOUGH_GRADIENT, 1.2, minDist=10, param1=30, param2=15, minRadius=10, maxRadius=80) 
+    #param1 the higher the threshold the higher standard of whether its a circle
+    #param2 the amount of edge points that are needed to be considered a circle
 
+    
+    if circles is not None:
+        circles = np.uint16(np.around(circles))  
+        chosen = None
+        for i in circles[0, :]:
+            if chosen is None: chosen = i
+            if prevCircle is not None:
+                if dist(chosen[0],chosen[1],prevCircle[0],prevCircle[1]) < dist(i[0],i[1],prevCircle[0],prevCircle[1]):
+                    chosen = i
+        cv2.circle(img, (chosen[0], chosen[1]), 1, (0, 100, 100), 3)
+        cv2.circle(img, (chosen[0], chosen[1]), chosen[2], (255, 0, 255), 3)
+        prevCircle = chosen
+    else:
+        print("No circles found")
+    cv2.imshow("Found Circles", img)
+    if cv2.waitKey(0) & 0xFF == ord('q'):
+        cv2.destroyAllWindows()
 
+if __name__ == "__main__":
+    choice =  input("Enter whether to process many or single (m/s): ")
+    if choice == "m":
+        LENGTH_ALL_BALLS_FILES = 67
+        LENGTH_BLUE_BALLS = 7
+        LENGTH_RED_BALLS = 6
+        for i in range(LENGTH_ALL_BALLS_FILES):
+            img = ALL_BALLS_FOLDER + f"/frame_{i+1:05d}.jpg"
+            # tune_hsv(img)
+            # find_first_ball(img)
+            try:
+                ball_tracking(cv2.imread(img), display=True, ball_color="blue")
+                ball_tracking(cv2.imread(img), display=True, ball_color="red")
+            except AttributeError:
+                pass
+    else:
+        img = ALL_BALLS_FOLDER + "/frame_00022.jpg"
+        # ball_tracking(cv2.imread(img), display=True, ball_color="red")
+
+        tune_hsv(img)

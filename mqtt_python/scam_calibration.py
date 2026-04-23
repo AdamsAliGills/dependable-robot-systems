@@ -2,13 +2,28 @@
 import numpy as np
 import cv2
 
+
 class CameraCalib:
     def __init__(self):
-        '''Get required calibration files'''
+        """Get required calibration files"""
         try:
-            self.mtx  = np.loadtxt("calib_mtx.txt")
+            self.mtx = np.loadtxt("calib_mtx.txt")
+            self.mtx = np.array(
+                [
+                    [953.422, 0.000, 614.889],
+                    [0.000, 952.264, 562.618],
+                    [0.000, 0.000, 1.000],
+                ]
+            )
         except FileNotFoundError:
             print("No matrix calibrartion file found")
+            self.mtx = np.array(
+                [
+                    [953.422, 0.000, 614.889],
+                    [0.000, 952.264, 562.618],
+                    [0.000, 0.000, 1.000],
+                ]
+            )
         # Load dist if available, otherwise assume zero distortion
         try:
             self.dist = np.loadtxt("calib_dist.txt")
@@ -41,4 +56,3 @@ class CameraCalib:
         real_radius_m = real_diameter_m / 2
         distance = (self.fx * real_radius_m) / radius_pixels
         return distance
-
