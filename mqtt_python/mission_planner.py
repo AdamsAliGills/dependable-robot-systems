@@ -24,6 +24,13 @@ class missionPlanner:
     def planMission(self):
         edge.lineControl(0.2, followLeft=True)
 
+        # initialize servos
+        service.send("robobot/cmd/T0","servo 1 0 50")
+        service.send("robobot/cmd/T0","servo 2 0 50")
+        sleep(0.3)
+        service.send("robobot/cmd/T0","servo 1 -400 50")
+        service.send("robobot/cmd/T0","servo 2 -200 50")
+
         wait_turn(25)
         sleep(1)
 
@@ -67,11 +74,11 @@ class missionPlanner:
 
         wait_ramp_top(LONG_RAMP_TILT, tolerance = 2)
         print(f"END FIRST RAMP")
-        edge.lineControl(0.2, followLeft=False)
+        edge.lineControl(0.0)
 
         print("STARTING BALL IN HOLE OP")
 
-        ball_in_hole = BallInHole()
+        ball_in_hole = BallInHole("orange")
 
         # Rotate 75 degrees to the left for first ball
         service.send("robobot/cmd/ti", f"rc 0.0 0.7")
