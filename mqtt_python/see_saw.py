@@ -5,10 +5,10 @@ from simu import imu
 from datetime import *
 import time
 import math
-from ball_in_hole import BallInHole
+from ball_in_hole_2 import BallInHole_2
 
 #Pick up orange golf ball
-pickup = BallInHole("orange")
+pickup = BallInHole_2("orange")
 
 stateTime = datetime.now()
 

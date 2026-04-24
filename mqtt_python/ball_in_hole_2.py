@@ -13,7 +13,7 @@ def sleep(t):
     while (time.time() - start < t) and not service.stop:
         time.sleep(0.01)
 
-class BallInHole:
+class BallInHole_2:
     SEARCHING_BALL = 0
     ALIGNING_BALL = 1
     APPROACHING_BALL = 2
