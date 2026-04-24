@@ -54,10 +54,10 @@ class SeeSaw():
                 '''Move to the middle and pick up the ball'''
                 print(f"distance: {pose.tripB}")
                 if pose.tripB > self.MIDDLE_DISTANCE:     # pose.tripB is the variable to record distance
-                    edge.lineControl(0)
+                    edge.lineControl(0)  #Stop the robot when reach the middle
                     service.send("robobot/cmd/ti","rc 0.0 0.0")
                     self.state = 3  
-
+            
             elif self.state == 3:
                 reached = pickup._approaching() # approach to the golf ball
                 if reached:
@@ -67,7 +67,7 @@ class SeeSaw():
 
             elif self.state == 4:
                 pickup._picking_up() # pick up the golf ball
-                # Keep the arm down for robot balance
+                # Keep the arm down balance
                 print(f"[BallInHole] Ball picked up, transitioning to NAVIGATING_HOLE")
                 #service.send("robobot/cmd/T0", "servo 1 657 100")  # Lower gripper down
                 self.state = 5
@@ -79,7 +79,7 @@ class SeeSaw():
 
             elif self.state == 11:
                 
-                if pose.tripBtimePassed() > 7:
+                if pose.tripBtimePassed() > 7: #pose.tripBtimePassed() is a timer to record time
                     #service.send("robobot/cmd/T0", "servo 1 -400 100")
                     pose.tripBreset()
                     edge.lineControl(0.15, followLeft=True)
@@ -90,18 +90,18 @@ class SeeSaw():
 
             elif self.state == 12:
                 if pose.tripB > 0.3:
-                    service.send("robobot/cmd/T0", "servo 1 -400 100") #raise the arm
+                    service.send("robobot/cmd/T0", "servo 1 -400 100") #totally raise the arm
                     edge.lineControl(0)
-                    service.send("robobot/cmd/ti", "rc 0.15 0.0")
+                    service.send("robobot/cmd/ti", "rc 0.15 0.0") # keep forward after getting off see saw
                     self.state = 13
                     
 
             elif self.state == 13:
                 print(f"distance: {pose.tripB}")
-                if pose.tripB > self.BOTTOM_DISTANCE: # When robot leave the see-saw
+                if pose.tripB > self.BOTTOM_DISTANCE: # When finish task
                     #service.send("robobot/cmd/T0", "servo 1 -400 100") #raise the arm
                     service.send("robobot/cmd/ti", "rc 0.0 0.0")
-                    
+                    #Stop the robot
                     self.state = 99
 
             else:
