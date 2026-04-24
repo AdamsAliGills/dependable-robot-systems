@@ -13,7 +13,7 @@ def sleep(t):
     while (time.time() - start < t) and not service.stop:
         time.sleep(0.01)
 
-class BallInHole_2:
+class BallInHole:
     SEARCHING_BALL = 0
     ALIGNING_BALL = 1
     APPROACHING_BALL = 2
@@ -289,7 +289,7 @@ class BallInHole_2:
             "robobot/cmd/T0", "servo 2 400 150"
         )  # close gripper ### to open its -200
         sleep(2)
-        #service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
+        service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
 
     def _searching_hole(self, img):
         """Searching for the hole"""
