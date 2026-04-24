@@ -47,7 +47,7 @@ class SeeSaw():
                 print(f"yaw: {current_yaw}")
                 if abs(current_yaw-self.starting_yaw) >= 75: #detect the turning -- reach the see-saw
                     pose.tripBreset()  #reset the distance record
-                    edge.lineControl(0.15, followLeft=True) # slow down the speed
+                    edge.lineControl(0.08, followLeft=True) # slow down the speed
                     self.state = 2
 
             elif self.state == 2:
