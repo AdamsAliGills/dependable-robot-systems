@@ -5,3 +5,6 @@ teensy_interface/build/log*
 local_save_editable/
 oscar_program/
 local_save/
+mqtt_python/logfile.txt
+mqtt_python/log_err.txt
+mqtt_python/log_out.txt
