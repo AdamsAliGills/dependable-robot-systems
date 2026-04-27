@@ -1,5 +1,6 @@
 from ball_tracking import ball_tracking
 from hole_detection import hole_tacking
+from qr_detection import qr_tacking
 from scam import cam
 import time
 from uservice import service
@@ -8,10 +9,12 @@ import cv2
 from sedge import edge
 from spose import pose
 
+
 def sleep(t):
     start = time.time()
     while (time.time() - start < t) and not service.stop:
         time.sleep(0.01)
+
 
 class BallInHole:
     SEARCHING_BALL = 0
@@ -25,7 +28,12 @@ class BallInHole:
     BACK_TO_LINE = 8
     DONE = 9
 
-    def __init__(self,ball_color):
+    ALIGNING_QR_C = 10
+    APPROACHING_QR_C = 11
+    ALIGNING_QR_B = 12
+    APPROACHING_QR_B = 13
+
+    def __init__(self, ball_color):
         self.state = 0
         self.in_center = False
         self.final_alignment = False
@@ -57,7 +65,7 @@ class BallInHole:
 
                 print("###################################################")
 
-                center, radius = self._searching_golf_ball(img,self.ball_color)
+                center, radius = self._searching_golf_ball(img, self.ball_color)
 
                 # cv2.imshow("BallInHole Search", img)
                 if center is not None:
@@ -80,7 +88,7 @@ class BallInHole:
                 # img = self.get_img(trys = 10)
 
                 img = self.get_img()
-                center, radius = self._searching_golf_ball(img,self.ball_color)
+                center, radius = self._searching_golf_ball(img, self.ball_color)
                 if center is None:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     sleep(0.3)
@@ -119,7 +127,6 @@ class BallInHole:
             elif self.state == self.DONE:
                 break
 
-
     def ball_drop_down(self):
         """Find and approach the hole, drop the ping pong ball"""
         self.state = self.ALIGNING_HOLE
@@ -153,6 +160,72 @@ class BallInHole:
             elif self.state == self.DONE:
                 break
 
+    def ball_drop_down_grid_C(self):
+        """Find and approach the grid, drop the ball"""
+        self.state = self.ALIGNING_QR_C
+
+        while not service.stop:
+            if self.state == self.ALIGNING_QR_C:
+                img = self.get_img()
+                center_qr_c = self._searching_qr_C(img)
+                if center_qr_c is None:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    sleep(0.3)
+                    print("Hole lost during alignment")
+                    continue
+                aligned = self._aligning(center_qr_c)
+
+                if aligned:
+                    print("Hole Aligned, approaching hole")
+                    self.state = self.APPROACHING_QR_C
+
+            elif self.state == self.APPROACHING_QR_C:
+                approach_hole = self._approaching_qr_c()
+                if approach_hole:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    print("hole approached, going to drop")
+                    self.state = self.DROPPING
+
+            elif self.state == self.DROPPING:
+                self._dropping()
+                self.state = self.DONE
+
+            elif self.state == self.DONE:
+                break
+
+    def ball_drop_down_grid_B(self):
+        """Find and approach the grid, drop the ball"""
+        self.state = self.ALIGNING_QR_B
+
+        while not service.stop:
+            if self.state == self.ALIGNING_QR_B:
+                img = self.get_img()
+                center_hole = self._searching_qr_B(img)
+                if center_hole is None:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    sleep(0.3)
+                    print("Hole lost during alignment")
+                    continue
+                aligned = self._aligning(center_hole)
+
+                if aligned:
+                    print("Hole Aligned, approaching hole")
+                    self.state = self.APPROACHING_QR_B
+
+            elif self.state == self.APPROACHING_QR_B:
+                approach_hole = self._approaching_qr_B()
+                if approach_hole:
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                    print("hole approached, going to drop")
+                    self.state = self.DROPPING
+
+            elif self.state == self.DROPPING:
+                self._dropping()
+                self.state = self.DONE
+
+            elif self.state == self.DONE:
+                break
+
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
         if cam.useCam:
@@ -166,7 +239,7 @@ class BallInHole:
 
     def _searching_golf_ball(self, img, ball_color):
         """Searching for the golf ball"""
-        center, radius = ball_tracking(img, display=False,ball_color=ball_color)
+        center, radius = ball_tracking(img, display=False, ball_color=ball_color)
         return center, radius
 
     def _aligning(
@@ -252,6 +325,58 @@ class BallInHole:
         service.send("robobot/cmd/ti", "rc 0.07 0")
         return False
 
+    def _approaching_qr_c(self, at_end=False):
+        """Driving towards ball, maybe parallel thread with camera input?"""
+        TARGET_Y = 385
+        TOLERANCE_Y = 60  # pixels, tune thiss
+
+        img = self.get_img()
+        if img is None:
+            return False
+
+        center_qr_c = self._searching_qr_C(img)
+        if center_qr_c is None:
+            return False
+
+        error_y = (
+            TARGET_Y - center_qr_c[1]
+        )  # positive = ball too far (low y), need to drive forward
+        print(
+            f"[Approaching] qr  y={center_qr_c[1]}, target y={TARGET_Y}, error={error_y}"
+        )
+
+        if abs(error_y) < TOLERANCE_Y:
+            return True  # reached pickup position
+
+        service.send("robobot/cmd/ti", "rc 0.07 0")
+        return False
+
+    def _approaching_qr_B(self, at_end=False):
+        """Driving towards ball, maybe parallel thread with camera input?"""
+        TARGET_Y = 385
+        TOLERANCE_Y = 60  # pixels, tune thiss
+
+        img = self.get_img()
+        if img is None:
+            return False
+
+        center_qr_B = self._searching_qr_B(img)
+        if center_qr_B is None:
+            return False
+
+        error_y = (
+            TARGET_Y - center_qr_B[1]
+        )  # positive = ball too far (low y), need to drive forward
+        print(
+            f"[Approaching] qr  y={center_qr_B[1]}, target y={TARGET_Y}, error={error_y}"
+        )
+
+        if abs(error_y) < TOLERANCE_Y:
+            return True  # reached pickup position
+
+        service.send("robobot/cmd/ti", "rc 0.07 0")
+        return False
+
     def _approaching(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
         TARGET_Y = 357
@@ -261,7 +386,7 @@ class BallInHole:
         if img is None:
             return False
 
-        center, radius = self._searching_golf_ball(img,self.ball_color)
+        center, radius = self._searching_golf_ball(img, self.ball_color)
         if center is None:
             return False
 
@@ -293,6 +418,16 @@ class BallInHole:
         center_hole = hole_tacking(img)
         return center_hole
 
+    def _searching_qr_C(self, img):
+        """Searching fot the QR"""
+        center_qr = qr_tacking(img, "C")
+        return center_qr
+
+    def _searching_qr_B(self, img):
+        """Searching fot the QR"""
+        center_qr = qr_tacking(img, "B")
+        return center_qr
+
     def _dropping(self):
         """Open servo to release ball into hole"""
         sleep(0.5)
@@ -307,4 +442,3 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
-

@@ -11,12 +11,12 @@ QR / ArUco marker detector for markers labeled C and B.
 """
 
 MARKER_IDS = {
-    'C': [15],
-    'B': [12],
+    "C": [15],
+    "B": [12],
 }
 
 
-def hole_tacking(frame_rasp, marker_type, display=True):
+def qr_tacking(frame_rasp, marker_type, display=True):
     """
     Detect a specific marker ('C' or 'B') and return its center.
 
