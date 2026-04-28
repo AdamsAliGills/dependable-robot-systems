@@ -238,8 +238,8 @@ class BallInHole:
                 sleep(0.5)
                 service.send("robobot/cmd/ti", f"rc -0.2 0.0")
                 sleep(1)
-                service.send("robobot/cmd/ti", f"rc 0.0 0.2")
-                sleep(2)
+                service.send("robobot/cmd/ti", f"rc 0.0 -0.2")
+                sleep(2.5)
                 service.send("robobot/cmd/ti", f"rc 0.2 0.0")
                 sleep(1.5)
                 service.send("robobot/cmd/ti", f"rc 0.0 0.2")
@@ -461,3 +461,4 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
+
