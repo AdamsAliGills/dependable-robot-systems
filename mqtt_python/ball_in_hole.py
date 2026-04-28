@@ -141,9 +141,8 @@ class BallInHole:
                 img = self.get_img()
                 center_hole = self._searching_hole(img)
                 if center_hole is None:
-                    service.send("robobot/cmd/ti", "rc 0 0")
-                    sleep(0.3)
-                    print("Hole lost during alignment")
+                    # No hole yet — rotate slowly to scan
+                    service.send("robobot/cmd/ti", "rc 0 0.2")
                     continue
                 aligned = self._aligning(center_hole)
 
@@ -174,9 +173,8 @@ class BallInHole:
                 img = self.get_img()
                 center_qr_c = self._searching_qr_C(img)
                 if center_qr_c is None:
-                    service.send("robobot/cmd/ti", "rc 0 0")
-                    sleep(0.3)
-                    print("Hole lost during alignment")
+                    # scan if lost
+                    service.send("robobot/cmd/ti", "rc 0 0.2")
                     continue
                 aligned = self._aligning(center_qr_c)
 
@@ -207,9 +205,8 @@ class BallInHole:
                 img = self.get_img()
                 center_hole = self._searching_qr_B(img)
                 if center_hole is None:
-                    service.send("robobot/cmd/ti", "rc 0 0")
-                    sleep(0.3)
-                    print("Hole lost during alignment")
+                    # scan if lost
+                    service.send("robobot/cmd/ti", "rc 0 0.2")
                     continue
                 aligned = self._aligning(center_hole)
 
