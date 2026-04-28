@@ -8,6 +8,7 @@ from scam_calibration import CameraCalib
 import cv2
 from sedge import edge
 from spose import pose
+from sir import ir
 
 
 def sleep(t):
@@ -229,7 +230,15 @@ class BallInHole:
                 break
 
     def knock_down_cup(self):
-        pass
+        while not service.stop:
+            if ir.ir[1] < 0.05:
+                edge.lineControl(0.0)
+                service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+                sleep(0.5)
+                service.send("robobot/cmd/ti", f"rc -0.2 0.0")
+                sleep(1)
+                service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+                return
 
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
