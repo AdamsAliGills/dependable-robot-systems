@@ -348,7 +348,7 @@ class BallInHole:
     def _approaching_qr_c(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
         TARGET_Y = 385
-        TOLERANCE_Y = 60  # pixels, tune thiss
+        TOLERANCE_Y = 147  # pixels, tune thiss
 
         img = self.get_img()
         if img is None:
@@ -374,7 +374,7 @@ class BallInHole:
     def _approaching_qr_B(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
         TARGET_Y = 385
-        TOLERANCE_Y = 60  # pixels, tune thiss
+        TOLERANCE_Y = 147  # pixels, tune thiss
 
         img = self.get_img()
         if img is None:
