@@ -243,7 +243,7 @@ class BallInHole:
                 service.send("robobot/cmd/ti", f"rc 0.2 0.0")
                 sleep(3)
                 service.send("robobot/cmd/ti", f"rc 0.0 0.2")
-                sleep(9)
+                sleep(13)
                 return
 
     def get_img(self):
