@@ -228,6 +228,9 @@ class BallInHole:
             elif self.state == self.DONE:
                 break
 
+    def knock_down_cup(self):
+        pass
+
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
         if cam.useCam:
