@@ -29,44 +29,30 @@ class missionPlanner:
         # self.ballInHoleCaller()
 
     def planMission(self):
-        # edge.lineControl(0.2, followLeft=True)
 
-        # wait_turn(25)
-        # sleep(1)
+        edge.lineControl(0.25, followLeft=False)
 
-        # edge.lineControl(0.05, followLeft=True)
+        wait_ramp_bottom(SHORT_RAMP_TILT, tolerance=3)
+        print(f"END SECOND RAMP")
+        edge.lineControl(0.15, followLeft=False)
 
-        # r = roundAbout(-225)
-        # r.execute()
+        sleep(2.5)
+        edge.lineControl(0.0)
 
-        edge.lineControl(0.2, followLeft=False)
-
-        balls_in_grid = BallsInGrid()
-        balls_in_grid.off_line_check()
-        sleep(2)
-        balls_in_grid.additional_time()
-
-        # wait_turn(80)
-        # print(f"TURN DETECTED")
-
-        sleep(1.5)
-        edge.lineControl(0)
-        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
-        sleep(1)
-
-        # edge.lineControl(0.2, followLeft=True)
-
-        # sleep(3.5)
-
-        # edge.lineControl(0.05, followLeft=True)
-
-        # r = roundAbout(-225)
-        # r.execute()
-
-        # edge.lineControl(0.2, followLeft=True)
-        # wait_end()
+        service.send("robobot/cmd/ti", f"rc 0.3 0.0")
+        sleep(5)
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc 0.1 0.0")
+        wait_end()
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc 0.3 0.0")
+        sleep(5.5)
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc 0.1 0.0")
 
 
 if __name__ == "__main__":
     mp = missionPlanner()
-
