@@ -33,16 +33,10 @@ class missionPlanner:
 
         # knock balls
         edge.lineControl(0.2, False)
+        sleep(1)
         ball_o = BallInHole("orange")
         ball_o.knock_down_cup()
         # rotate over the balls
-        """
-        radius = 0.33  # radius of the roundabout in meters
-        speed = 0.2  # speed for the roundabout in meters/second
-        t = 0  # traget angle
-        angular_speed = math.copysign(speed / radius, t)
-        service.send("robobot/cmd/ti", f"rc {speed} {angular_speed}")
-        """  # ball detection
         # qr detection
         # ball detection
         # qr detection
