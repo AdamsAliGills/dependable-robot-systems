@@ -8,10 +8,12 @@ import cv2
 from sedge import edge
 from spose import pose
 
+
 def sleep(t):
     start = time.time()
     while (time.time() - start < t) and not service.stop:
         time.sleep(0.01)
+
 
 class BallInHole:
     SEARCHING_BALL = 0
@@ -25,8 +27,7 @@ class BallInHole:
     BACK_TO_LINE = 8
     DONE = 9
 
-    
-    def __init__(self,ball_color):
+    def __init__(self, ball_color):
         self.state = 0
         self.in_center = False
         self.final_alignment = False
@@ -58,9 +59,9 @@ class BallInHole:
                 img = self.get_img()
 
                 print("###################################################")
-            
-                center, radius = self._searching_golf_ball(img,self.ball_color)
-                
+
+                center, radius = self._searching_golf_ball(img, self.ball_color)
+
                 # cv2.imshow("BallInHole Search", img)
                 if center is not None:
                     service.send("robobot/cmd/ti", "rc 0 0")
@@ -82,7 +83,7 @@ class BallInHole:
                 # img = self.get_img(trys = 10)
 
                 img = self.get_img()
-                center, radius = self._searching_golf_ball(img,self.ball_color)
+                center, radius = self._searching_golf_ball(img, self.ball_color)
                 if center is None:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     sleep(0.3)
@@ -121,7 +122,6 @@ class BallInHole:
             elif self.state == self.DONE:
                 break
 
-
     def ball_drop_down(self):
         """Find and approach the hole, drop the ping pong ball"""
         self.state = self.ALIGNING_HOLE
@@ -131,9 +131,8 @@ class BallInHole:
                 img = self.get_img()
                 center_hole = self._searching_hole(img)
                 if center_hole is None:
-                    service.send("robobot/cmd/ti", "rc 0 0")
-                    sleep(0.3)
-                    print("Hole lost during alignment")
+                    # No ball yet — rotate slowly to scan
+                    service.send("robobot/cmd/ti", "rc 0 0.2")
                     continue
                 aligned = self._aligning(center_hole)
 
@@ -166,11 +165,10 @@ class BallInHole:
         # else:
         #     return self.calib.undistort(img.copy())
 
-    def _searching_golf_ball(self,img,ball_color):
-        '''Searching for ball with parameter for different balls'''
-        center, radius = ball_tracking(img,display = False,ball_color=ball_color)
-        return center,radius
-
+    def _searching_golf_ball(self, img, ball_color):
+        """Searching for ball with parameter for different balls"""
+        center, radius = ball_tracking(img, display=False, ball_color=ball_color)
+        return center, radius
 
     def _aligning(
         self, center
@@ -263,8 +261,8 @@ class BallInHole:
         img = self.get_img()
         if img is None:
             return False
-        
-        center, radius = self._searching_golf_ball(img,self.ball_color)
+
+        center, radius = self._searching_golf_ball(img, self.ball_color)
         if center is None:
             return False
 
@@ -310,4 +308,3 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
-
