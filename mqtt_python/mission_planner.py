@@ -30,10 +30,8 @@ class missionPlanner:
         # self.ballInHoleCaller()
 
     def planMission(self):
-
-        # knock balls
         edge.lineControl(0.2, False)
-        sleep(1)
+        sleep(2.2)
         ball_o = BallInHole("orange")
         ball_o.knock_down_cup()
         # rotate over the balls
