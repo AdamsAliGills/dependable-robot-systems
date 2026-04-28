@@ -32,8 +32,9 @@ class missionPlanner:
     def planMission(self):
         edge.lineControl(0.2, False)
         sleep(2.2)
-        ball_o = BallInHole("orange")
+        ball_o = BallInHole("blue")
         ball_o.knock_down_cup()
+        ball_o.ball_pick_up()
         # rotate over the balls
         # qr detection
         # ball detection
@@ -43,4 +44,3 @@ class missionPlanner:
 
 if __name__ == "__main__":
     mp = missionPlanner()
-
