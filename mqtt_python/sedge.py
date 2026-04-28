@@ -402,7 +402,7 @@ class SEdge:
         if self.followLeft:
             e = self.refPosition - self.posLeft
         else:
-            e = 0  # self.refPosition - self.posRight
+            e = self.refPosition - self.posRight
         abs_e = abs(e)
         if abs_e < 0.5:
             self.lineKp = 0.0
@@ -580,4 +580,3 @@ class SEdge:
 
 # create the data object
 edge = SEdge()
-
