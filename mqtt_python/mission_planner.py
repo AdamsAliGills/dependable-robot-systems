@@ -33,14 +33,8 @@ class missionPlanner:
 
         # knock balls
         edge.lineControl(0.2, False)
-        sleep(2.5)
-        edge.lineControl(0.0)
-        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
-        sleep(0.5)
-        service.send("robobot/cmd/ti", f"rc -0.2 0.0")
-        sleep(1)
-        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
-
+        ball_o = BallInHole("orange")
+        ball_o.knock_down_cup()
         # rotate over the balls
         """
         radius = 0.33  # radius of the roundabout in meters
