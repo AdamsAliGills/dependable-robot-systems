@@ -34,6 +34,7 @@ class missionPlanner:
         sleep(2.5)
         edge.lineControl(0.0)
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+        service.send("robobot/cmd/T0", "servo 1 -40 100")  
         sleep(5)
         service.send("robobot/cmd/ti", f"rc 0.0 0.2")
         sleep(1)
