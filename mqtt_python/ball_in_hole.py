@@ -231,8 +231,8 @@ class BallInHole:
 
     def knock_down_cup(self):
         while not service.stop:
-            if ir.ir[1] < 0.5:
-                sleep(0.3)
+            if ir.ir[1] < 1:
+                sleep(0.8)
                 edge.lineControl(0.0)
                 service.send("robobot/cmd/ti", f"rc 0.0 0.0")
                 sleep(0.5)
@@ -461,4 +461,3 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
-
