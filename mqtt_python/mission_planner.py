@@ -29,7 +29,10 @@ class missionPlanner:
         # self.ballInHoleCaller()
 
     def planMission(self):
-
+        edge.lineControl(0.2, True)
+        print("DONE WITH BALL OP")
+        wait_ramp_top(SHORT_RAMP_TILT, tolerance=3)
+        print(f"START SECOND RAMP")
         edge.lineControl(0.25, followLeft=False)
 
         wait_ramp_bottom(SHORT_RAMP_TILT, tolerance=3)
@@ -52,6 +55,8 @@ class missionPlanner:
         service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
         wait_turn(85)
         service.send("robobot/cmd/ti", f"rc 0.1 0.0")
+        edge.lineControl(0.15, followLeft=True)
+        # knock over balls
 
 
 if __name__ == "__main__":
