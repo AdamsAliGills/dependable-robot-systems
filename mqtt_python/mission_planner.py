@@ -30,16 +30,17 @@ class missionPlanner:
         # self.ballInHoleCaller()
 
     def planMission(self):
-        edge.lineControl(0.2, True)
+
+        # knock balls
+        edge.lineControl(0.2, False)
         sleep(2.5)
         edge.lineControl(0.0)
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
-        service.send("robobot/cmd/T0", "servo 1 -40 100")
-        sleep(5)
-        service.send("robobot/cmd/ti", f"rc 0.0 0.2")
+        sleep(0.5)
+        service.send("robobot/cmd/ti", f"rc -0.2 0.0")
         sleep(1)
-        service.send("robobot/cmd/ti", f"rc 0.0 -0.2")
-        sleep(1)
+        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+
         # rotate over the balls
         """
         radius = 0.33  # radius of the roundabout in meters
@@ -56,3 +57,4 @@ class missionPlanner:
 
 if __name__ == "__main__":
     mp = missionPlanner()
+
