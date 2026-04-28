@@ -243,6 +243,7 @@ class BallInHole:
                 service.send("robobot/cmd/ti", f"rc 0.2 0.0")
                 sleep(3)
                 service.send("robobot/cmd/ti", f"rc 0.0 0.2")
+                sleep(3)
                 return
 
     def get_img(self):
@@ -461,3 +462,4 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
+
