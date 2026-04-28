@@ -28,10 +28,15 @@ class BallInHole:
     BACK_TO_LINE = 8
     DONE = 9
 
-    ALIGNING_QR_C = 10
-    APPROACHING_QR_C = 11
-    ALIGNING_QR_B = 12
-    APPROACHING_QR_B = 13
+    # Extra time from mission panner
+    # go back to line
+    KNOCK_CUP = 10  # can use gripper or high speed crash
+    SEARCHING_BLUE = 11
+    ALIGNING_QR_C = 12
+    APPROACHING_QR_C = 13
+    SEARCHING_RED = 14
+    ALIGNING_QR_B = 15
+    APPROACHING_QR_B = 16
 
     def __init__(self, ball_color):
         self.state = 0
