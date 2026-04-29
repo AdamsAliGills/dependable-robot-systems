@@ -173,7 +173,7 @@ class BallInHole:
         while not service.stop:
             if self.state == self.ALIGNING_QR_C:
                 img = self.get_img()
-                center_qr_c = self._searching_qr_C(img)
+                center_qr_c, angle_qr_c = self._searching_qr_C(img)
                 if center_qr_c is None:
                     # scan if lost
                     service.send("robobot/cmd/ti", "rc 0 0.2")
@@ -205,7 +205,7 @@ class BallInHole:
         while not service.stop:
             if self.state == self.ALIGNING_QR_B:
                 img = self.get_img()
-                center_hole = self._searching_qr_B(img)
+                center_hole, angle_qr_B = self._searching_qr_B(img)
                 if center_hole is None:
                     # scan if lost
                     service.send("robobot/cmd/ti", "rc 0 0.2")
@@ -369,7 +369,7 @@ class BallInHole:
         if img is None:
             return False
 
-        center_qr_c = self._searching_qr_C(img)
+        center_qr_c, angle_c = self._searching_qr_C(img)
         if center_qr_c is None:
             return False
 
@@ -395,7 +395,7 @@ class BallInHole:
         if img is None:
             return False
 
-        center_qr_B = self._searching_qr_B(img)
+        center_qr_B, angle_qr_B = self._searching_qr_B(img)
         if center_qr_B is None:
             return False
 
@@ -471,13 +471,13 @@ class BallInHole:
 
     def _searching_qr_C(self, img):
         """Searching fot the QR"""
-        center_qr = qr_tacking(img, "C")
-        return center_qr
+        center_qr, angle_qr = qr_tacking(img, "C")
+        return center_qr, angle_qr
 
     def _searching_qr_B(self, img):
         """Searching fot the QR"""
-        center_qr = qr_tacking(img, "B")
-        return center_qr
+        center_qr, angle_qr = qr_tacking(img, "B")
+        return center_qr, angle_qr
 
     def _dropping(self):
         """Open servo to release ball into hole"""

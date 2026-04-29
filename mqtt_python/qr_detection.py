@@ -16,6 +16,17 @@ MARKER_IDS = {
 }
 
 
+def get_marker_angle(pts):
+    """ Get the orientation of the arco marker in degrees"""
+    top_left  = pts[0]
+    top_right = pts[1]
+    
+    dx = top_right[0] - top_left[0]
+    dy = top_right[1] - top_left[1]
+    
+    angle = np.degrees(np.arctan2(dy, dx))
+    return angle
+
 def qr_tacking(frame_rasp, marker_type, display=True):
     """
     Detect a specific marker ('C' or 'B') and return its center.
@@ -74,6 +85,7 @@ def qr_tacking(frame_rasp, marker_type, display=True):
     if candidates:
         best = max(candidates, key=lambda item: item[3])
         best_pts, best_x, best_y, best_area, best_id = best
+        angle = get_marker_angle(best_pts.reshape(4, 2))
         center = (best_x, best_y)
 
         cv2.polylines(
@@ -118,4 +130,4 @@ def qr_tacking(frame_rasp, marker_type, display=True):
                 )
         cv2.imwrite("qr_all_debug.jpg", debug)
 
-    return center
+    return center,angle 
