@@ -1,5 +1,5 @@
 from uservice import service
-from stair_climb import stairClimb
+from stair_climb import StairClimb
 from sedge import edge
 
 class missionPlanner():
@@ -13,5 +13,5 @@ class missionPlanner():
     def stairClimbCaller(self):
         '''Caller for the stair climb mission'''
         tot = 10
-        succ = stairClimb.test(tot)
+        succ = StairClimb.test(tot)
         print(f"{succ}/{tot} tests successful")

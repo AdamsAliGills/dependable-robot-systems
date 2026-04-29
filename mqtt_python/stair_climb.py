@@ -9,7 +9,7 @@ def sleep(t):
     while (time.time() - start < t) and not service.stop:
         time.sleep(0.01)
 
-class stairClimb():
+class StairClimb():
     def __init__(self):
         pass
 
@@ -77,7 +77,7 @@ class stairClimb():
         
         for i in range(max_attempts):
             print(f"Stair climb test {i} starting")
-            s = stairClimb()
+            s = StairClimb()
             results = s.execute()
 
             if results:
