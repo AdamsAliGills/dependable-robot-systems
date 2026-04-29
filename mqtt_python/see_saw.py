@@ -117,7 +117,7 @@ class PickUp:
         """Pick up golf ball with servo arms and CV"""
 
         time.sleep(0.5)
-        service.send("robobot/cmd/T0", "servo 1 665 100")  # Lower gripper down
+        service.send("robobot/cmd/T0", "servo 1 650 100")  # Lower gripper down
         time.sleep(2)
         service.send(
             "robobot/cmd/T0", "servo 2 440 150"

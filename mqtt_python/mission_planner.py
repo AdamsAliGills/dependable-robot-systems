@@ -1,6 +1,8 @@
 from uservice import service
 from round_about import roundAbout
 from guard_robot import GuardRobot
+from see_saw import SeeSaw
+from stair_climb import StairClimb
 from sedge import edge
 from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn, wait_end, wait_line
 import time
@@ -31,7 +33,7 @@ class missionPlanner:
         service.send("robobot/cmd/T0","servo 1 -400 50")
         service.send("robobot/cmd/T0","servo 2 -200 50")
 
-        wait_turn(25)
+        """wait_turn(25)
         sleep(1)
 
         edge.lineControl(0.05, followLeft=True)
@@ -64,40 +66,57 @@ class missionPlanner:
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
         
         guard_robot = GuardRobot()
-        guard_robot.execute()
-        edge.lineControl(0.2, followLeft=False)
+        guard_robot.execute()"""
+        edge.lineControl(0.2, followLeft=True)
 
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
         print(f"START FIRST RAMP")
-        sleep(1)
-        edge.lineControl(0.3, followLeft=False)
+        edge.lineControl(0.3, followLeft=True)
+        sleep(5)
+        edge.lineControl(0.2, followLeft=True)
 
-        wait_ramp_top(LONG_RAMP_TILT, tolerance = 2)
-        print(f"END FIRST RAMP")
-        edge.lineControl(0.0)
+        see_saw = SeeSaw()
+        see_saw.execute()
 
-        print("STARTING BALL IN HOLE OP")
+        #edge.lineControl(0)
 
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+        wait_line()
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        wait_turn(85)
+        
+        stair_climb = StairClimb()
+        stair_climb.execute()
+
+        
+        service.send("robobot/cmd/ti", f"rc 0.2 0.7")
+        sleep(1.5)
+        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+        
         ball_in_hole = BallInHole("orange")
+        ball_in_hole.ball_drop_down()
 
-        # Rotate 75 degrees to the left for first ball
-        service.send("robobot/cmd/ti", f"rc 0.0 0.7")
-        sleep(1)
+        service.send("robobot/cmd/ti", f"rc 0.0 1.0")
+        wait_turn(170)
+        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+        sleep(2)
+
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
 
         ball_in_hole.ball_pick_up()
 
-        # navigating hole
-        service.send("robobot/cmd/ti", f"rc 0 -1.35")
-        sleep(1.25)
-        service.send("robobot/cmd/ti", "rc 0.2 0")
-        sleep(2.5)
-        service.send("robobot/cmd/ti", "rc 0 0")
+        service.send("robobot/cmd/ti", f"rc 0.0 1.0")
+        wait_turn(180)
+        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+        sleep(2)
+        service.send("robobot/cmd/ti", "rc 0.0 0.0")
 
         ball_in_hole.ball_drop_down()
 
         # back to line
-        service.send("robobot/cmd/ti", "rc -0.07 0")
+        service.send("robobot/cmd/ti", "rc -0.07 0.0")
         wait_line()
 
         edge.lineControl(0.2, True)
