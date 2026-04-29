@@ -15,7 +15,7 @@ from detection_utils import (
 import time
 from scam import cam
 from ball_in_hole import BallInHole
-from balls_in_grid import BallsInGrid
+# from balls_in_grid import BallsInGrid
 
 LONG_RAMP_TILT = 8  # TODO check real value
 SHORT_RAMP_TILT = 15  # TODO check real value
@@ -35,21 +35,41 @@ class missionPlanner:
         # ball_o.ball_pick_up()
 
     def planMission(self):
-        edge.lineControl(0.2, False)
-        sleep(2)
-        ball_o = BallInHole("red")
-        ball_o.knock_down_cup()
+        edge.lineControl(0.13, False)
+        sleep(3)
+
+        # ball_o = BallInHole("red")
+        # ball_o.knock_down_cup_right()
+        # sleep(2)
+        # # ball_o.knock_down_cup()
+        # time.sleep(1.5)
         ok, img, imgTime = cam.getImage()
         center_red, radius_red = ball_tracking(img, display=True, ball_color="red")
         center_blue, radius_blue = ball_tracking(img, display=True, ball_color="blue")
 
-        turn_direction = self.compare_positions(center_red, center_blue)
+        turn_direction,color = self.compare_positions(center_red, center_blue)
+        print("#################################################")
+        print(f"turn direction: {turn_direction}, color: {color}")
+        print("#################################################")
+
+        ball_o = BallInHole(color)
+        print("finished initalization")
         if turn_direction == "right":
-            ball_o.turn_right()
+            ball_o.knock_down_cup_right()
         else:
-            ball_o.turn_left()
+            ball_o.knock_down_cup_left()
+        print("#################################################")
+        print("going to pick up ")
+        print("#################################################")
 
         ball_o.ball_pick_up()
+
+        if color == "red":
+            ball_o.ball_drop_down_grid_C()
+        else:
+            ball_o.ball_drop_down_grid_B()
+
+       
         # rotate over the balls
         # qr detection
         # ball detection
@@ -59,23 +79,25 @@ class missionPlanner:
     def compare_positions(self, center_red, center_blue):
         if center_red is None and center_blue is None: #no balls detected
             turn_direction = "right"
-
+            color = "red"
         elif center_red is not None and center_blue is not None: #both balls detected
             edge_ball, side_red, side_blue = self.closer_to_edge(center_red[0], center_blue[0])
             if edge_ball == center_red[0]:
                 turn_direction = side_red
+                color = "red"
             elif edge_ball == center_blue[0]:
                 turn_direction = side_blue
-
+                color = "blue"
         elif center_red is not None: #only red ball detected
-            _, side_red, side_blue = self.closer_to_edge(center_red[0], None)
+            edge_ball, side_red = self.closer_to_edge(center_red[0], None)
             turn_direction = side_red
+            color = "red"
 
         else: #only blue ball detected
-            _, side_red, side_blue = self.closer_to_edge(None, center_blue[0])
+            edge_ball, side_blue = self.closer_to_edge(None, center_blue[0])
             turn_direction = side_blue
-
-        return turn_direction
+            color = "blue"
+        return turn_direction,color
     
     def closer_to_edge(self, x1, x2): 
         center_x = 300  # Assuming image width is 640 pixels

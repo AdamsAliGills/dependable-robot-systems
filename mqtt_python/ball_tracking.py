@@ -101,7 +101,8 @@ def ball_tracking(frame_rasp,display = False, ball_color = type(str)):
         lower_hsv = np.array([0, 126, 69])
         upper_hsv = np.array([17, 255, 255])
 
-
+        lower_hsv = np.array([171, 172, 33])
+        upper_hsv = np.array([179, 255, 255])      
     elif ball_color == "blue":
         lower_hsv = np.array([89, 33, 64])
         upper_hsv = np.array([112, 250, 255])

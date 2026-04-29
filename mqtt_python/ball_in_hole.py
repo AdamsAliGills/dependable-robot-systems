@@ -231,38 +231,35 @@ class BallInHole:
                 break
 
     def knock_down_cup_left(self):
-        while not service.stop:
-            if ir.ir[1] < 1:
-                sleep(0.8)
-                edge.lineControl(0.0)
-                service.send("robobot/cmd/ti", f"rc 0.0 0.0")
-                sleep(0.5)
-                service.send("robobot/cmd/ti", f"rc -0.2 0.0")
-                sleep(1)
-                service.send("robobot/cmd/ti", f"rc 0.0 0.2")
-                sleep(3)
-                service.send("robobot/cmd/ti", f"rc 0.2 0.0")
-                sleep(3)
-                service.send("robobot/cmd/ti", f"rc 0.0 -0.4")
-                sleep(4)
-                return
+            sleep(0.8)
+            edge.lineControl(0.0)
+            service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+            sleep(0.5)
+            service.send("robobot/cmd/ti", f"rc -0.2 0.0")
+            sleep(1)
+            service.send("robobot/cmd/ti", f"rc 0.0 0.2")
+            sleep(3)
+            service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+            sleep(3)
+            service.send("robobot/cmd/ti", f"rc 0.0 -0.4")
+            sleep(4.5)
+            return
             
     def knock_down_cup_right(self):
-        while not service.stop:
-            if ir.ir[1] < 1:
-                sleep(0.8)
-                edge.lineControl(0.0)
-                service.send("robobot/cmd/ti", f"rc 0.0 0.0")
-                sleep(0.5)
-                service.send("robobot/cmd/ti", f"rc -0.2 0.0")
-                sleep(1)
-                service.send("robobot/cmd/ti", f"rc 0.0 -0.2")
-                sleep(3)
-                service.send("robobot/cmd/ti", f"rc 0.2 0.0")
-                sleep(3)
-                service.send("robobot/cmd/ti", f"rc 0.0 0.4")
-                sleep(4)
-                return
+        
+            sleep(0.8)
+            edge.lineControl(0.0)
+            service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+            sleep(0.5)
+            service.send("robobot/cmd/ti", f"rc -0.2 0.0")
+            sleep(1)
+            service.send("robobot/cmd/ti", f"rc 0.0 -0.2")
+            sleep(3)
+            service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+            sleep(3)
+            service.send("robobot/cmd/ti", f"rc 0.0 0.4")
+            sleep(4.5   )
+            return
 
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
@@ -418,7 +415,7 @@ class BallInHole:
     def _approaching(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
         TARGET_Y = 357
-        TOLERANCE_Y = 20  # pixels, tune this
+        TOLERANCE_Y = 25  # pixels, tune this
 
         img = self.get_img()
         if img is None:
@@ -426,6 +423,7 @@ class BallInHole:
 
         center, radius = self._searching_golf_ball(img, self.ball_color)
         if center is None:
+            service.send("robobot/cmd/ti", "rc 0 0")  # stop first
             return False
 
         error_y = (
@@ -436,7 +434,7 @@ class BallInHole:
         if abs(error_y) < TOLERANCE_Y:
             return True  # reached pickup position
 
-        service.send("robobot/cmd/ti", "rc 0.07 0")
+        service.send("robobot/cmd/ti", "rc 0.07 0" if error_y > 0 else "rc -0.07 0")        
         return False
 
     def _picking_up(self):
@@ -455,13 +453,16 @@ class BallInHole:
             sleep(2)
             service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
         elif self.ball_color in ["blue", "red"]:
-            service.send("robobot/cmd/T0", "servo 2 350 150")  # close gripper ### to open its -200
+            service.send("robobot/cmd/T0", "servo 2 270 150")  # close gripper ### to open its -200
             sleep(1)
             service.send("robobot/cmd/T0", "servo 1 657 100")  # Lower gripper down
             sleep(1)
-            service.send("robobot/cmd/T0", "servo 1 657 50")  # Lower gripper down
+            service.send("robobot/cmd/T0", "servo 1 750 170")  # Lower gripper down slower
             sleep(3)
+            service.send("robobot/cmd/T0", "servo 2 450 100")  # close gripper
             service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
+            time.sleep(2)
+            service.send("robobot/cmd/T0", "servo 2 -450 100")  # close gripper
 
 
     def _searching_hole(self, img):
