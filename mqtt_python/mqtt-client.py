@@ -294,7 +294,7 @@ def loop():
   gpio.set_value(20, 0)
   edge.lineControl(0, True) # stop following line
   service.send("robobot/cmd/ti","rc 0 0")
-  service.send("robobot/cmd/T0","servo 1 100000 0") # disable the servo
+  service.send("robobot/cmd/T0","servo 1 -400 0") # disable the servo
   t.sleep(0.05)
   pass
 
