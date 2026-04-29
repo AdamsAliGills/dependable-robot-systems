@@ -74,15 +74,23 @@ class missionPlanner:
             time.sleep(2)
             service.send("robobot/cmd/ti", "rc 0 0")
         service.send("robobot/cmd/T0", "servo 2 -450 100")  # open gripper
+        
+        if colors_left == "blue": #TODO: Make this into a function to avoid code duplication
+            ball_o.ball_drop_down_grid_C()
+        else:
+            ball_o.ball_drop_down_grid_B()
+
+        service.send("robobot/cmd/ti", "rc 0 -0.2") #Turn around after dropping ball off
+        time.sleep(3.5)
+        service.send("robobot/cmd/ti", "rc 0 0")
 
         colors = ["red","blue"]
         colors.remove(color)
-        color = colors[0]
-        ball_o = BallInHole(color)
+        colors_left = colors[0]
+        ball_o = BallInHole(colors_left)
         ball_o.ball_pick_up()
 
-
-        if color == "blue":
+        if colors_left == "blue": #TODO: Again...make this into a function to avoid code duplication
             ball_o.ball_drop_down_grid_C()
         else:
             ball_o.ball_drop_down_grid_B()

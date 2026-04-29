@@ -362,8 +362,10 @@ class BallInHole:
 
     def _approaching_qr_c(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
-        TARGET_Y = 385
+        TARGET_Y = 385 
         TOLERANCE_Y = 147  # pixels, tune thiss
+        ORIENTATION_CHECK_Y = 250 # TODO: Tune this to stop a bit before white line of grid
+        ANGLE_TOLERANCE = 20 # TODO: Tune this to be more forgiving or more strict
 
         img = self.get_img()
         if img is None:
@@ -380,10 +382,19 @@ class BallInHole:
             f"[Approaching] qr  y={center_qr_c[1]}, target y={TARGET_Y}, error={error_y}"
         )
 
+        if center_qr_c[1] > ORIENTATION_CHECK_Y and angle_c is not None and abs(angle_c) > ANGLE_TOLERANCE:
+            service.send("robobot/cmd/ti", "rc 0 0")
+            print(f"[QR_C] Orientation off by {angle_c:.1f}°, correcting")
+            turn = -0.2 if angle_c > 0 else 0.2
+            service.send("robobot/cmd/ti", f"rc 0 {turn}")
+            sleep(0.4)
+            service.send("robobot/cmd/ti", "rc 0 0")
+            return False
+
         if abs(error_y) < TOLERANCE_Y:
             return True  # reached pickup position
 
-        service.send("robobot/cmd/ti", "rc 0.07 0")
+        service.send("robobot/cmd/ti", "rc 0.07 0" if error_y > 0 else "rc -0.07 0")        
         return False
 
     def _approaching_qr_B(self, at_end=False):
