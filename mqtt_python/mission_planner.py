@@ -33,7 +33,7 @@ class missionPlanner:
         service.send("robobot/cmd/T0","servo 1 -400 50")
         service.send("robobot/cmd/T0","servo 2 -200 50")
 
-        """wait_turn(25)
+        wait_turn(25)
         sleep(1)
 
         edge.lineControl(0.05, followLeft=True)
@@ -66,7 +66,7 @@ class missionPlanner:
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
         
         guard_robot = GuardRobot()
-        guard_robot.execute()"""
+        guard_robot.execute()
         edge.lineControl(0.2, followLeft=True)
 
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
