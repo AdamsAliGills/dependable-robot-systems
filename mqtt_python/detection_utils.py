@@ -55,7 +55,7 @@ def wait_turn(turn_angle: float):
 
 def wait_end():
     while not service.stop:
-        if ir.ir[1] < 0.14:
+        if ir.ir[1] < 0.2:
             return
         time.sleep(0.01)
 
