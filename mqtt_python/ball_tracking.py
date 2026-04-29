@@ -80,7 +80,7 @@ def ball_tracking(frame_rasp,display = False, ball_color = type(str)):
         MAX_RAD = 50
     else:
         MIN_Y = 100
-        MIN_CIRC = 0.40
+        MIN_CIRC = 0.50
         MIN_RAD = 10
         MAX_RAD = 60
 
@@ -97,9 +97,17 @@ def ball_tracking(frame_rasp,display = False, ball_color = type(str)):
     elif ball_color == "red":
         lower_hsv = np.array([120, 71, 138])
         upper_hsv = np.array([179, 255, 255])
+
+        lower_hsv = np.array([0, 126, 69])
+        upper_hsv = np.array([17, 255, 255])
+
+
     elif ball_color == "blue":
         lower_hsv = np.array([89, 33, 64])
         upper_hsv = np.array([112, 250, 255])
+
+        lower_hsv = np.array([92, 60, 64])
+        upper_hsv = np.array([134, 255, 255])
     else:
         pass
 
@@ -426,7 +434,7 @@ if __name__ == "__main__":
             except AttributeError:
                 pass
     else:
-        img = ALL_BALLS_FOLDER + "/frame_00022.jpg"
-        # ball_tracking(cv2.imread(img), display=True, ball_color="red")
+        img = RED_BALL_FOLDER + "/newest_1.jpg"
+        ball_tracking(cv2.imread(img), display=True, ball_color="blue")
 
-        tune_hsv(img)
+        # tune_hsv(img)

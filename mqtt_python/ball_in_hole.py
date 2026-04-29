@@ -121,9 +121,10 @@ class BallInHole:
                         print("CHECKING FINAL ALLIGNMENT")
                         print("#####################")
                         self.state = self.ALIGNING_BALL
-                        self.final_alignment = True
                     self.state = self.PICKING_UP_GOLF_BALL
+                    self.final_alignment = True
                     print(f"[BallInHole] Ball in reach, transitioning to PICKING_UP")
+
 
             elif self.state == self.PICKING_UP_GOLF_BALL:
                 self._picking_up()
@@ -229,7 +230,24 @@ class BallInHole:
             elif self.state == self.DONE:
                 break
 
-    def knock_down_cup(self):
+    def knock_down_cup_left(self):
+        while not service.stop:
+            if ir.ir[1] < 1:
+                sleep(0.8)
+                edge.lineControl(0.0)
+                service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+                sleep(0.5)
+                service.send("robobot/cmd/ti", f"rc -0.2 0.0")
+                sleep(1)
+                service.send("robobot/cmd/ti", f"rc 0.0 0.2")
+                sleep(3)
+                service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+                sleep(3)
+                service.send("robobot/cmd/ti", f"rc 0.0 -0.4")
+                sleep(4)
+                return
+            
+    def knock_down_cup_right(self):
         while not service.stop:
             if ir.ir[1] < 1:
                 sleep(0.8)
@@ -243,7 +261,7 @@ class BallInHole:
                 service.send("robobot/cmd/ti", f"rc 0.2 0.0")
                 sleep(3)
                 service.send("robobot/cmd/ti", f"rc 0.0 0.4")
-                sleep(6)
+                sleep(4)
                 return
 
     def get_img(self):
@@ -266,9 +284,9 @@ class BallInHole:
         self, center
     ):  # TODO: Need to adjust this such that it doesn't get stuck on minor adjustments
         """Steer robot such the ball center is centered in frame for x-axis"""
-        TARGET_X = 288
+        TARGET_X = 284
         TURN_RATE = 0.5
-        TOLERANCE = 0.025
+        TOLERANCE = 0.02
 
         # angle_x, _ = self.calib.pixel_to_angle(center[0], center[1])
         # target_angle_x, _ = self.calib.pixel_to_angle(TARGET_X, center[1])
@@ -292,7 +310,7 @@ class BallInHole:
         KP = 0.5  # tune this
         MIN_TURN = 0.2  # minimum to overcome friction
         MAX_TURN = 0.6  # safety clamp
-        TOLERANCE = 0.017  # radians
+        TOLERANCE = 0.015  # radians
 
         angle_x, _ = self.calib.pixel_to_angle(center[0], center[1])
         target_angle_x, _ = self.calib.pixel_to_angle(TARGET_X, center[1])
@@ -423,27 +441,28 @@ class BallInHole:
 
     def _picking_up(self):
         """Pick up golf ball with servo arms and CV"""
+
+        service.send( "robobot/cmd/T0", "servo 2 -450 200") 
+        time.sleep(1) #
+
+
+
         if self.ball_color == "orange":
             sleep(0.5)
             service.send("robobot/cmd/T0", "servo 1 657 100")  # Lower gripper down
             sleep(2)
-            service.send(
-                "robobot/cmd/T0", "servo 2 400 150"
-            )  # close gripper ### to open its -200
+            service.send("robobot/cmd/T0", "servo 2 320 150")  # close gripper ### to open its -200
             sleep(2)
             service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
         elif self.ball_color in ["blue", "red"]:
-            service.send(
-                "robobot/cmd/T0", "servo 2 250 150"
-            )  # close gripper ### to open its -200
-            sleep(0.5)
+            service.send("robobot/cmd/T0", "servo 2 350 150")  # close gripper ### to open its -200
+            sleep(1)
             service.send("robobot/cmd/T0", "servo 1 657 100")  # Lower gripper down
-            sleep(2)
-            service.send(
-                "robobot/cmd/T0", "servo 2 400 150"
-            )  # close gripper ### to open its -200
-            sleep(2)
+            sleep(1)
+            service.send("robobot/cmd/T0", "servo 1 657 50")  # Lower gripper down
+            sleep(3)
             service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
+
 
     def _searching_hole(self, img):
         """Searching for the hole"""
