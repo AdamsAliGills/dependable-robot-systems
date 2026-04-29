@@ -40,13 +40,9 @@ class stairClimb():
 
             #edge.lineControl(0)
             #service.send("robobot/cmd/ti", "rc 0.0 0.0")
-            service.send("robobot/cmd/T0", "servo 1 700 100")
+            service.send("robobot/cmd/T0", "servo 1 800 100")
 
-            sleep(1.6)
-
-            # Step 5: small forward movement
-            service.send("robobot/cmd/ti", "rc 0.05 0.0")
-            sleep(1.5)
+            sleep(4)
 
 
             if service.stop:
@@ -61,8 +57,8 @@ class stairClimb():
             service.send("robobot/cmd/T0", "servo 3 700 100")
             #service.send("robobot/cmd/T0", "servo 1 -400 0")
             sleep(2.5)
-            edge.lineControl(0.05)
-            #service.send("robobot/cmd/ti", "rc 0.15 0.0")
+            #edge.lineControl(0.05)
+            service.send("robobot/cmd/ti", "rc 0.05 0.0")
 
             sleep(0.85)
 
@@ -83,7 +79,6 @@ class stairClimb():
             print(f"Stair climb test {i} starting")
             s = stairClimb()
             results = s.execute()
-            return 1
 
             if results:
                 print(f"Stair climb test {i} successful")
