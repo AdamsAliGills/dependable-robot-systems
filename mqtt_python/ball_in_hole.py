@@ -283,7 +283,7 @@ class BallInHole:
         """Steer robot such the ball center is centered in frame for x-axis"""
         TARGET_X = 284
         TURN_RATE = 0.5
-        TOLERANCE = 0.02
+        TOLERANCE = 0.015
 
         # angle_x, _ = self.calib.pixel_to_angle(center[0], center[1])
         # target_angle_x, _ = self.calib.pixel_to_angle(TARGET_X, center[1])
@@ -462,7 +462,6 @@ class BallInHole:
             service.send("robobot/cmd/T0", "servo 2 450 100")  # close gripper
             service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
             time.sleep(2)
-            service.send("robobot/cmd/T0", "servo 2 -450 100")  # close gripper
 
 
     def _searching_hole(self, img):

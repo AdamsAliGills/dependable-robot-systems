@@ -36,7 +36,7 @@ class missionPlanner:
 
     def planMission(self):
         edge.lineControl(0.13, False)
-        sleep(3)
+        sleep(3.5)
 
         # ball_o = BallInHole("red")
         # ball_o.knock_down_cup_right()
@@ -64,7 +64,25 @@ class missionPlanner:
 
         ball_o.ball_pick_up()
 
-        if color == "red":
+        if turn_direction == "right":
+            service.send("robobot/cmd/ti", "rc 0 -0.2")
+            time.sleep(2)
+            service.send("robobot/cmd/ti", "rc 0 0")
+
+        elif turn_direction == "left":
+            service.send("robobot/cmd/ti", "rc 0 0.2")
+            time.sleep(2)
+            service.send("robobot/cmd/ti", "rc 0 0")
+        service.send("robobot/cmd/T0", "servo 2 -450 100")  # open gripper
+
+        colors = ["red","blue"]
+        colors.remove(color)
+        color = colors[0]
+        ball_o = BallInHole(color)
+        ball_o.ball_pick_up()
+
+
+        if color == "blue":
             ball_o.ball_drop_down_grid_C()
         else:
             ball_o.ball_drop_down_grid_B()
