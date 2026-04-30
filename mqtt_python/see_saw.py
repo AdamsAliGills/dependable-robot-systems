@@ -9,7 +9,7 @@ import cv2
 #from ball_in_hole_2 import BallInHole_2
 from scam_calibration import CameraCalib
 from scam import cam
-
+from detection_utils import wait_turn
 from ball_tracking import ball_tracking
 from hole_detection import hole_tacking
 
@@ -163,14 +163,15 @@ class SeeSaw():
             elif self.state == 1:
                 current_yaw = get_yaw()
                 print(f"yaw: {current_yaw}")
-                if abs(current_yaw-self.starting_yaw) >= 75: #detect the turning -- reach the see-saw
-                    pose.tripBreset()  #reset the distance record
-                    edge.lineControl(0.08, followLeft=True) # slow down the speed
-                    self.state = 20
+                wait_turn(60)
+                #if abs(current_yaw-self.starting_yaw) <= -10: #detect the turning -- reach the see-saw
+                pose.tripBreset()  #reset the distance record
+                edge.lineControl(0.08, followLeft=False) # slow down the speed
+                self.state = 20
 
             elif self.state == 20:
                 if pose.tripBtimePassed() > 5:
-                    edge.lineControl(0.15, followLeft=True) 
+                    edge.lineControl(0.15, followLeft=False) 
                     self.state = 2
 
             elif self.state == 2:
@@ -206,7 +207,7 @@ class SeeSaw():
 
             elif self.state == 6:
                 pose.tripBreset()
-                edge.lineControl(0.04, followLeft=True) # slowly move down the see saw
+                edge.lineControl(0.04, followLeft=False) # slowly move down the see saw
                 self.state = 11 
 
             elif self.state == 11:
@@ -214,7 +215,7 @@ class SeeSaw():
                 if pose.tripBtimePassed() > 7:
                     #service.send("robobot/cmd/T0", "servo 1 -400 100")
                     pose.tripBreset()
-                    edge.lineControl(0.15, followLeft=True)
+                    edge.lineControl(0.15, followLeft=False)
                     # accelerate from 0.04m/s to 0.15m/s for saving time 
                     service.send("robobot/cmd/T0", "servo 1 600 100")
                     #Slightly raise arm

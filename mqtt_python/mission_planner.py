@@ -39,12 +39,31 @@ class missionPlanner:
         edge.lineControl(0.05, followLeft=True)
         sleep(2)
 
-        r = roundAbout(-225)
+        r = roundAbout(-135)
         r.execute()
 
         edge.lineControl(0.2, followLeft=False)
         sleep(3)
+        wait_turn(80)
+        print(f"TURN")
+        stair_climb = StairClimb()
+        stair_climb.execute()
 
+        edge.lineControl(0.2, followLeft=False)
+        sleep(3)
+        see_saw = SeeSaw()
+        see_saw.execute()
+
+        service.send("robobot/cmd/ti", f"rc 0.0 0.7")
+        wait_turn(95)
+        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+        wait_line()
+        service.send("robobot/cmd/ti", f"rc 0.0 0.7")
+        wait_turn(75)
+
+
+        edge.lineControl(0.2, followLeft=False)
+        sleep(1)
         wait_turn(80)
         print(f"FIRST TURN")
         sleep(2)
@@ -68,32 +87,20 @@ class missionPlanner:
         
         guard_robot = GuardRobot()
         guard_robot.execute()
-        edge.lineControl(0.2, followLeft=True)
+        edge.lineControl(0.2, followLeft=False)
 
         wait_ramp_bottom(LONG_RAMP_TILT, tolerance = 3)
         print(f"START FIRST RAMP")
-        edge.lineControl(0.3, followLeft=True)
-        sleep(5)
-        edge.lineControl(0.2, followLeft=True)
-
-        see_saw = SeeSaw()
-        see_saw.execute()
-
-        #edge.lineControl(0)
-
-        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
-        wait_turn(85)
-        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
-        wait_line()
-        service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
-        wait_turn(85)
+        edge.lineControl(0.3, followLeft=False)
         
-        stair_climb = StairClimb()
-        stair_climb.execute()
-
-        
-        service.send("robobot/cmd/ti", f"rc 0.2 0.7")
+        wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
+        print(f"END FIRST RAMP")
+        edge.lineControl(0.2, followLeft=False)
         sleep(1.5)
+        edge.lineControl(0)
+        
+        #service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
+        #sleep(0.3)
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
         
         ball_in_hole = BallInHole("orange")
