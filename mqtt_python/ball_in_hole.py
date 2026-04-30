@@ -413,21 +413,34 @@ class BallInHole:
         if img is None:
             return False
 
-        center_qr_B, angle_qr_B = self._searching_qr_B(img)
-        if center_qr_B is None:
+        center_qr_b, angle_b = self._searching_qr_B(img)
+        if center_qr_b is None:
             return False
 
         error_y = (
-            TARGET_Y - center_qr_B[1]
+            TARGET_Y - center_qr_b[1]
         )  # positive = ball too far (low y), need to drive forward
         print(
-            f"[Approaching] qr  y={center_qr_B[1]}, target y={TARGET_Y}, error={error_y}"
+            f"[Approaching] qr  y={center_qr_b[1]}, target y={TARGET_Y}, error={error_y}"
         )
+
+        if (
+            center_qr_b[1] > ORIENTATION_CHECK_Y
+            and angle_b is not None
+            and abs(angle_b) > ANGLE_TOLERANCE
+        ):
+            service.send("robobot/cmd/ti", "rc 0 0")
+            print(f"[QR_C] Orientation off by {angle_c:.1f}°, correcting")
+            turn = -0.2 if angle_b > 0 else 0.2
+            service.send("robobot/cmd/ti", f"rc 0 {turn}")
+            sleep(0.4)
+            service.send("robobot/cmd/ti", "rc 0 0")
+            return False
 
         if abs(error_y) < TOLERANCE_Y:
             return True  # reached pickup position
 
-        service.send("robobot/cmd/ti", "rc 0.07 0")
+        service.send("robobot/cmd/ti", "rc 0.07 0" if error_y > 0 else "rc -0.07 0")
         return False
 
     def _approaching(self, at_end=False):
