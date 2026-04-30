@@ -52,16 +52,18 @@ class StairClimb():
             service.send("robobot/cmd/ti", "rc 0.25 0.0")
             service.send("robobot/cmd/T0", "servo 1 -400 0")
 
-            sleep(2)
-            service.send("robobot/cmd/ti", "rc 0.0 0.0")
+            sleep(1)
+            #service.send("robobot/cmd/ti", "rc 0.0 0.0")
             service.send("robobot/cmd/T0", "servo 3 700 100")
             #service.send("robobot/cmd/T0", "servo 1 -400 0")
-            sleep(2.5)
+            #sleep(2.5)
             #edge.lineControl(0.05)
             service.send("robobot/cmd/ti", "rc 0.05 0.0")
 
-            sleep(0.85)
+            #sleep(0.85)
 
+
+        sleep(2)
         service.send("robobot/cmd/T0", "servo 1 -400 0")
         sleep(0.5)
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
