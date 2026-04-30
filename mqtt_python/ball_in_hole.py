@@ -89,6 +89,7 @@ class BallInHole:
                 else:
                     # No ball yet — rotate slowly to scan
                     service.send("robobot/cmd/ti", "rc 0 0.2")
+                    
 
             elif self.state == self.ALIGNING_BALL:
                 # img = self.get_img(trys = 10)
@@ -99,9 +100,9 @@ class BallInHole:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     sleep(0.3)
                     print(
-                        "[BallInHole] Lost ball during alignment, back to SEARCHING_BALL"
-                    )
-                    self.state = self.SEARCHING_BALL
+                        "[BallInHole] Lost ball during alignment, back to SEARCHING_BALL")
+
+                    service.send("robobot/cmd/ti", "rc 0 0.1")
                     continue
 
                 self.ball_center = center
@@ -165,7 +166,7 @@ class BallInHole:
             elif self.state == self.DONE:
                 break
 
-    def ball_drop_down_grid_C(self):
+    def ball_drop_down_grid_C(self,drop_flag):
         """Find and approach the grid, drop the ball"""
         self.state = self.ALIGNING_QR_C
 
@@ -191,13 +192,25 @@ class BallInHole:
                     self.state = self.DROPPING
 
             elif self.state == self.DROPPING:
-                self._dropping()
-                self.state = self.DONE
+                
 
+                if drop_flag == True:
+                    self._dropping()
+                else:
+                    service.send("robobot/cmd/ti", "rc -0.2 0") #TODO: Adjust this shit
+                    sleep(0.5)
+                    service.send("robobot/cmd/ti", "rc 0 0.2")
+                    sleep(5)
+                    service.send("robobot/cmd/ti", "rc 0.2 0")
+                    sleep(2)
+                    service.send("robobot/cmd/ti", "rc 0 -0.2")
+                    sleep(2)
+                    service.send("robobot/cmd/ti", "rc 0 0")
+                self.state = self.DONE
             elif self.state == self.DONE:
                 break
 
-    def ball_drop_down_grid_B(self):
+    def ball_drop_down_grid_B(self,drop_flag):
         """Find and approach the grid, drop the ball"""
         self.state = self.ALIGNING_QR_B
 
@@ -223,44 +236,60 @@ class BallInHole:
                     self.state = self.DROPPING
 
             elif self.state == self.DROPPING:
-                self._dropping()
+                if drop_flag == True:
+                    self._dropping()
+                else:
+                    service.send("robobot/cmd/ti", "rc -0.2 0") #TODO: Adjust this shit
+                    sleep(0.5)
+                    service.send("robobot/cmd/ti", "rc 0 -0.2")
+                    sleep(5)
+                    service.send("robobot/cmd/ti", "rc 0.2 0")
+                    sleep(2)
+                    service.send("robobot/cmd/ti", "rc 0 0.2")
+                    sleep(2)
+                    service.send("robobot/cmd/ti", "rc 0 0") #TODO: Adjust this shit
+
+                    self._dropping()
                 self.state = self.DONE
 
             elif self.state == self.DONE:
                 break
 
+    def knock_cup(self):
+        start_time = time.perf_counter()
+        while not service.stop:
+            if ir.ir[1] < 1.5 or time.perf_counter() - start_time > 3:
+                sleep(1)
+                edge.lineControl(0.0)
+                service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+                return
+
     def knock_down_cup_left(self):
-        sleep(0.8)
         edge.lineControl(0.0)
         service.send("robobot/cmd/ti", f"rc 0.0 0.0")
         sleep(0.5)
         service.send("robobot/cmd/ti", f"rc -0.2 0.0")
-        sleep(1)
+        sleep(2)
         service.send("robobot/cmd/ti", f"rc 0.0 0.2")
         sleep(3)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
-        sleep(3)
+        sleep(4)
         service.send("robobot/cmd/ti", f"rc 0.0 -0.4")
         sleep(4.5)
         return
 
     def knock_down_cup_right(self):
-        start_time = time.perf_counter()
-        while not service.stop:
-            if ir.ir[1] < 1.5 or time.perf_counter() - start_time > 3:
-                sleep(0.8)
-                edge.lineControl(0.0)
-                service.send("robobot/cmd/ti", f"rc 0.0 0.0")
-                sleep(0.5)
-                service.send("robobot/cmd/ti", f"rc -0.2 0.0")
-                sleep(1)
-                service.send("robobot/cmd/ti", f"rc 0.0 -0.2")
-                sleep(3)
-                service.send("robobot/cmd/ti", f"rc 0.2 0.0")
-                sleep(3)
-                service.send("robobot/cmd/ti", f"rc 0.0 0.4")
-                sleep(4.5)
-                return
+        service.send("robobot/cmd/ti", f"rc 0.0 0.0")
+        sleep(0.5)
+        service.send("robobot/cmd/ti", f"rc -0.2 0.0")
+        sleep(2)
+        service.send("robobot/cmd/ti", f"rc 0.0 -0.2")
+        sleep(3)
+        service.send("robobot/cmd/ti", f"rc 0.2 0.0")
+        sleep(4)
+        service.send("robobot/cmd/ti", f"rc 0.0 0.4")
+        sleep(4.5)
+        return
 
     def get_img(self):
         """get image from rasp camera and return it also undistorted via calibration"""
@@ -284,7 +313,7 @@ class BallInHole:
         """Steer robot such the ball center is centered in frame for x-axis"""
         TARGET_X = 284
         TURN_RATE = 0.5
-        TOLERANCE = 0.015
+        TOLERANCE = 0.010
 
         # angle_x, _ = self.calib.pixel_to_angle(center[0], center[1])
         # target_angle_x, _ = self.calib.pixel_to_angle(TARGET_X, center[1])
@@ -308,7 +337,7 @@ class BallInHole:
         KP = 0.5  # tune this
         MIN_TURN = 0.2  # minimum to overcome friction
         MAX_TURN = 0.6  # safety clamp
-        TOLERANCE = 0.015  # radians
+        TOLERANCE = 0.010  # radians
 
         angle_x, _ = self.calib.pixel_to_angle(center[0], center[1])
         target_angle_x, _ = self.calib.pixel_to_angle(TARGET_X, center[1])
@@ -408,6 +437,9 @@ class BallInHole:
         """Driving towards ball, maybe parallel thread with camera input?"""
         TARGET_Y = 165
         TOLERANCE_Y = 20  # pixels, tune thiss
+        ORIENTATION_CHECK_Y = (
+            250  # TODO: Tune this to stop a bit before white line of grid
+        )
 
         img = self.get_img()
         if img is None:

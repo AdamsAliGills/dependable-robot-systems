@@ -11,7 +11,7 @@ from detection_utils import (
     wait_end,
     wait_line,
 )
-
+from sir import ir
 import time
 from scam import cam
 from ball_in_hole import BallInHole
@@ -37,17 +37,22 @@ class missionPlanner:
     def planMission(self):
         edge.lineControl(0.2, False)
         sleep(2)
-        ball_blue = BallInHole("blue")
-        ball_blue.knock_down_cup_right()
-        ball_blue.ball_pick_up()
-        ball_blue.ball_drop_down_grid_C()
-        ball_red = BallInHole("red")
-        ball_red.ball_pick_up()
-        service.send("robobot/cmd/ti", "rc 0 -0.6")
-        sleep(3)
-        ball_red.ball_drop_down_grid_B()
 
-        """
+        # ball_blue = BallInHole("blue")
+        # ball_blue.knock_down_cup_right()
+        # ball_blue.ball_pick_up()
+        # ball_blue.ball_drop_down_grid_C()
+        # ball_red = BallInHole("red")
+        # ball_red.ball_pick_up()
+        # service.send("robobot/cmd/ti", "rc 0 -0.6")
+        # sleep(3)
+        # ball_red.ball_drop_down_grid_B()
+
+        ball_o = BallInHole("orange")
+        ball_o.knock_cup()
+
+            
+
         ok, img, imgTime = cam.getImage()
         center_red, radius_red = ball_tracking(img, display=True, ball_color="red")
         center_blue, radius_blue = ball_tracking(img, display=True, ball_color="blue")
@@ -68,6 +73,9 @@ class missionPlanner:
         print("#################################################")
 
         ball_o.ball_pick_up()
+
+        # To face the grid quicker
+
         if turn_direction == "right":
             service.send("robobot/cmd/ti", "rc 0 -0.2")
             time.sleep(2)
@@ -77,12 +85,23 @@ class missionPlanner:
             service.send("robobot/cmd/ti", "rc 0 0.2")
             time.sleep(2)
             service.send("robobot/cmd/ti", "rc 0 0")
-        service.send("robobot/cmd/T0", "servo 2 -450 100")  # open gripper
+        service.send("robobot/cmd/T0", "servo 2 0 100")  # open gripper
         
-        if colors_left == "blue": #TODO: Make this into a function to avoid code duplication
-            ball_o.ball_drop_down_grid_C()
-        else:
-            ball_o.ball_drop_down_grid_B()
+        if color == "blue": #TODO: Make this into a function to avoid code duplication
+            if turn_direction == "right":
+                ball_o.ball_drop_down_grid_C(drop_flag=True)
+            else:
+                ball_o.ball_drop_down_grid_B(drop_flag=False)
+        
+        elif color == "red":
+            if turn_direction == "right":
+                ball_o.ball_drop_down_grid_C(drop_flag=False)
+            else:
+                ball_o.ball_drop_down_grid_B(drop_flag=True)
+
+        service.send("robobot/cmd/ti", "rc -0.3 0") #Turn around after dropping ball off
+        sleep(3)
+        service.send("robobot/cmd/ti", "rc 0 0") #Turn around after dropping ball off
 
         service.send("robobot/cmd/ti", "rc 0 -0.2") #Turn around after dropping ball off
         time.sleep(3.5)
@@ -93,12 +112,21 @@ class missionPlanner:
         colors_left = colors[0]
         ball_o = BallInHole(colors_left)
         ball_o.ball_pick_up()
+        
+        service.send("robobot/cmd/ti", "rc 0 0.4") #Turn around after dropping ball off
+        time.sleep(3.5)
 
-        if colors_left == "blue": #TODO: Again...make this into a function to avoid code duplication
-            ball_o.ball_drop_down_grid_C()
-        else:
-            ball_o.ball_drop_down_grid_B()
-"""
+        if colors_left == "blue": #TODO: Make this into a function to avoid code duplication
+            if turn_direction == "right":
+                ball_o.ball_drop_down_grid_C(drop_flag=True)
+            else:
+                ball_o.ball_drop_down_grid_B(drop_flag=False)
+        
+        elif colors_left == "red":
+            if turn_direction == "right":
+                ball_o.ball_drop_down_grid_B(drop_flag=True)
+            else:
+                ball_o.ball_drop_down_grid_C(drop_flag=False)
 
         # rotate over the balls
         # qr detection
@@ -120,7 +148,7 @@ class missionPlanner:
             elif edge_ball == center_blue[0]:
                 turn_direction = side_blue
                 color = "blue"
-        elif center_red is not None:  # only red ball detected
+        elif center_red is not None and center_blue is None:  # only red ball detected
             edge_ball, side_red = self.closer_to_edge(center_red[0], None)
             turn_direction = side_red
             color = "red"
