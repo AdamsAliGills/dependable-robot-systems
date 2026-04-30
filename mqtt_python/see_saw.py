@@ -117,10 +117,10 @@ class PickUp:
         """Pick up golf ball with servo arms and CV"""
 
         time.sleep(0.5)
-        service.send("robobot/cmd/T0", "servo 1 650 100")  # Lower gripper down
+        service.send("robobot/cmd/T0", "servo 1 640 100")  # Lower gripper down
         time.sleep(2)
         service.send(
-            "robobot/cmd/T0", "servo 2 580 150"
+            "robobot/cmd/T0", "servo 2 590 150"
         )  # close gripper ### to open its -200
         time.sleep(2)
 
@@ -223,7 +223,7 @@ class SeeSaw():
 
             elif self.state == 12:
                 if pose.tripB > 0.3:
-                    service.send("robobot/cmd/T0", "servo 1 -400 100") #raise the arm
+                    service.send("robobot/cmd/T0", "servo 1 -400 150") #raise the arm
                     edge.lineControl(0)
                     service.send("robobot/cmd/ti", "rc 0.15 0.0")
                     self.state = 13
