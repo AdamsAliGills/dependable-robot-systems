@@ -430,7 +430,7 @@ class BallInHole:
             and abs(angle_b) > ANGLE_TOLERANCE
         ):
             service.send("robobot/cmd/ti", "rc 0 0")
-            print(f"[QR_C] Orientation off by {angle_c:.1f}°, correcting")
+            print(f"[QR_C] Orientation off by {angle_b:.1f}°, correcting")
             turn = -0.2 if angle_b > 0 else 0.2
             service.send("robobot/cmd/ti", f"rc 0 {turn}")
             sleep(0.4)
