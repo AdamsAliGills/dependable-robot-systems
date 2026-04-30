@@ -49,9 +49,6 @@ class missionPlanner:
         sleep(3)
         ball_red.ball_drop_down_grid_B()
 
-
-
-
         """
         ok, img, imgTime = cam.getImage()
         center_red, radius_red = ball_tracking(img, display=True, ball_color="red")
@@ -103,8 +100,8 @@ class missionPlanner:
             ball_o.ball_drop_down_grid_C()
         else:
             ball_o.ball_drop_down_grid_B()
-""""
-       
+"""
+
         # rotate over the balls
         # qr detection
         # ball detection
@@ -112,30 +109,33 @@ class missionPlanner:
         # back on line
 
     def compare_positions(self, center_red, center_blue):
-        if center_red is None and center_blue is None: #no balls detected
+        if center_red is None and center_blue is None:  # no balls detected
             turn_direction = "right"
             color = "red"
-        elif center_red is not None and center_blue is not None: #both balls detected
-            edge_ball, side_red, side_blue = self.closer_to_edge(center_red[0], center_blue[0])
+        elif center_red is not None and center_blue is not None:  # both balls detected
+            edge_ball, side_red, side_blue = self.closer_to_edge(
+                center_red[0], center_blue[0]
+            )
             if edge_ball == center_red[0]:
                 turn_direction = side_red
                 color = "red"
             elif edge_ball == center_blue[0]:
                 turn_direction = side_blue
                 color = "blue"
-        elif center_red is not None: #only red ball detected
+        elif center_red is not None:  # only red ball detected
             edge_ball, side_red = self.closer_to_edge(center_red[0], None)
             turn_direction = side_red
             color = "red"
 
-        else: #only blue ball detected
+        else:  # only blue ball detected
             edge_ball, side_blue = self.closer_to_edge(None, center_blue[0])
             turn_direction = side_blue
             color = "blue"
-        return turn_direction,color
-    
-    def closer_to_edge(self, x1, x2): 
+        return turn_direction, color
+
+    def closer_to_edge(self, x1, x2):
         center_x = 300  # Assuming image width is 640 pixels
+
         def side_of(x):
             return "right" if x > center_x else "left"
 
@@ -143,12 +143,12 @@ class missionPlanner:
         if x1 is None and x2 is None:
             print("Both values are None")
             return None, None
-        
+
         if x1 is None:
             side2 = side_of(x2)
             print(f"x1 is None, x2={x2} is to the {side2} of center")
             return x2, side2
-        
+
         if x2 is None:
             side1 = side_of(x1)
             print(f"x2 is None, x1={x1} is to the {side1} of center")
@@ -167,5 +167,7 @@ class missionPlanner:
         print(f"x{'1' if closer == x1 else '2'}={closer} is closer to the edge")
 
         return closer, side1, side2
+
+
 if __name__ == "__main__":
     mp = missionPlanner()

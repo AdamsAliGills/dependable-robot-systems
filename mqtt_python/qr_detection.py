@@ -45,6 +45,7 @@ def qr_tacking(frame_rasp, marker_type, display=True):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     center = None
+    angle = 0
     candidates = []
 
     # Detect ArUco markers
