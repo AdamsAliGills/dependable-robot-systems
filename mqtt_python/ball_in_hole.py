@@ -126,6 +126,7 @@ class BallInHole:
         """Find and approach the hole, drop the ping pong ball"""
         self.state = self.ALIGNING_HOLE
 
+        final_alignment = False
         while not service.stop:
             if self.state == self.ALIGNING_HOLE:
                 img = self.get_img()
@@ -145,7 +146,11 @@ class BallInHole:
                 if approach_hole:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     print("hole approached, going to drop")
-                    self.state = self.DROPPING
+                    if final_alignment == False:
+                        self.state == self.ALIGNING_HOLE
+                    else:
+                        self.state = self.DROPPING
+                    
 
             elif self.state == self.DROPPING:
                 self._dropping()
