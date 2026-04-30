@@ -37,6 +37,7 @@ class missionPlanner:
         sleep(1)
 
         edge.lineControl(0.05, followLeft=True)
+        sleep(2)
 
         r = roundAbout(-225)
         r.execute()
@@ -165,6 +166,7 @@ class missionPlanner:
         sleep(3.5)
 
         edge.lineControl(0.05, followLeft=True)
+        sleep(2)
 
         r = roundAbout(-225)
         r.execute()

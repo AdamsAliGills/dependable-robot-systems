@@ -44,7 +44,10 @@ class roundAbout():
         while not service.stop:
 
             if self.state == 0:
+                edge.lineControl(0)
                 self.starting_tilt = get_tilt() # store the original tilt in degrees
+                service.send("robobot/cmd/T0", "servo 2 400 150")
+                service.send("robobot/cmd/ti", f"rc 0.05 0.0")
                 self.state = 1
 
             elif self.state == 1:
@@ -93,6 +96,7 @@ class roundAbout():
             elif self.state == 14:
                 # when the line is found, finish
                 if edge.lineValidCnt > 4:
+                    service.send("robobot/cmd/T0", "servo 2 -200 150")
                     #service.send("robobot/cmd/ti","rc 0.0 0.0")
                     self.state = 99
 
