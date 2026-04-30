@@ -35,7 +35,7 @@ class StairClimb():
             service.send("robobot/cmd/ti", "rc 0.05 0.0")
             sleep(3 if i != 0 else 1)
             service.send("robobot/cmd/ti", "rc -0.05 0.0")
-            sleep(1)
+            sleep(0.7)
             service.send("robobot/cmd/ti", "rc -0.0 0.0")
 
             if service.stop:
@@ -47,7 +47,7 @@ class StairClimb():
 
             sleep(1)
             service.send("robobot/cmd/ti", "rc 0.05 0.0")
-            sleep(3)
+            sleep(2.5)
 
 
             if service.stop:
