@@ -35,14 +35,24 @@ class missionPlanner:
         # ball_o.ball_pick_up()
 
     def planMission(self):
-        edge.lineControl(0.13, False)
-        sleep(3.5)
+        edge.lineControl(0.2, False)
+        sleep(2)
+        ball_blue = BallInHole("blue")
+        ball_blue.knock_down_cup_right()
+        ball_blue.ball_pick_up()
+        ball_blue.ball_drop_down_grid_C()
+        ball_red = BallInHole("red")
+        ball_red.ball_pick_up()
+        service.send("robobot/cmd/ti", "rc 0 0.2")
+        sleep(2)
+        service.send("robobot/cmd/ti", "rc 0.2 0")
+        sleep(3)
+        ball_red.ball_drop_down_grid_B()
 
-        # ball_o = BallInHole("red")
-        # ball_o.knock_down_cup_right()
-        # sleep(2)
-        # # ball_o.knock_down_cup()
-        # time.sleep(1.5)
+
+
+
+        """
         ok, img, imgTime = cam.getImage()
         center_red, radius_red = ball_tracking(img, display=True, ball_color="red")
         center_blue, radius_blue = ball_tracking(img, display=True, ball_color="blue")
@@ -63,7 +73,6 @@ class missionPlanner:
         print("#################################################")
 
         ball_o.ball_pick_up()
-
         if turn_direction == "right":
             service.send("robobot/cmd/ti", "rc 0 -0.2")
             time.sleep(2)
@@ -94,7 +103,7 @@ class missionPlanner:
             ball_o.ball_drop_down_grid_C()
         else:
             ball_o.ball_drop_down_grid_B()
-
+""""
        
         # rotate over the balls
         # qr detection
