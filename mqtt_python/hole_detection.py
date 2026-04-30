@@ -21,6 +21,7 @@ def hole_tacking(frame_rasp, display=True):
     high_H, high_S, high_V = 35, 200, 200
 
     frame = imutils.resize(frame_rasp, width=600)
+    # frame[: frame.shape[0] // 2, :] = (255, 255, 255)
     blurred = cv2.GaussianBlur(frame, (7, 7), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
