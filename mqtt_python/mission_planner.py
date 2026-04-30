@@ -29,9 +29,11 @@ class missionPlanner:
         # initialize servos
         service.send("robobot/cmd/T0","servo 1 0 50")
         service.send("robobot/cmd/T0","servo 2 0 50")
+        service.send("robobot/cmd/T0","servo 3 0 50")
         sleep(0.3)
         service.send("robobot/cmd/T0","servo 1 -400 50")
         service.send("robobot/cmd/T0","servo 2 0 50")
+        service.send("robobot/cmd/T0","servo 3 265 50")
 
         wait_turn(25)
         sleep(1)
