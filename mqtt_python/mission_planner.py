@@ -31,7 +31,7 @@ class missionPlanner:
         service.send("robobot/cmd/T0","servo 2 0 50")
         sleep(0.3)
         service.send("robobot/cmd/T0","servo 1 -400 50")
-        service.send("robobot/cmd/T0","servo 2 0 50")
+        service.send("robobot/cmd/T0","servo 2 400 50")
 
         wait_turn(25)
         sleep(1)
@@ -116,7 +116,7 @@ class missionPlanner:
         ball_in_hole.ball_pick_up()
 
         service.send("robobot/cmd/ti", f"rc 0.0 1.0")
-        wait_turn(175)
+        wait_turn(185)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
         sleep(2)
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
