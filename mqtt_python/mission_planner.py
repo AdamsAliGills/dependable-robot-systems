@@ -43,9 +43,7 @@ class missionPlanner:
         ball_blue.ball_drop_down_grid_C()
         ball_red = BallInHole("red")
         ball_red.ball_pick_up()
-        service.send("robobot/cmd/ti", "rc 0 0.2")
-        sleep(2)
-        service.send("robobot/cmd/ti", "rc 0.2 0")
+        service.send("robobot/cmd/ti", "rc 0 -0.6")
         sleep(3)
         ball_red.ball_drop_down_grid_B()
 
@@ -171,3 +169,4 @@ class missionPlanner:
 
 if __name__ == "__main__":
     mp = missionPlanner()
+
