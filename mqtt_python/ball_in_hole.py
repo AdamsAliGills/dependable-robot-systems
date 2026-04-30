@@ -146,10 +146,14 @@ class BallInHole:
                 if approach_hole:
                     service.send("robobot/cmd/ti", "rc 0 0")
                     print("hole approached, going to drop")
-                    if final_alignment == False:
-                        self.state == self.ALIGNING_HOLE
-                    else:
-                        self.state = self.DROPPING
+                    print("#####################")
+                    print("CHECKING FINAL ALLIGNMENT")
+                    print("#####################")
+                    self.state = self.ALIGNING_BALL
+                    self.final_alignment = True
+                    print(f"[BallInHole] Ball in reach, transitioning to PICKING_UP")
+
+                    self.state = self.DROPPING
                     
 
             elif self.state == self.DROPPING:
@@ -289,7 +293,7 @@ class BallInHole:
         service.send("robobot/cmd/T0", "servo 1 650 100")  # Lower gripper down
         sleep(2)
         service.send(
-            "robobot/cmd/T0", "servo 2 580 150"
+            "robobot/cmd/T0", "servo 2 620 150"
         )  # close gripper ### to open its -200
         sleep(2)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper

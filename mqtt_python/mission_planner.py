@@ -98,8 +98,11 @@ class missionPlanner:
         wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
         print(f"END FIRST RAMP")
         edge.lineControl(0.2, followLeft=False)
-        sleep(1)
+        sleep(2.5)
         edge.lineControl(0)
+        service.send("robobot/cmd/ti", f"rc -0.05 -0.7")
+        wait_turn(70)
+
         
         #service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
         #sleep(0.3)
@@ -109,7 +112,7 @@ class missionPlanner:
         ball_in_hole.ball_drop_down()
 
         service.send("robobot/cmd/ti", f"rc 0.0 1.0")
-        wait_turn(150)
+        wait_turn(170)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
         sleep(2)
 
@@ -118,7 +121,7 @@ class missionPlanner:
         ball_in_hole.ball_pick_up()
 
         service.send("robobot/cmd/ti", f"rc 0.0 1.0")
-        wait_turn(185) #TODO: It turns too far to the left
+        wait_turn(170) #TODO: It turns too far to the left
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
         sleep(2)
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
@@ -128,7 +131,8 @@ class missionPlanner:
         # back to line
         service.send("robobot/cmd/ti", "rc -0.07 0.0")
         wait_line()
-
+        service.send("robobot/cmd/ti", "rc 0.0 0.7")
+        wait_turn(80)
         edge.lineControl(0.2, True)
 
        

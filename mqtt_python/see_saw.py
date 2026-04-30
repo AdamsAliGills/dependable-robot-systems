@@ -120,7 +120,7 @@ class PickUp:
         service.send("robobot/cmd/T0", "servo 1 640 100")  # Lower gripper down
         time.sleep(2)
         service.send(
-            "robobot/cmd/T0", "servo 2 590 150"
+            "robobot/cmd/T0", "servo 2 610 150"
         )  # close gripper ### to open its -200
         time.sleep(2)
 
