@@ -19,10 +19,10 @@ class StairClimb():
         print("% Stair climb: starting")
         edge.lineControl(0.15, True)
 
-        for _ in range(5):
+        for i in range(5):
 
             # Step 1: move servo to straight position
-            service.send("robobot/cmd/T0", "servo 1 -400 0")
+            service.send("robobot/cmd/T0", "servo 1 -410 0")
             
             # Step 2: wait until first step is detected
             while not service.stop:
@@ -33,16 +33,21 @@ class StairClimb():
             edge.lineControl(0)
 
             service.send("robobot/cmd/ti", "rc 0.05 0.0")
-            sleep(3)
+            sleep(3 if i != 0 else 1)
+            service.send("robobot/cmd/ti", "rc -0.05 0.0")
+            sleep(1)
+            service.send("robobot/cmd/ti", "rc -0.0 0.0")
 
             if service.stop:
                 return False
 
             #edge.lineControl(0)
             #service.send("robobot/cmd/ti", "rc 0.0 0.0")
-            service.send("robobot/cmd/T0", "servo 1 800 100")
+            service.send("robobot/cmd/T0", "servo 1 800 0")
 
-            sleep(4)
+            sleep(1)
+            service.send("robobot/cmd/ti", "rc 0.05 0.0")
+            sleep(3)
 
 
             if service.stop:
@@ -50,19 +55,21 @@ class StairClimb():
 
             # Step 6: stronger forward
             service.send("robobot/cmd/ti", "rc 0.25 0.0")
-            service.send("robobot/cmd/T0", "servo 1 -400 0")
+            service.send("robobot/cmd/T0", "servo 1 -410 0")
 
-            sleep(2)
-            service.send("robobot/cmd/ti", "rc 0.0 0.0")
+            sleep(1)
+            #service.send("robobot/cmd/ti", "rc 0.0 0.0")
             service.send("robobot/cmd/T0", "servo 3 700 100")
             #service.send("robobot/cmd/T0", "servo 1 -400 0")
-            sleep(2.5)
+            #sleep(2.5)
             #edge.lineControl(0.05)
             service.send("robobot/cmd/ti", "rc 0.05 0.0")
 
-            sleep(0.85)
+            #sleep(0.85)
 
-        service.send("robobot/cmd/T0", "servo 1 -400 0")
+
+        sleep(4)
+        service.send("robobot/cmd/T0", "servo 1 -410 0")
         sleep(0.5)
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
         service.send("robobot/cmd/T0", "servo 3 265 0")
