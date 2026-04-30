@@ -363,8 +363,8 @@ class BallInHole:
 
     def _approaching_qr_c(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
-        TARGET_Y = 160
-        TOLERANCE_Y = 25  # pixels, tune thiss
+        TARGET_Y = 165
+        TOLERANCE_Y = 20  # pixels, tune thiss
         ORIENTATION_CHECK_Y = (
             250  # TODO: Tune this to stop a bit before white line of grid
         )
@@ -406,8 +406,8 @@ class BallInHole:
 
     def _approaching_qr_B(self, at_end=False):
         """Driving towards ball, maybe parallel thread with camera input?"""
-        TARGET_Y = 160
-        TOLERANCE_Y = 25  # pixels, tune thiss
+        TARGET_Y = 165
+        TOLERANCE_Y = 20  # pixels, tune thiss
 
         img = self.get_img()
         if img is None:
@@ -514,4 +514,3 @@ class BallInHole:
     def _record_start_pose(self):
         """Get initial pose"""
         pass
-
