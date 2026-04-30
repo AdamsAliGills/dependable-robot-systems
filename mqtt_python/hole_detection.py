@@ -14,8 +14,8 @@ so that we can detect the exact hole in asta.
 
 def hole_tacking(frame_rasp, display=True):
     MIN_Y = 50
-    MIN_CIRC = 0.15
-    MIN_AREA = 400
+    MIN_CIRC = 0.1
+    MIN_AREA = 150
 
     low_H, low_S, low_V = 0, 85, 40
     high_H, high_S, high_V = 35, 200, 200
@@ -56,7 +56,7 @@ def hole_tacking(frame_rasp, display=True):
             candidates.append((c, cx, cy, area, circularity))
 
     if candidates:
-        best = max(candidates, key=lambda item: item[3])
+        best = max(candidates, key=lambda item: item[2])
         best_c, best_x, best_y, best_area, best_circ = best
         center = (best_x, best_y)
 

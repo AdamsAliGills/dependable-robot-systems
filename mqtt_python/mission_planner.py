@@ -31,7 +31,7 @@ class missionPlanner:
         service.send("robobot/cmd/T0","servo 2 0 50")
         sleep(0.3)
         service.send("robobot/cmd/T0","servo 1 -400 50")
-        service.send("robobot/cmd/T0","servo 2 -200 50")
+        service.send("robobot/cmd/T0","servo 2 0 50")
 
         wait_turn(25)
         sleep(1)
@@ -96,7 +96,7 @@ class missionPlanner:
         wait_ramp_top(LONG_RAMP_TILT, tolerance = 3)
         print(f"END FIRST RAMP")
         edge.lineControl(0.2, followLeft=False)
-        sleep(1.5)
+        sleep(1)
         edge.lineControl(0)
         
         #service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
@@ -107,7 +107,7 @@ class missionPlanner:
         ball_in_hole.ball_drop_down()
 
         service.send("robobot/cmd/ti", f"rc 0.0 1.0")
-        wait_turn(170)
+        wait_turn(150)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
         sleep(2)
 
@@ -116,7 +116,7 @@ class missionPlanner:
         ball_in_hole.ball_pick_up()
 
         service.send("robobot/cmd/ti", f"rc 0.0 1.0")
-        wait_turn(180)
+        wait_turn(175)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
         sleep(2)
         service.send("robobot/cmd/ti", "rc 0.0 0.0")

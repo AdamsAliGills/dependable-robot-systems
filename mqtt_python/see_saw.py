@@ -157,7 +157,7 @@ class SeeSaw():
             if self.state == 0:
                 self.starting_yaw = get_yaw() # store the original yaw in degrees
                 service.send("robobot/cmd/T0", "servo 1 -350 100") #raise the arm
-                service.send("robobot/cmd/T0", "servo 2 -200 150") # open the gripper
+                service.send("robobot/cmd/T0", "servo 2 0 150") # open the gripper
                 self.state = 1
 
             elif self.state == 1:

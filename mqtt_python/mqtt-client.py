@@ -295,7 +295,7 @@ def loop():
   edge.lineControl(0, True) # stop following line
   service.send("robobot/cmd/ti","rc 0 0")
   service.send("robobot/cmd/T0","servo 1 -400 0")
-  service.send("robobot/cmd/T0","servo 2 -200 0")
+  service.send("robobot/cmd/T0","servo 2 0 0")
   t.sleep(0.05)
   pass
 
