@@ -284,7 +284,7 @@ class BallInHole:
         service.send("robobot/cmd/T0", "servo 1 650 100")  # Lower gripper down
         sleep(2)
         service.send(
-            "robobot/cmd/T0", "servo 2 450 150"
+            "robobot/cmd/T0", "servo 2 580 150"
         )  # close gripper ### to open its -200
         sleep(2)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
@@ -301,7 +301,7 @@ class BallInHole:
         sleep(2)
         service.send(
             "robobot/cmd/T0", "servo 2 0 150"
-        )  # close gripper ### to open its -200
+        )
         sleep(2)
         service.send("robobot/cmd/T0", "servo 1 -400 100")  # raise gripper
 
