@@ -1,8 +1,12 @@
 from uservice import service
 from sedge import edge
 from sir import ir
+from simu import imu
 import time
 from detection_utils import wait_ramp_bottom, wait_ramp_top, wait_turn
+
+def get_tilt():
+    return imu.gyroIntegral[1]
 
 def sleep(t):
     start = time.time()
@@ -15,6 +19,7 @@ class StairClimb():
 
     def execute(self):
         
+        starting_tilt = get_tilt()
         service.send("robobot/cmd/T0", "servo 1 1 10")
         print("% Stair climb: starting")
         edge.lineControl(0.15, True)
@@ -43,7 +48,7 @@ class StairClimb():
 
             #edge.lineControl(0)
             #service.send("robobot/cmd/ti", "rc 0.0 0.0")
-            service.send("robobot/cmd/T0", "servo 1 800 0")
+            service.send("robobot/cmd/T0", "servo 1 700 0")
 
             sleep(1)
             service.send("robobot/cmd/ti", "rc 0.05 0.0")
@@ -68,7 +73,12 @@ class StairClimb():
             #sleep(0.85)
 
 
-        sleep(4)
+        while not service.stop:
+            if abs(get_tilt() - starting_tilt) < 10 :
+                break
+            time.sleep(0.01)
+
+        sleep(1)
         service.send("robobot/cmd/T0", "servo 1 -410 0")
         sleep(0.5)
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
