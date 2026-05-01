@@ -39,7 +39,7 @@ class missionPlanner:
         sleep(1)
 
         edge.lineControl(0.05, followLeft=True)
-        sleep(2)
+        sleep(3)
 
         r = roundAbout(-135)
         r.execute()
@@ -69,16 +69,16 @@ class missionPlanner:
         wait_turn(80)
         print(f"FIRST TURN")
         sleep(2)
-        wait_turn(80)
+        wait_turn(75)
         print(f"SECOND TURN")
         edge.lineControl(0)
         
         service.send("robobot/cmd/ti", f"rc -0.15 0.0")
-        sleep(8.3)
+        sleep(8)
 
         service.send("robobot/cmd/ti", f"rc -0.1 -0.7")
         wait_turn(80)
-        service.send("robobot/cmd/ti", f"rc 0.1 0.0")
+        service.send("robobot/cmd/ti", f"rc 0.1 0.05")
         wait_end()
         service.send("robobot/cmd/ti", f"rc -0.1 0.0")
         sleep(2.6)
