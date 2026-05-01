@@ -24,6 +24,7 @@ class missionPlanner:
         self.planMission()
 
     def planMission(self):
+        
         edge.lineControl(0.2, followLeft=True)
 
         # initialize servos
@@ -54,10 +55,12 @@ class missionPlanner:
     
         service.send("robobot/cmd/ti", f"rc 0.0 -0.7")
         wait_turn(85)
+        service.send("robobot/cmd/ti", f"rc -0.1 0.0")
+        sleep(1)
         service.send("robobot/cmd/ti", f"rc 0.2 0.0")
         wait_line()
         service.send("robobot/cmd/ti", f"rc 0.0 0.7")
-        wait_turn(85)
+        wait_turn(70)
 
         edge.lineControl(0.2, followLeft=False)
         sleep(3)
