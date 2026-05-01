@@ -14,6 +14,7 @@ from sgpio import gpio
 from scam import cam
 from uservice import service
 from simu import imu
+from detection_utils import wait_turn
 
 class GuardRobot: 
     
@@ -39,6 +40,9 @@ class GuardRobot:
                 
             elif self.state == 1:
                 if edge.lineValidCnt > 4: #Detect the line
+                    
+                    service.send("robobot/cmd/ti", f"rc 0.0 -1.5")
+                    wait_turn(60)
                     edge.lineControl(0.15, False)
                     self.state = 2
 
@@ -60,7 +64,7 @@ class GuardRobot:
                     self.state = 3
 
             elif self.state == 3:
-                if pose.tripB > 0.2:
+                if pose.tripB > 0.3:
                     service.send("robobot/cmd/ti","rc -0.2 -0.03")
                     self.start_time = t.time()
                     t.sleep(0.1)
