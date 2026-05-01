@@ -199,5 +199,5 @@ class missionPlanner:
 
         edge.lineControl(0.2, followLeft=True)
         wait_end()
-        sleep(1)
+        sleep(0.5)
 
