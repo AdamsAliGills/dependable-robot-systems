@@ -27,7 +27,7 @@ class StairClimb():
         for i in range(5):
 
             # Step 1: move servo to straight position
-            service.send("robobot/cmd/T0", "servo 1 -410 0")
+            service.send("robobot/cmd/T0", "servo 1 -420 0")
             
             # Step 2: wait until first step is detected
             while not service.stop:
@@ -60,7 +60,7 @@ class StairClimb():
 
             # Step 6: stronger forward
             service.send("robobot/cmd/ti", "rc 0.25 0.0")
-            service.send("robobot/cmd/T0", "servo 1 -410 0")
+            service.send("robobot/cmd/T0", "servo 1 -420 0")
 
             sleep(1)
             #service.send("robobot/cmd/ti", "rc 0.0 0.0")
@@ -79,9 +79,9 @@ class StairClimb():
             time.sleep(0.01)
 
         sleep(1)
-        service.send("robobot/cmd/T0", "servo 1 -410 0")
-        sleep(0.5)
+        service.send("robobot/cmd/T0", "servo 1 -420 0")
         service.send("robobot/cmd/ti", "rc 0.0 0.0")
+        sleep(0.5)
         service.send("robobot/cmd/T0", "servo 3 265 0")
 
         if service.stop:
